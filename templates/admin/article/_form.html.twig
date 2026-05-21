@@ -21,6 +21,29 @@
 		{{ form_widget(form.imageFile) }}
 		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.imageFile) }}</div>
 	</div>
+	<div>
+		{{ form_label(form.galleryFiles) }}
+		{{ form_widget(form.galleryFiles) }}
+		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.galleryFiles) }}</div>
+	</div>
+
+	{% set article = form.vars.value %}
+	{% if article and article.id and article.gallery is not empty %}
+		<div class="mb-4">
+			<span class="block text-xs font-bold uppercase tracking-wider text-text-primary mb-2">Images de la galerie existantes (sélectionner pour supprimer)</span>
+			<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-custom-tertiary p-4 rounded-xl border border-custom">
+				{% for img in article.gallery %}
+					<div class="relative group rounded-lg border border-custom bg-custom-secondary p-2 flex flex-col items-center">
+						<img src="{{ asset('images/articles/' ~ img) }}" alt="Galerie image" class="h-20 w-20 object-cover rounded-md mb-2 border border-custom">
+						<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold uppercase text-text-secondary hover:text-text-primary">
+							<input type="checkbox" name="delete_gallery_images[]" value="{{ img }}" class="rounded border-custom bg-custom-secondary text-custom-orange focus:ring-custom-orange focus:ring-1">
+							Supprimer
+						</label>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	{% endif %}
 
 	<div>
 		{{ form_label(form.url) }}

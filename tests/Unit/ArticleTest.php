@@ -67,4 +67,17 @@ class ArticleTest extends TestCase
         $article->setContent(null);
         $this->assertNull($article->getContent());
     }
+
+    public function testGalleryGetterSetter(): void
+    {
+        $article = new Article();
+        $this->assertSame([], $article->getGallery());
+
+        $gallery = ['img1.jpg', 'img2.webp'];
+        $article->setGallery($gallery);
+        $this->assertSame($gallery, $article->getGallery());
+
+        $article->setGallery(null);
+        $this->assertNull($article->getGallery());
+    }
 }

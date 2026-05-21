@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -57,6 +58,27 @@ class ArticleType extends AbstractType
                     )
                 ],
                 'attr' => $inputAttr,
+            ])
+            ->add('galleryFiles', FileType::class, [
+                'label' => 'Galerie d\'images (optionnel - plusieurs possibles)',
+                'label_attr' => $labelAttr,
+                'multiple' => true,
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new All([
+                        new File(
+                            maxSize: '5M',
+                            mimeTypes: [
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                            ],
+                            mimeTypesMessage: 'Veuillez uploader des images valides (JPEG, PNG ou WebP).',
+                        )
+                    ])
+                ],
+                'attr' => array_merge($inputAttr, ['multiple' => 'multiple']),
             ])
 
             ->add('url', TextType::class, [

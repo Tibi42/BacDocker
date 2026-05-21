@@ -43,6 +43,9 @@ class Article
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $active = true;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $gallery = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +125,17 @@ class Article
     public function setActive(bool $active): static
     {
         $this->active = $active;
+        return $this;
+    }
+
+    public function getGallery(): ?array
+    {
+        return $this->gallery;
+    }
+
+    public function setGallery(?array $gallery): static
+    {
+        $this->gallery = $gallery;
         return $this;
     }
 }

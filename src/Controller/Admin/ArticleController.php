@@ -49,6 +49,7 @@ class ArticleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->handleImageUpload($form, $article);
+            $this->handleGalleryUpload($form, $article);
             $this->entityManager->persist($article);
             $this->entityManager->flush();
             $this->addFlash('success', 'L\'article « ' . $article->getTitle() . ' » a été ajouté.');
@@ -69,7 +70,22 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer les suppressions d'images de la galerie
+            $deleteImages = $request->request->all('delete_gallery_images');
+            $currentGallery = $article->getGallery() ?? [];
+            foreach ($deleteImages as $delImg) {
+                if (($key = array_search($delImg, $currentGallery)) !== false) {
+                    unset($currentGallery[$key]);
+                    $filePath = $this->getParameter('articles_images_directory') . '/' . $delImg;
+                    if (file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
+                }
+            }
+            $article->setGallery(array_values($currentGallery));
+
             $this->handleImageUpload($form, $article);
+            $this->handleGalleryUpload($form, $article);
             $this->entityManager->flush();
             $this->addFlash('success', 'L\'article « ' . $article->getTitle() . ' » a été mis à jour.');
 
@@ -137,6 +153,33 @@ class ArticleController extends AbstractController
             } catch (FileException $e) {
                 $this->addFlash('error', 'Erreur lors du transfert de l\'image.');
             }
+        }
+    }
+
+    private function handleGalleryUpload(FormInterface $form, Article $article): void
+    {
+        $galleryFiles = $form->get('galleryFiles')->getData();
+        if ($galleryFiles) {
+            $currentGallery = $article->getGallery() ?? [];
+            foreach ($galleryFiles as $file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = preg_replace('/[^a-zA-Z0-9_]/', '', strtolower($originalFilename));
+                if (empty($safeFilename)) {
+                    $safeFilename = 'gallery';
+                }
+                $newFilename = 'gallery-'.$safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                try {
+                    $file->move(
+                        $this->getParameter('articles_images_directory'),
+                        $newFilename
+                    );
+                    $currentGallery[] = $newFilename;
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Erreur lors du transfert d\'une image de la galerie.');
+                }
+            }
+            $article->setGallery($currentGallery);
         }
     }
 }
