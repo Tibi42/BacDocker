@@ -1,11 +1,10 @@
 {# Macro pour la couleur d'un jour du calendrier selon le type d'activité #}
 {# isPast = true → version grisée pour les jours passés #}
 {% macro day_classes(actType, isPast) %}
-{% if isPast %}bg-gray-600/60 shadow-none{% elseif actType == 'JDS' %}bg-emerald-500 shadow-emerald-500/40{% elseif actType == 'JDR' %}bg-violet-500 shadow-violet-500/40{% elseif actType == 'GN' %}bg-red-500 shadow-red-500/40{% elseif actType == 'JDF' %}bg-sky-500 shadow-sky-500/40{% elseif actType == 'AG' %}bg-amber-500 shadow-amber-500/40{% else %}bg-custom-orange shadow-custom-orange/40{% endif %}
+{% if isPast %}calendar-day-past{% elseif actType == 'JDS' %}bg-emerald-500 shadow-emerald-500/40{% elseif actType == 'JDR' %}bg-violet-500 shadow-violet-500/40{% elseif actType == 'GN' %}bg-red-500 shadow-red-500/40{% elseif actType == 'JDF' %}bg-sky-500 shadow-sky-500/40{% elseif actType == 'AG' %}bg-amber-500 shadow-amber-500/40{% else %}bg-custom-orange shadow-custom-orange/40{% endif %}
 {% endmacro %}
 
 {# Macro pour la couleur du texte d'un jour du calendrier selon le type d'activité #}
 {% macro day_text_classes(actType, isPast) %}
-{% if isPast %}text-white{% elseif actType == 'JDR' %}text-white{% elseif actType == 'GN' %}text-white{% else %}text-gray-900{% endif %}
+{% if isPast %}{% elseif actType == 'JDR' %}text-white{% elseif actType == 'GN' %}text-white{% else %}text-gray-900{% endif %}
 {% endmacro %}
-

@@ -340,6 +340,88 @@ html.light-mode .bg-black\/80 {
     background-color: rgba(255, 255, 255, 0.8) !important;
 }
 
+/* Calendrier — taille des numéros de jours */
+.calendar-grid {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25;
+}
+
+@media (min-width: 1024px) {
+    .calendar-grid {
+        font-size: 1rem; /* 16px */
+    }
+}
+
+.calendar-weekday {
+    font-size: 0.7em;
+    letter-spacing: 0.05em;
+}
+
+.calendar-grid .calendar-day-event,
+.calendar-grid .calendar-day-empty,
+.calendar-grid button,
+.calendar-grid a {
+    font-size: 1em;
+    font-weight: 800;
+}
+
+.calendar-grid .calendar-day-event .text-\[8px\],
+.calendar-grid .calendar-day-event span.block {
+    font-size: 0.65em;
+    font-weight: 700;
+}
+
+/* Calendrier — jours passés avec événement (fond toujours visible) */
+.calendar-day-past {
+    background-color: #4b5563;
+    color: #ffffff !important;
+    box-shadow: none;
+}
+
+html.light-mode .calendar-day-past {
+    background-color: #64748b;
+    color: #ffffff !important;
+}
+
+/* Calendrier — contraste mode jour */
+html.light-mode .calendar-grid {
+    color: var(--text-primary);
+}
+
+html.light-mode .calendar-weekday {
+    color: #334155 !important;
+    font-weight: 800;
+}
+
+html.light-mode .calendar-day-empty {
+    color: #0f172a !important;
+    font-weight: 700;
+}
+
+html.light-mode .calendar-day-empty.text-text-secondary {
+    color: #475569 !important;
+}
+
+html.light-mode .calendar-grid .text-emerald-400 {
+    color: #047857 !important;
+}
+
+html.light-mode .calendar-grid .text-violet-400 {
+    color: #6d28d9 !important;
+}
+
+html.light-mode .calendar-grid .text-red-400 {
+    color: #b91c1c !important;
+}
+
+html.light-mode .calendar-grid .text-sky-400 {
+    color: #0369a1 !important;
+}
+
+html.light-mode .calendar-grid .text-amber-400 {
+    color: #b45309 !important;
+}
+
 /* Mobile menu animation */
 #mobile-menu-overlay {
     opacity: 0;
@@ -362,4 +444,4 @@ html.light-mode .bg-black\/80 {
 /* Force high contrast dark text color for accessibility */
 #cookie-accept, #mobile-join-btn, .text-gray-900 {
     color: #111827 !important;
-}
+}
