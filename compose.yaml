@@ -57,7 +57,7 @@ services:
     environment:
       PMA_HOST: database
       PMA_USER: root
-      PMA_PASSWORD: Rapupyxe112358134&
+      PMA_PASSWORD: root
     depends_on:
       - database
     restart: unless-stopped

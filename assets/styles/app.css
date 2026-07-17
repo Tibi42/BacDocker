@@ -1,4 +1,7 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../../templates/**/*.html.twig";
+@source "../../templates/**/*.twig";
+@source "../../src/**/*.php";
 
 /* Configuration Tailwind v4 avec @theme */
 @theme {

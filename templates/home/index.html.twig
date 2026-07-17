@@ -112,7 +112,9 @@
 						{# Navigation mois #}
 						<div class="flex items-center justify-between mb-4">
 							<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-							<span class="text-[10px] font-bold uppercase tracking-wider text-text-primary">{{ calendarMonthName }} {{ calendarYear }}</span>
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
+								{{ calendarMonthName }} {{ calendarYear }}
+							</a>
 							<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
 						</div>
 						{# Filtres par type #}
@@ -299,7 +301,7 @@
 				class="grid gap-12 lg:gap-16 lg:grid-cols-12 items-start">
 
 				<!-- Section ÉVÉNEMENTS À VENIR (Sidebar - Desktop). Turbo-frame : mise à jour partielle pour ne pas fermer les modales. -->
-				<aside id="calendar-desktop" class="lg:col-span-4 order-4 lg:order-1 space-y-10">
+				<aside id="calendar-desktop" class="lg:col-span-12 order-4 lg:order-1 space-y-10">
 					<turbo-frame id="calendar-desktop-frame">
 						<div class="hidden lg:block">
 							<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8">ÉVÉNEMENTS À VENIR</h2>
@@ -307,7 +309,9 @@
 								{# Navigation mois #}
 								<div class="flex items-center justify-between mb-4">
 									<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-									<span class="text-[10px] font-bold uppercase tracking-wider text-text-primary">{{ calendarMonthName }} {{ calendarYear }}</span>
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
+										{{ calendarMonthName }} {{ calendarYear }}
+									</a>
 									<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
 								</div>
 								{# Filtres par type #}
@@ -325,155 +329,130 @@
 									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}#calendar-desktop" aria-label="Filtrer par AG"
 									   class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all {{ filterType == 'AG' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/40' }}">AG</a>
 								</div>
-								<div class="flex gap-4 mb-6">
-									<div class="flex-1">
-										<div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-tighter text-white mb-4">
-											<span>Lu</span>
-											<span>Ma</span>
-											<span>Me</span>
-											<span>Je</span>
-											<span>Ve</span>
-											<span>Sa</span>
-											<span>Di</span>
-											{% for day in calendarDays %}
-												{% if day is not null %}
-													{% set isFuture = (calendarYear > nowYear)
-														or (calendarYear == nowYear and calendarMonth > nowMonth)
-														or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
-													{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
-													{% set isClickable = is_granted('ROLE_USER') and (isToday or isFuture) %}
-													{% set isPast = not isFuture and not isToday %}
-													{% if day in daysWithActivities %}
-														<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}#calendar-desktop" class="block py-2 rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-white transition-all {{ isPast ? 'opacity-60' : '' }} {{ selectedDay == day ? 'ring-2 ring-white' : ''  }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
-															<span>{{ day }}</span>
-															{% if (activitiesCountByDay[day] ?? 1) > 1 %}
-																<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
+								<div class="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+									<!-- Left Column: Calendar Grid -->
+									<div class="lg:col-span-7">
+										<div class="flex gap-4">
+											<div class="flex-1">
+												<div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-tighter text-white mb-4">
+													<span>Lu</span>
+													<span>Ma</span>
+													<span>Me</span>
+													<span>Je</span>
+													<span>Ve</span>
+													<span>Sa</span>
+													<span>Di</span>
+													{% for day in calendarDays %}
+														{% if day is not null %}
+															{% set isFuture = (calendarYear > nowYear)
+																or (calendarYear == nowYear and calendarMonth > nowMonth)
+																or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
+															{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
+															{% set isClickable = is_granted('ROLE_USER') and (isToday or isFuture) %}
+															{% set isPast = not isFuture and not isToday %}
+															{% if day in daysWithActivities %}
+																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}#calendar-desktop" class="block py-2 rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-white transition-all {{ isPast ? 'opacity-60' : '' }} {{ selectedDay == day ? 'ring-2 ring-white' : ''  }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
+																	<span>{{ day }}</span>
+																	{% if (activitiesCountByDay[day] ?? 1) > 1 %}
+																		<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
+																	{% endif %}
+																</a>
+															{% elseif isToday %}
+																{% if isClickable %}
+																	<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2" title="Ajouter un événement">{{ day }}</button>
+																{% else %}
+																	<span class="py-2 text-custom-orange font-bold underline underline-offset-2">{{ day }}</span>
+																{% endif %}
+															{% elseif isClickable %}
+																<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer" title="Ajouter un événement">{{ day }}</button>
+															{% else %}
+																<span class="py-2">{{ day }}</span>
 															{% endif %}
-														</a>
-													{% elseif isToday %}
-														{% if isClickable %}
-															<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2" title="Ajouter un événement">{{ day }}</button>
 														{% else %}
-															<span class="py-2 text-custom-orange font-bold underline underline-offset-2">{{ day }}</span>
+															<span class="py-2"></span>
 														{% endif %}
-													{% elseif isClickable %}
-														<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer" title="Ajouter un événement">{{ day }}</button>
-													{% else %}
-														<span class="py-2">{{ day }}</span>
-													{% endif %}
-												{% else %}
-													<span class="py-2"></span>
-												{% endif %}
-											{% endfor %}
+													{% endfor %}
+												</div>
+											</div>
 										</div>
+									</div>
+
+									<!-- Right Column: Events List -->
+									<div class="lg:col-span-5 mt-6 lg:mt-0">
+										{% if selectedDay %}
+											<p class="text-[10px] font-bold uppercase tracking-wider text-custom-orange mb-3">
+												Événements du {{ selectedDay }} {{ calendarMonthName }}
+												{% if activitiesForSelectedDay|length > 1 %}
+													<span class="text-text-secondary font-normal">({{ activitiesForSelectedDay|length }} événements)</span>
+												{% endif %}
+											</p>
+											{% for activity in activitiesForSelectedDay %}
+											<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
+												<div class="flex justify-between items-start mb-1">
+													{% set actType = activity.type|default('Play Test') %}
+															{{ activity_badge(actType) }}
+													<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
+												</div>
+												<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
+												{% if activity.description %}
+													<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
+												{% else %}
+													<div class="mb-2"></div>
+												{% endif %}
+												{% if activity.startAt > date() %}
+											<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
+										{% else %}
+											<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
+										{% endif %}
+											</div>
+											{% else %}
+											<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center mb-4">
+												<p class="text-xs text-text-secondary">Aucun événement ce jour-là.</p>
+											</div>
+											{% endfor %}
+											{% set selectedDayIsFuture = (calendarYear > nowYear)
+												or (calendarYear == nowYear and calendarMonth > nowMonth)
+												or (calendarYear == nowYear and calendarMonth == nowMonth and selectedDay >= nowDay) %}
+											{% if is_granted('ROLE_USER') and selectedDayIsFuture %}
+												<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(selectedDay)}) }}"
+												   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
+													+ Ajouter une activité
+												</button>
+											{% endif %}
+										{% else %}
+											{% for activity in activities %}
+											<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
+												<div class="flex justify-between items-start mb-1">
+													{% set actType = activity.type|default('Play Test') %}
+															{{ activity_badge(actType) }}
+													<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
+												</div>
+												<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
+												{% if activity.description %}
+													<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
+												{% else %}
+													<div class="mb-2"></div>
+												{% endif %}
+												{% if activity.startAt > date() %}
+											<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
+										{% else %}
+											<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
+										{% endif %}
+											</div>
+											{% else %}
+											<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center">
+												<p class="text-xs text-text-secondary">Aucun événement ce mois-ci. Cliquez sur un jour pour voir les événements.</p>
+											</div>
+											{% endfor %}
+										{% endif %}
 									</div>
 								</div>
-								{% if selectedDay %}
-									<p class="text-[10px] font-bold uppercase tracking-wider text-custom-orange mb-3">
-										Événements du {{ selectedDay }} {{ calendarMonthName }}
-										{% if activitiesForSelectedDay|length > 1 %}
-											<span class="text-text-secondary font-normal">({{ activitiesForSelectedDay|length }} événements)</span>
-										{% endif %}
-									</p>
-									{% for activity in activitiesForSelectedDay %}
-									<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
-										<div class="flex justify-between items-start mb-1">
-											{% set actType = activity.type|default('Play Test') %}
-													{{ activity_badge(actType) }}
-											<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-										</div>
-										<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-										{% if activity.description %}
-											<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-										{% else %}
-											<div class="mb-2"></div>
-										{% endif %}
-										{% if activity.startAt > date() %}
-									<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
-								{% else %}
-									<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
-								{% endif %}
-									</div>
-									{% else %}
-									<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center mb-4">
-										<p class="text-xs text-text-secondary">Aucun événement ce jour-là.</p>
-									</div>
-									{% endfor %}
-									{% set selectedDayIsFuture = (calendarYear > nowYear)
-										or (calendarYear == nowYear and calendarMonth > nowMonth)
-										or (calendarYear == nowYear and calendarMonth == nowMonth and selectedDay >= nowDay) %}
-									{% if is_granted('ROLE_USER') and selectedDayIsFuture %}
-										<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(selectedDay)}) }}"
-										   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
-											+ Ajouter une activité
-										</button>
-									{% endif %}
-								{% else %}
-									{% for activity in activities %}
-									<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
-										<div class="flex justify-between items-start mb-1">
-											{% set actType = activity.type|default('Play Test') %}
-													{{ activity_badge(actType) }}
-											<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-										</div>
-										<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-										{% if activity.description %}
-											<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-										{% else %}
-											<div class="mb-2"></div>
-										{% endif %}
-										{% if activity.startAt > date() %}
-									<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
-								{% else %}
-									<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
-								{% endif %}
-									</div>
-									{% else %}
-									<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center">
-										<p class="text-xs text-text-secondary">Aucun événement ce mois-ci. Cliquez sur un jour pour voir les événements.</p>
-									</div>
-									{% endfor %}
-								{% endif %}
 							</article>
 						</div>
 					</turbo-frame>
 
 					<div
 						class="grid grid-cols-1 gap-6 lg:gap-4">
-						<!-- FILTRER LES ARTICLES -->
-						<section class="rounded-xl border border-custom glass-card p-5" aria-labelledby="filter-title">
-							<h3 id="filter-title" class="text-xs font-bold uppercase tracking-[0.2em] text-text-primary/60 mb-4">FILTRER LES ARTICLES</h3>
-							<div class="space-y-3">
-								<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
-									<span class="text-xs font-medium text-text-primary/70">Fantasy</span>
-									<div class="relative">
-										<input type="checkbox" class="sr-only toggle-input" checked>
-										<span class="toggle-track toggle-violet">
-											<span class="toggle-knob"></span>
-										</span>
-									</div>
-								</label>
-								<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
-									<span class="text-xs font-medium text-text-primary/70">Science-Fiction</span>
-									<div class="relative">
-										<input type="checkbox" class="sr-only toggle-input" checked>
-										<span class="toggle-track toggle-cyan">
-											<span class="toggle-knob"></span>
-										</span>
-									</div>
-								</label>
-								<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
-									<span class="text-xs font-medium text-text-primary/70">Horreur</span>
-									<div class="relative">
-										<input type="checkbox" class="sr-only toggle-input" checked>
-										<span class="toggle-track toggle-cyan">
-											<span class="toggle-knob"></span>
-										</span>
-									</div>
-								</label>
-							</div>
-						</section>
-
 						<!-- VOIR LES ARCHIVES (Mobile only here) -->
 						<section class="lg:hidden rounded-xl border border-custom glass-card p-5" aria-labelledby="archives-title-mobile">
 							<h3 id="archives-title-mobile" class="text-xs font-bold uppercase tracking-[0.2em] text-text-primary/60 mb-4">VOIR LES ARCHIVES</h3>
@@ -496,9 +475,9 @@
 				</aside>
 
 				<!-- Section DERNIÈRES CHIMÈRES (Main Content) -->
-				<section class="lg:col-span-8 order-3 lg:order-2 space-y-8">
-					<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8">DERNIÈRES CHIMÈRES</h2>
-					<div class="grid gap-6 md:grid-cols-2">
+				<section class="lg:col-span-12 order-3 lg:order-2 space-y-8">
+					<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8 lg:text-center">DERNIÈRES CHIMÈRES</h2>
+					<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{% set articles = featured_articles() %}
 						{% for article in articles %}
 							<article class="reveal delay-{{ loop.index }}00">
@@ -523,6 +502,40 @@
 							</article>
 						{% endfor %}
 					</div>
+
+					<!-- FILTRER LES ARTICLES -->
+					<section class="rounded-xl border border-custom glass-card p-5" aria-labelledby="filter-title">
+						<h3 id="filter-title" class="text-xs font-bold uppercase tracking-[0.2em] text-text-primary/60 mb-4">FILTRER LES ARTICLES</h3>
+						<div class="space-y-3">
+							<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
+								<span class="text-xs font-medium text-text-primary/70">Fantasy</span>
+								<div class="relative">
+									<input type="checkbox" class="sr-only toggle-input" checked>
+									<span class="toggle-track toggle-violet">
+										<span class="toggle-knob"></span>
+									</span>
+								</div>
+							</label>
+							<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
+								<span class="text-xs font-medium text-text-primary/70">Science-Fiction</span>
+								<div class="relative">
+									<input type="checkbox" class="sr-only toggle-input" checked>
+									<span class="toggle-track toggle-cyan">
+										<span class="toggle-knob"></span>
+									</span>
+								</div>
+							</label>
+							<label class="flex cursor-pointer items-center justify-between p-3 rounded-lg bg-custom-tertiary border border-custom hover:border-custom transition-all">
+								<span class="text-xs font-medium text-text-primary/70">Horreur</span>
+								<div class="relative">
+									<input type="checkbox" class="sr-only toggle-input" checked>
+									<span class="toggle-track toggle-cyan">
+										<span class="toggle-knob"></span>
+									</span>
+								</div>
+							</label>
+						</div>
+					</section>
 
 					<!-- VOIR LES ARCHIVES (Desktop only here) -->
 					<div class="hidden lg:block">
