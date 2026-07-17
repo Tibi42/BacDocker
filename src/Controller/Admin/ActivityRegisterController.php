@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ActivityRegisterController extends AbstractController
@@ -21,7 +22,8 @@ class ActivityRegisterController extends AbstractController
         Request $request,
         ActivityRepository $activityRepository,
         InscriptionRepository $inscriptionRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        RateLimiterFactoryInterface $activityRegisterLimiter,
     ): Response {
         $activity = $activityRepository->find($id);
         if (!$activity) {
@@ -36,7 +38,6 @@ class ActivityRegisterController extends AbstractController
         $inscription = new Inscription();
         $inscription->setActivity($activity);
 
-        // Pré-remplir avec les infos de l'utilisateur connecté
         $currentUser = $this->getUser();
         if ($currentUser) {
             $inscription->setParticipantName($currentUser->getUsername());
@@ -50,7 +51,6 @@ class ActivityRegisterController extends AbstractController
         ]);
         $form->handleRequest($request);
 
-        // Forcer les valeurs de l'utilisateur connecté (disabled fields ne sont pas soumis)
         if ($isLoggedIn) {
             $inscription->setParticipantName($currentUser->getUsername());
             $inscription->setParticipantEmail($currentUser->getEmail());
@@ -60,6 +60,15 @@ class ActivityRegisterController extends AbstractController
         $isAjax = $request->isXmlHttpRequest() || $request->headers->has('Turbo-Frame');
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $limiterKey = $currentUser
+                ? 'user_' . $currentUser->getId()
+                : ($request->getClientIp() ?? 'unknown');
+            $limiter = $activityRegisterLimiter->create($limiterKey);
+            if (!$limiter->consume()->isAccepted()) {
+                $this->addFlash('error', 'Trop de tentatives d\'inscription. Veuillez réessayer dans quelques minutes.');
+                return $this->redirectToRoute('app_home');
+            }
+
             if ($inscriptionRepository->hasAlreadyRegistered($activity->getId(), $inscription->getParticipantEmail())) {
                 $alreadyRegistered = true;
             } else {

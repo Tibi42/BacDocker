@@ -8,3 +8,11 @@ framework:
             policy: 'fixed_window'
             limit: 3
             interval: '15 minutes'
+        registration:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '15 minutes'
+        activity_register:
+            policy: 'fixed_window'
+            limit: 10
+            interval: '15 minutes'

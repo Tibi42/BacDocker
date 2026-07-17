@@ -50,9 +50,9 @@ class UserType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank(message: 'Le mot de passe est obligatoire.'),
-                    new Length(min: 6, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères.'),
+                    new Length(min: 12, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères.'),
                 ],
-                'attr' => ['placeholder' => 'Minimum 6 caractères'],
+                'attr' => ['placeholder' => 'Minimum 12 caractères'],
             ]);
         }
 

@@ -28,6 +28,12 @@ class UserChecker implements UserCheckerInterface
                 'Votre compte a été suspendu. Contactez un administrateur.'
             );
         }
+
+        if (!$user->isVerified()) {
+            throw new CustomUserMessageAccountStatusException(
+                'Veuillez confirmer votre adresse email avant de vous connecter. Vérifiez votre boîte de réception.'
+            );
+        }
     }
 
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void

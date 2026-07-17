@@ -22,7 +22,7 @@ class SecurityHeadersSubscriberTest extends TestCase
 
     public function testSetsSecurityHeadersOnMainRequest(): void
     {
-        $subscriber = new SecurityHeadersSubscriber();
+        $subscriber = new SecurityHeadersSubscriber('dev');
         $response = new Response();
         $event = new ResponseEvent(
             $this->createStub(HttpKernelInterface::class),
@@ -40,11 +40,29 @@ class SecurityHeadersSubscriberTest extends TestCase
         $this->assertNotNull($response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString("default-src 'self'", $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString("frame-ancestors 'none'", $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString("object-src 'none'", $response->headers->get('Content-Security-Policy'));
+        $this->assertNull($response->headers->get('Strict-Transport-Security'));
+    }
+
+    public function testSetsHstsInProd(): void
+    {
+        $subscriber = new SecurityHeadersSubscriber('prod');
+        $response = new Response();
+        $event = new ResponseEvent(
+            $this->createStub(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
+
+        $subscriber->onKernelResponse($event);
+
+        $this->assertSame('max-age=31536000; includeSubDomains', $response->headers->get('Strict-Transport-Security'));
     }
 
     public function testSkipsSubRequests(): void
     {
-        $subscriber = new SecurityHeadersSubscriber();
+        $subscriber = new SecurityHeadersSubscriber('dev');
         $response = new Response();
         $event = new ResponseEvent(
             $this->createStub(HttpKernelInterface::class),

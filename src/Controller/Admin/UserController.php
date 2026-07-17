@@ -52,6 +52,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setPassword($this->passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
+            $user->setIsVerified(true);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
             $this->addFlash('success', 'Utilisateur « ' . $user->getEmail() . ' » créé.');
@@ -240,18 +241,18 @@ class UserController extends AbstractController
             $user->setUsername($username);
             $user->setEmail($email);
 
-            // Parse roles if provided — only whitelist safe roles
+            // Parse roles if provided — seuls les SUPER_ADMIN peuvent attribuer des rôles admin
             $rolesStr = trim($row[2] ?? '');
-            if ($rolesStr && $rolesStr !== 'Utilisateur') {
-                $allowedRoles = $this->isGranted('ROLE_SUPER_ADMIN')
-                    ? ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_SUPER_ADMIN']
-                    : ['ROLE_ADMIN', 'ROLE_USER'];
+            if ($rolesStr && $rolesStr !== 'Utilisateur' && $this->isGranted('ROLE_SUPER_ADMIN')) {
+                $allowedRoles = ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_SUPER_ADMIN'];
                 $roles = array_values(array_filter(
                     array_map('trim', explode(',', $rolesStr)),
                     fn(string $r) => in_array($r, $allowedRoles, true)
                 ));
                 $user->setRoles($roles);
             }
+
+            $user->setIsVerified(true);
 
             // Generate a random password (user will need to reset it)
             $randomPassword = bin2hex(random_bytes(16));

@@ -24,7 +24,7 @@
     {% endif %}
 
     <div class="prose prose-invert max-w-none text-text-secondary text-sm lg:text-base leading-relaxed space-y-6">
-        {{ article.content|raw }}
+        {{ article.content|sanitize_html }}
     </div>
 
     {% if article.gallery is not empty %}

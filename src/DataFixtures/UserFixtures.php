@@ -21,24 +21,25 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager): void
     {
+        // Comptes de développement uniquement — ne jamais y mettre d'identifiants réels.
         $users = [
             [
-                'email'    => 'guillaume.pecquet@gmail.com',
-                'username' => 'Dyonisos',
+                'email'    => 'superadmin@example.com',
+                'username' => 'superadmin',
                 'roles'    => ['ROLE_SUPER_ADMIN'],
-                'password' => '112358134AaBb&',
+                'password' => 'DevSuperAdmin!12',
             ],
             [
-                'email'    => 'admin@boitechimere.fr',
+                'email'    => 'admin@example.com',
                 'username' => 'admin',
                 'roles'    => ['ROLE_ADMIN'],
-                'password' => 'admin123',
+                'password' => 'DevAdminPass!12',
             ],
             [
-                'email'    => 'user@boitechimere.fr',
+                'email'    => 'user@example.com',
                 'username' => 'user',
                 'roles'    => ['ROLE_USER'],
-                'password' => 'user123',
+                'password' => 'DevUserPass!12',
             ],
         ];
 
@@ -48,6 +49,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
             $user->setUsername($data['username']);
             $user->setRoles($data['roles']);
             $user->setPassword($this->hasher->hashPassword($user, $data['password']));
+            $user->setIsVerified(true);
             $manager->persist($user);
         }
 

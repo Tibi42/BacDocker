@@ -44,7 +44,7 @@ class ArticleExtension extends AbstractExtension
                     'title' => $a->getTitle() ?? '',
                     'image' => $a->getImage() ?? '',
                     'tag' => $a->getTag() ?? '',
-                    'url' => $a->getUrl(),
+                    'url' => $this->sanitizeArticleUrl($a->getUrl()),
                     'hasContent' => $a->getContent() !== null && trim($a->getContent()) !== '',
                 ];
             }
@@ -86,5 +86,21 @@ class ArticleExtension extends AbstractExtension
                 'hasContent' => false,
             ],
         ];
+    }
+
+    private function sanitizeArticleUrl(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+
+        $url = trim($url);
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
+            return $url;
+        }
+
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        return \in_array($scheme, ['http', 'https'], true) ? $url : null;
     }
 }

@@ -44,6 +44,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ['default' => false])]
     private bool $suspended = false;
 
+    /** Compte email confirmé (les comptes créés en admin / fixtures le sont par défaut). */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $isVerified = true;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $emailVerificationToken = null;
+
     #[ORM\Column(options: ['default' => true])]
     private bool $newsletterOptIn = true;
 
@@ -120,6 +127,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSuspended(bool $suspended): static
     {
         $this->suspended = $suspended;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function getEmailVerificationToken(): ?string
+    {
+        return $this->emailVerificationToken;
+    }
+
+    public function setEmailVerificationToken(?string $emailVerificationToken): static
+    {
+        $this->emailVerificationToken = $emailVerificationToken;
+        return $this;
+    }
+
+    public function regenerateEmailVerificationToken(): static
+    {
+        $this->emailVerificationToken = bin2hex(random_bytes(32));
         return $this;
     }
 

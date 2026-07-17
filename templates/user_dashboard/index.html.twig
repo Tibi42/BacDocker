@@ -166,11 +166,18 @@
 						Modifier
 					</button>
 				</div>
-				<form id="change-email-form" method="post" action="{{ path('app_user_change_email') }}" class="hidden mt-4 flex flex-col sm:flex-row gap-3">
+				<form id="change-email-form" method="post" action="{{ path('app_user_change_email') }}" class="hidden mt-4 flex flex-col gap-3">
 					<input type="hidden" name="_token" value="{{ csrf_token('change_email') }}">
-					<input type="email" name="new_email" required placeholder="nouvelle@adresse.email" class="flex-1 rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
-					<button type="submit" class="rounded-lg bg-amber-500 px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-white hover:bg-amber-600 transition-all">
-						Confirmer
+					<div>
+						<label class="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">Mot de passe actuel</label>
+						<input type="password" name="current_password" required class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="········" autocomplete="current-password">
+					</div>
+					<div>
+						<label class="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">Nouvelle adresse email</label>
+						<input type="email" name="new_email" required placeholder="nouvelle@adresse.email" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
+					</div>
+					<button type="submit" class="rounded-lg bg-amber-500 px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-white hover:bg-amber-600 transition-all self-start">
+						Envoyer la confirmation
 					</button>
 				</form>
 			</div>
@@ -202,7 +209,7 @@
 					<div>
 						<label class="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">Nouveau mot de passe</label>
 						<div class="relative">
-							<input type="password" name="new_password" id="new_password" required minlength="6" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="········" autocomplete="new-password">
+							<input type="password" name="new_password" id="new_password" required minlength="12" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="········" autocomplete="new-password">
 							<button type="button" data-toggle-password="new_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors" tabindex="-1" aria-label="Afficher le mot de passe">
 								<svg class="h-4 w-4 eye-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.5 6.5m3.378 3.378L6.5 6.5m0 0L3 3m3.5 3.5l10 10M17.5 17.5L21 21m-3.5-3.5l-10-10m13.043 4.51A9.953 9.953 0 0121 12c-1.275 4.057-5.065 7-9.543 7"/></svg>
 								<svg class="h-4 w-4 eye-open hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -212,7 +219,7 @@
 					<div>
 						<label class="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">Confirmer le nouveau mot de passe</label>
 						<div class="relative">
-							<input type="password" name="confirm_password" id="confirm_password" required minlength="6" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="········" autocomplete="new-password">
+							<input type="password" name="confirm_password" id="confirm_password" required minlength="12" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="········" autocomplete="new-password">
 							<button type="button" data-toggle-password="confirm_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors" tabindex="-1" aria-label="Afficher la confirmation du mot de passe">
 								<svg class="h-4 w-4 eye-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.5 6.5m3.378 3.378L6.5 6.5m0 0L3 3m3.5 3.5l10 10M17.5 17.5L21 21m-3.5-3.5l-10-10m13.043 4.51A9.953 9.953 0 0121 12c-1.275 4.057-5.065 7-9.543 7"/></svg>
 								<svg class="h-4 w-4 eye-open hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>

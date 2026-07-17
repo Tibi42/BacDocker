@@ -102,7 +102,7 @@
 
 						<div id="preview-detail-content" class="prose prose-invert max-w-none text-text-secondary text-xs leading-relaxed space-y-3">
 							{% if article.content %}
-								{{ article.content|raw }}
+								{{ article.content|sanitize_html }}
 							{% else %}
 								<p class="italic text-text-secondary/50">Rédigez votre texte pour voir l'aperçu...</p>
 							{% endif %}

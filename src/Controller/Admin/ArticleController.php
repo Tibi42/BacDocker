@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Article;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
+use App\Security\HtmlSanitizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -18,7 +19,8 @@ class ArticleController extends AbstractController
 {
     public function __construct(
         private readonly ArticleRepository $articleRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly HtmlSanitizer $htmlSanitizer,
     ) {
     }
 
@@ -48,6 +50,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $article->setContent($this->htmlSanitizer->sanitize($article->getContent()));
             $this->handleImageUpload($form, $article);
             $this->handleGalleryUpload($form, $article);
             $this->entityManager->persist($article);
@@ -84,6 +87,7 @@ class ArticleController extends AbstractController
             }
             $article->setGallery(array_values($currentGallery));
 
+            $article->setContent($this->htmlSanitizer->sanitize($article->getContent()));
             $this->handleImageUpload($form, $article);
             $this->handleGalleryUpload($form, $article);
             $this->entityManager->flush();

@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -40,15 +41,12 @@ class UserDashboardController extends AbstractController
         $user = $this->getUser();
         $email = $user->getEmail();
 
-        $username = $user->getUsername();
-
-        // Inscriptions de l'utilisateur (par email OU par nom)
+        // Inscriptions de l'utilisateur (par email uniquement — évite les collisions de noms)
         $inscriptions = $inscriptionRepository->createQueryBuilder('i')
             ->leftJoin('i.activity', 'a')
             ->addSelect('a')
-            ->where('i.participantEmail = :email OR i.participantName = :username')
+            ->where('i.participantEmail = :email')
             ->setParameter('email', $email)
-            ->setParameter('username', $username)
             ->orderBy('a.startAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -79,7 +77,7 @@ class UserDashboardController extends AbstractController
      * et la correspondance entre le nouveau mot de passe et sa confirmation.
      */
     #[Route('/mon-espace/changer-mot-de-passe', name: 'app_user_change_password', methods: ['POST'])]
-    public function changePassword(Request $request, EntityManagerInterface $em, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher): Response
+    public function changePassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
         if (!$this->isCsrfTokenValid('change_password', $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
@@ -117,38 +115,99 @@ class UserDashboardController extends AbstractController
     /**
      * Changement d'adresse email depuis l'espace utilisateur.
      *
-     * Valide le format de la nouvelle adresse et s'assure qu'elle n'est pas
-     * déjà utilisée par un autre compte avant de l'enregistrer.
+     * Exige le mot de passe actuel. Le nouvel email doit être confirmé
+     * via un lien envoyé à la nouvelle adresse avant d'être appliqué.
      */
     #[Route('/mon-espace/changer-email', name: 'app_user_change_email', methods: ['POST'])]
-    public function changeEmail(Request $request, EntityManagerInterface $em): Response
-    {
+    public function changeEmail(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        MailerInterface $mailer,
+    ): Response {
         if (!$this->isCsrfTokenValid('change_email', $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        $newEmail = trim($request->request->get('new_email', ''));
+        $user = $this->getUser();
+        $currentPassword = (string) $request->request->get('current_password', '');
+        $newEmail = trim((string) $request->request->get('new_email', ''));
+
+        if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+            $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
         if (!$newEmail || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('error', 'Veuillez saisir une adresse email valide.');
             return $this->redirectToRoute('app_user_dashboard');
         }
-
-        $user = $this->getUser();
 
         if ($newEmail === $user->getEmail()) {
             $this->addFlash('warning', 'C\'est déjà votre adresse email actuelle.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        // Vérifier qu'aucun autre utilisateur n'utilise cet email
         $existing = $em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $newEmail]);
         if ($existing) {
             $this->addFlash('error', 'Cette adresse email est déjà utilisée par un autre compte.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        // Stocker le nouvel email dans le token (préfixe pending:) jusqu'à confirmation
+        $token = bin2hex(random_bytes(32));
+        $user->setEmailVerificationToken('email_change:' . $token . ':' . $newEmail);
+        $em->flush();
+
+        $confirmUrl = $this->generateUrl('app_confirm_email_change', [
+            'token' => $token,
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $email = (new TemplatedEmail())
+            ->from('noreply@laboiteachimere.fr')
+            ->to($newEmail)
+            ->subject('Confirmez votre nouvelle adresse email')
+            ->htmlTemplate('emails/email_change_confirm.html.twig')
+            ->context([
+                'username' => $user->getUsername(),
+                'confirmUrl' => $confirmUrl,
+                'newEmail' => $newEmail,
+            ]);
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $newEmail . '. Cliquez sur le lien pour finaliser le changement.');
+
+        return $this->redirectToRoute('app_user_dashboard');
+    }
+
+    #[Route('/mon-espace/confirmer-email/{token}', name: 'app_confirm_email_change', methods: ['GET'])]
+    public function confirmEmailChange(string $token, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $stored = $user->getEmailVerificationToken() ?? '';
+
+        if (!str_starts_with($stored, 'email_change:' . $token . ':')) {
+            $this->addFlash('error', 'Ce lien de confirmation est invalide ou a expiré.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        $newEmail = substr($stored, strlen('email_change:' . $token . ':'));
+        if (!$newEmail || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('error', 'Ce lien de confirmation est invalide.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        $existing = $em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $newEmail]);
+        if ($existing && $existing->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Cette adresse email est déjà utilisée.');
+            $user->setEmailVerificationToken(null);
+            $em->flush();
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
         $user->setEmail($newEmail);
+        $user->setEmailVerificationToken(null);
         $em->flush();
 
         $this->addFlash('success', 'Votre adresse email a été mise à jour.');
@@ -172,8 +231,8 @@ class UserDashboardController extends AbstractController
         }
 
         $user = $this->getUser();
-        // Vérifier que l'inscription appartient bien à cet utilisateur
-        if ($inscription->getParticipantEmail() !== $user->getEmail() && $inscription->getParticipantName() !== $user->getUsername()) {
+        // Vérifier que l'inscription appartient bien à cet utilisateur (email uniquement)
+        if ($inscription->getParticipantEmail() !== $user->getEmail()) {
             $this->addFlash('error', 'Cette inscription ne vous appartient pas.');
             return $this->redirectToRoute('app_user_dashboard');
         }
