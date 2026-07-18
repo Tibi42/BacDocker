@@ -4,6 +4,28 @@
  * (sinon un clic peut ouvrir puis refermer dans le même tick).
  */
 
+function isShortMobileViewport() {
+    return window.innerWidth < 1024 && window.innerHeight < 900;
+}
+
+function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        const input = modal.querySelector('input:not([type="hidden"])');
+        if (input) input.focus();
+    }, 100);
+}
+
+function closeLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 let escapeHandlerInstalled = false;
 
 function installEscapeHandlerOnce() {
@@ -115,6 +137,10 @@ function initJoinPanel() {
 
         mobileBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (isShortMobileViewport()) {
+                openLoginModal();
+                return;
+            }
             if (mobileOpen) {
                 closeMobile();
             } else {
@@ -222,9 +248,31 @@ function initRegisterModal() {
     }
 }
 
+function initLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('login-close');
+    const overlay = document.getElementById('login-overlay');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeLoginModal);
+    if (overlay) overlay.addEventListener('click', closeLoginModal);
+
+    modal.querySelectorAll('[data-close-login]').forEach((btn) => {
+        btn.addEventListener('click', closeLoginModal);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeLoginModal();
+        }
+    });
+}
+
 function bootJoinPanel() {
     initJoinPanel();
     initRegisterModal();
+    initLoginModal();
 
     const openParam = new URLSearchParams(window.location.search).get('open');
 
@@ -243,17 +291,22 @@ function bootJoinPanel() {
 
         // Idem sur mobile : ouvrir le tiroir de menu et le formulaire de connexion,
         // sinon la redirection ?open=login n'affiche rien de visible en dessous de lg.
-        const drawer = document.getElementById('mobile-menu-drawer');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileForm = document.getElementById('mobile-join-form');
-        const mobileBtn = document.getElementById('mobile-join-btn');
-        if (drawer && mobileMenuBtn && mobileForm && mobileBtn) {
-            drawer.classList.remove('pointer-events-none');
-            drawer.classList.add('menu-open');
-            mobileMenuBtn.classList.add('hidden');
-            document.body.style.overflow = 'hidden';
-            mobileForm.style.maxHeight = mobileForm.scrollHeight + 'px';
-            mobileBtn.classList.add('ring-2', 'ring-white/30');
+        // Sur les écrans courts, la modale de connexion remplace l'accordéon (voir isShortMobileViewport).
+        if (isShortMobileViewport()) {
+            openLoginModal();
+        } else {
+            const drawer = document.getElementById('mobile-menu-drawer');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileForm = document.getElementById('mobile-join-form');
+            const mobileBtn = document.getElementById('mobile-join-btn');
+            if (drawer && mobileMenuBtn && mobileForm && mobileBtn) {
+                drawer.classList.remove('pointer-events-none');
+                drawer.classList.add('menu-open');
+                mobileMenuBtn.classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+                mobileForm.style.maxHeight = mobileForm.scrollHeight + 'px';
+                mobileBtn.classList.add('ring-2', 'ring-white/30');
+            }
         }
     }
 }
