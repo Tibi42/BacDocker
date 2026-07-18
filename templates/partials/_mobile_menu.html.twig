@@ -17,7 +17,7 @@
 			{% if is_granted('ROLE_ADMIN') %}
 				<a href="{{ path('admin') }}" class="text-lg font-bold uppercase tracking-widest text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
 			{% endif %}
-			<hr class="border-custom my-4">
+			<hr id="mobile-menu-separator" class="border-custom my-4">
 			{% if app.user %}
 				<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
 					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">

@@ -9,14 +9,17 @@ function relocateLogoutToFooter() {
     const logoutForm = document.getElementById('mobile-logout-form');
     const footer = document.getElementById('mobile-menu-footer');
     const nav = document.querySelector('#mobile-menu-content nav');
+    const separator = document.getElementById('mobile-menu-separator');
     if (!logoutForm || !footer) return;
 
     if (isShortMobileViewport()) {
         footer.insertBefore(logoutForm, footer.firstChild);
         if (nav) nav.classList.add('flex-1', 'min-h-0', 'overflow-y-auto');
+        if (separator) separator.classList.add('hidden');
     } else if (nav) {
         nav.appendChild(logoutForm);
         nav.classList.remove('flex-1', 'min-h-0', 'overflow-y-auto');
+        if (separator) separator.classList.remove('hidden');
     }
 }
 
