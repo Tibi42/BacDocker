@@ -2,6 +2,7 @@
 @source "../../templates/**/*.html.twig";
 @source "../../templates/**/*.twig";
 @source "../../src/**/*.php";
+@source "../**/*.js";
 
 /* Configuration Tailwind v4 avec @theme */
 @theme {

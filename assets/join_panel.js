@@ -4,7 +4,7 @@
  * (sinon un clic peut ouvrir puis refermer dans le même tick).
  */
 
-function isShortMobileViewport() {
+export function isShortMobileViewport() {
     return window.innerWidth < 1024 && window.innerHeight < 900;
 }
 
