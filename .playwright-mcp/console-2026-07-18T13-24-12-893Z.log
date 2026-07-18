@@ -1,0 +1,11 @@
+[     516ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[     517ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-EKQ_RPv.js:17
+[     517ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[     518ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[     518ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://devboitechimere.test/admin:0
+[     518ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://devboitechimere.test/admin:0
+[     521ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[   11575ms] [ERROR] Failed to load resource: the server responded with a status of 405 (Method Not Allowed) @ http://devboitechimere.test/admin:0
+[   12102ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-EKQ_RPv.js:17
+[   12103ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[   12103ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6

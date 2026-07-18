@@ -46,6 +46,8 @@ security:
         ROLE_ADMIN:       [ROLE_USER]
 
     # Note: Only the *first* matching rule is applied
+    # HTTPS is enforced at the Nginx layer in production (Certbot --redirect + HSTS),
+    # not here, to avoid duplicating access_control across environments.
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/mon-espace, roles: ROLE_USER }
@@ -61,13 +63,5 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
-
-when@prod:
-    security:
-        access_control:
-            - { path: ^/admin, roles: ROLE_ADMIN, requires_channel: https }
-            - { path: ^/mon-espace, roles: ROLE_USER, requires_channel: https }
-            - { path: ^/activite/\d+/inscrire, roles: ROLE_USER, requires_channel: https }
-            - { path: ^/, requires_channel: https }
 
 

@@ -1,0 +1,81 @@
+- generic [active] [ref=f19e1]:
+  - generic [ref=f19e2]:
+    - complementary [ref=f19e3]:
+      - generic [ref=f19e4]:
+        - link "La Boîte à Chimère" [ref=f19e5] [cursor=pointer]:
+          - /url: /admin
+        - paragraph [ref=f19e6]: Administration
+      - navigation [ref=f19e7]:
+        - link "Dashboard" [ref=f19e8] [cursor=pointer]:
+          - /url: /admin
+        - link "Activités" [ref=f19e11] [cursor=pointer]:
+          - /url: /admin/activites
+        - link "Carrousel" [ref=f19e14] [cursor=pointer]:
+          - /url: /admin/carousel
+        - link "Articles" [ref=f19e17] [cursor=pointer]:
+          - /url: /admin/articles
+        - link "Utilisateurs" [ref=f19e20] [cursor=pointer]:
+          - /url: /admin/utilisateurs
+        - link "Newsletter" [ref=f19e23] [cursor=pointer]:
+          - /url: /admin/newsletter
+        - link "Retour à la page d'accueil" [ref=f19e27] [cursor=pointer]:
+          - /url: /
+    - generic [ref=f19e31]:
+      - link "Retour" [ref=f19e32] [cursor=pointer]:
+        - /url: /admin/activites
+      - generic [ref=f19e35]:
+        - heading "Modifier l'activité" [level=1] [ref=f19e36]
+        - generic [ref=f19e37]:
+          - text: JDR
+          - paragraph [ref=f19e38]: Partie JDR one-shot
+          - paragraph [ref=f19e39]: 20/08/2026
+        - generic [ref=f19e40]:
+          - generic [ref=f19e41]:
+            - generic [ref=f19e42]: Titre
+            - textbox "Titre" [ref=f19e43]:
+              - /placeholder: "Ex : Soirée Jeux de société"
+              - text: Partie JDR one-shot
+          - generic [ref=f19e44]:
+            - generic [ref=f19e45]: Type d'activité
+            - combobox "Type d'activité" [ref=f19e46]:
+              - option "-- Choisir --"
+              - option "JDS (Jeux de Société)"
+              - option "JDR (Jeux de Rôle)" [selected]
+              - option "GN (Grandeur Nature)"
+              - option "JDF (Jeux de Figurines)"
+              - option "AG (Assemblée Générale)"
+              - option "Play Test"
+          - generic [ref=f19e47]:
+            - generic [ref=f19e48]: Description
+            - textbox "Description" [ref=f19e49]:
+              - /placeholder: Description de l'événement...
+          - generic [ref=f19e50]:
+            - generic [ref=f19e51]: Date de début
+            - textbox [ref=f19e52]: 20 août 2026
+          - generic [ref=f19e53]:
+            - generic [ref=f19e54]: Lieu
+            - combobox "Lieu" [ref=f19e55]:
+              - option "-- Choisir --" [selected]
+              - option "L'auberge de jeunesse Yves Robert"
+              - option "Le Natema"
+          - generic [ref=f19e56]:
+            - generic [ref=f19e57]: Nombre maximum de participants
+            - spinbutton "Nombre maximum de participants" [ref=f19e58]
+          - generic [ref=f19e59]:
+            - button "Enregistrer" [ref=f19e60]
+            - link "Annuler" [ref=f19e61] [cursor=pointer]:
+              - /url: /admin/activites
+  - generic [ref=f19e63]:
+    - paragraph [ref=f19e64]: Ce site utilise des cookies essentiels au fonctionnement (session, sécurité CSRF). Aucun cookie publicitaire n'est utilisé.
+    - generic [ref=f19e65]:
+      - button "Accepter" [ref=f19e66] [cursor=pointer]
+      - button "Refuser" [ref=f19e67] [cursor=pointer]
+  - region "Symfony Web Debug Toolbar" [ref=f19e68]:
+    - generic [ref=f19e71]:
+      - link "Symfony Loading…" [ref=f19e73] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/9af929?panel=request
+        - generic [ref=f19e74]:
+          - img "Symfony" [ref=f19e75]
+          - generic [ref=f19e77]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f19e78] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f19e79]

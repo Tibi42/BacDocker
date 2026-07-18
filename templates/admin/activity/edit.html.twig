@@ -53,7 +53,7 @@
 				<p class="font-medium text-text-primary mt-1">{{ activity.title }}</p>
 				<p class="text-sm text-text-secondary mt-0.5">{{ activity.startAt|date('d/m/Y') }}</p>
 			</div>
-			{{ include('admin/activity/_form.html.twig', { form: form, button_label: 'Enregistrer' }) }}
+			{{ include('admin/activity/_form.html.twig', { form: form, button_label: 'Enregistrer', form_action: path('app_activity_edit', { id: activity.id }) }) }}
 		</div>
 	</div>
 {% endblock %}

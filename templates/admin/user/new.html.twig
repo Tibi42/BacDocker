@@ -11,7 +11,7 @@
 
 		<div class="max-w-2xl rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card">
 			<h1 class="text-xl font-bold text-text-primary uppercase tracking-wide mb-6">Nouvel utilisateur</h1>
-			{{ include('admin/user/_form.html.twig', { form: form, button_label: 'Créer l\'utilisateur' }) }}
+			{{ include('admin/user/_form.html.twig', { form: form, button_label: 'Créer l\'utilisateur', form_action: path('app_admin_user_new') }) }}
 		</div>
 	</div>
 	<script>

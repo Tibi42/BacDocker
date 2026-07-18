@@ -1,0 +1,6 @@
+[     490ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-EKQ_RPv.js:17
+[     490ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[     491ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[    5852ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[    5860ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[    5953ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://devboitechimere.test/admin:0

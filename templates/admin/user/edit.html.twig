@@ -23,7 +23,7 @@
 		<div class="max-w-2xl rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card mb-6">
 			<h1 class="text-xl font-bold text-text-primary uppercase tracking-wide mb-1">Modifier l'utilisateur</h1>
 			<p class="text-sm text-text-secondary mb-6">{{ user.email }}</p>
-			{{ include('admin/user/_form.html.twig', { form: form, button_label: 'Enregistrer les modifications' }) }}
+			{{ include('admin/user/_form.html.twig', { form: form, button_label: 'Enregistrer les modifications', form_action: path('app_admin_user_edit', { id: user.id }) }) }}
 		</div>
 
 		<div class="max-w-2xl rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card">

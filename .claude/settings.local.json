@@ -111,7 +111,20 @@
       "Bash(docker exec devboitechimere-php-1 php -r \":*)",
       "Bash(composer remove:*)",
       "Bash(COMPOSER_DISABLE_TLS=1 /c/laragon/bin/php/php-8.4.12-nts-Win32-vs17-x64/php.exe /c/laragon/bin/composer/composer.phar update)",
-      "Bash(find /c/laragon/bin/php/php-8.4.12-nts-Win32-vs17-x64/ -name *.pem -o -name cacert*)"
+      "Bash(find /c/laragon/bin/php/php-8.4.12-nts-Win32-vs17-x64/ -name *.pem -o -name cacert*)",
+      "Bash(ssh-keygen -R 193.70.86.221)",
+      "Read(//c/Users/guill/.ssh/**)",
+      "Bash(ssh *)",
+      "Bash(nslookup guillaumepecquet.ovh)",
+      "Bash(nslookup www.guillaumepecquet.ovh)",
+      "Bash(tar --exclude='.git' --exclude='var' --exclude='vendor' --exclude='public/bundles' --exclude='public/assets' --exclude='assets/vendor' --exclude='.phpunit.cache' --exclude='.claude' --exclude='node_modules' -czf /tmp/devboitechimere.tar.gz .)",
+      "Read(//tmp/**)",
+      "Bash(scp *)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://guillaumepecquet.ovh/\" -UseBasicParsing -TimeoutSec 15; \"Status: $\\($r.StatusCode\\)\" } catch { \"Erreur: $_\" })",
+      "Bash(tasklist //FI \"IMAGENAME eq httpd.exe\")",
+      "mcp__plugin_playwright_playwright__browser_find",
+      "mcp__plugin_playwright_playwright__browser_network_request",
+      "mcp__plugin_playwright_playwright__browser_run_code_unsafe"
     ]
   }
 }

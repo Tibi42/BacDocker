@@ -1,0 +1,84 @@
+- generic [active] [ref=f13e1]:
+  - generic [ref=f13e2]:
+    - complementary [ref=f13e3]:
+      - generic [ref=f13e4]:
+        - link "La Boîte à Chimère" [ref=f13e5] [cursor=pointer]:
+          - /url: /admin
+        - paragraph [ref=f13e6]: Administration
+      - navigation [ref=f13e7]:
+        - link "Dashboard" [ref=f13e8] [cursor=pointer]:
+          - /url: /admin
+        - link "Activités" [ref=f13e11] [cursor=pointer]:
+          - /url: /admin/activites
+        - link "Carrousel" [ref=f13e14] [cursor=pointer]:
+          - /url: /admin/carousel
+        - link "Articles" [ref=f13e17] [cursor=pointer]:
+          - /url: /admin/articles
+        - link "Utilisateurs" [ref=f13e20] [cursor=pointer]:
+          - /url: /admin/utilisateurs
+        - link "Newsletter" [ref=f13e23] [cursor=pointer]:
+          - /url: /admin/newsletter
+        - link "Retour à la page d'accueil" [ref=f13e27] [cursor=pointer]:
+          - /url: /
+    - generic [ref=f13e31]:
+      - link "Retour à la liste" [ref=f13e32] [cursor=pointer]:
+        - /url: /admin/utilisateurs
+      - generic [ref=f13e35]:
+        - heading "Modifier l'utilisateur" [level=1] [ref=f13e36]
+        - paragraph [ref=f13e37]: user@example.com
+        - generic [ref=f13e38]:
+          - generic [ref=f13e39]:
+            - text: Email
+            - textbox "Email" [ref=f13e40]:
+              - /placeholder: utilisateur@exemple.com
+              - text: user@example.com
+          - generic [ref=f13e41]:
+            - text: Nom d'utilisateur
+            - textbox "Nom d'utilisateur" [ref=f13e42]:
+              - /placeholder: pseudo
+              - text: user
+          - generic [ref=f13e43]:
+            - generic [ref=f13e44]: Rôle
+            - generic [ref=f13e45]:
+              - generic [ref=f13e46] [cursor=pointer]:
+                - checkbox "Utilisateur" [checked] [ref=f13e47]
+                - generic [ref=f13e48]: Utilisateur
+              - generic [ref=f13e49] [cursor=pointer]:
+                - checkbox "Administrateur" [ref=f13e50]
+                - generic [ref=f13e51]: Administrateur
+              - generic [ref=f13e52] [cursor=pointer]:
+                - checkbox "Super administrateur" [ref=f13e53]
+                - generic [ref=f13e54]: Super administrateur
+          - generic [ref=f13e55]:
+            - button "Enregistrer les modifications" [ref=f13e56] [cursor=pointer]
+            - link "Annuler" [ref=f13e57] [cursor=pointer]:
+              - /url: /admin/utilisateurs
+      - generic [ref=f13e58]:
+        - heading "Changer le mot de passe" [level=2] [ref=f13e59]
+        - paragraph [ref=f13e60]: Laissez vide si vous ne souhaitez pas modifier le mot de passe.
+        - generic [ref=f13e61]:
+          - generic [ref=f13e62]:
+            - generic [ref=f13e63]: Nouveau mot de passe
+            - generic [ref=f13e64]:
+              - textbox "Minimum 12 caractères" [ref=f13e65]
+              - button [ref=f13e66] [cursor=pointer]
+          - generic [ref=f13e70]:
+            - generic [ref=f13e71]: Confirmer le mot de passe
+            - generic [ref=f13e72]:
+              - textbox "Répétez le mot de passe" [ref=f13e73]
+              - button [ref=f13e74] [cursor=pointer]
+          - button "Changer le mot de passe" [ref=f13e78] [cursor=pointer]
+  - generic [ref=f13e80]:
+    - paragraph [ref=f13e81]: Ce site utilise des cookies essentiels au fonctionnement (session, sécurité CSRF). Aucun cookie publicitaire n'est utilisé.
+    - generic [ref=f13e82]:
+      - button "Accepter" [ref=f13e83] [cursor=pointer]
+      - button "Refuser" [ref=f13e84] [cursor=pointer]
+  - region "Symfony Web Debug Toolbar" [ref=f13e85]:
+    - generic [ref=f13e88]:
+      - link "Symfony Loading…" [ref=f13e90] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/54fbee?panel=request
+        - generic [ref=f13e91]:
+          - img "Symfony" [ref=f13e92]
+          - generic [ref=f13e94]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f13e95] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f13e96]

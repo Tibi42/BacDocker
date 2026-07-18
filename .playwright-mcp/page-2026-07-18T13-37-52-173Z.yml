@@ -1,0 +1,343 @@
+- generic [active] [ref=f20e1]:
+  - generic [ref=f20e2]: L'activité « Partie JDR one-shot (test edit) » a été mise à jour.
+  - generic [ref=f20e3]:
+    - complementary [ref=f20e4]:
+      - generic [ref=f20e5]:
+        - link "La Boîte à Chimère" [ref=f20e6] [cursor=pointer]:
+          - /url: /admin
+        - paragraph [ref=f20e7]: Administration
+      - navigation [ref=f20e8]:
+        - link "Dashboard" [ref=f20e9] [cursor=pointer]:
+          - /url: /admin
+        - link "Activités" [ref=f20e12] [cursor=pointer]:
+          - /url: /admin/activites
+        - link "Carrousel" [ref=f20e15] [cursor=pointer]:
+          - /url: /admin/carousel
+        - link "Articles" [ref=f20e18] [cursor=pointer]:
+          - /url: /admin/articles
+        - link "Utilisateurs" [ref=f20e21] [cursor=pointer]:
+          - /url: /admin/utilisateurs
+        - link "Newsletter" [ref=f20e24] [cursor=pointer]:
+          - /url: /admin/newsletter
+        - link "Retour à la page d'accueil" [ref=f20e28] [cursor=pointer]:
+          - /url: /
+    - generic [ref=f20e32]:
+      - link "Retour au dashboard" [ref=f20e33] [cursor=pointer]:
+        - /url: /admin
+      - generic [ref=f20e36]:
+        - heading "Gestion des activités du calendrier" [level=1] [ref=f20e37]
+        - generic [ref=f20e38]:
+          - link "Export CSV" [ref=f20e39] [cursor=pointer]:
+            - /url: /admin/activites/export-csv
+          - link "Nouvelle activité" [ref=f20e42] [cursor=pointer]:
+            - /url: /admin/activites/nouvelle
+      - generic [ref=f20e45]:
+        - generic [ref=f20e46]:
+          - generic [ref=f20e47]: Statut
+          - generic [ref=f20e48]:
+            - link "Toutes" [ref=f20e49] [cursor=pointer]:
+              - /url: /admin/activites
+            - link "En attente" [ref=f20e50] [cursor=pointer]:
+              - /url: /admin/activites?status=pending
+            - link "Publiées" [ref=f20e51] [cursor=pointer]:
+              - /url: /admin/activites?status=published
+        - generic [ref=f20e52]:
+          - generic [ref=f20e53]: Type
+          - generic [ref=f20e54]:
+            - link "Tous" [ref=f20e55] [cursor=pointer]:
+              - /url: /admin/activites
+            - link "JDS" [ref=f20e56] [cursor=pointer]:
+              - /url: /admin/activites?type=JDS
+            - link "JDR" [ref=f20e57] [cursor=pointer]:
+              - /url: /admin/activites?type=JDR
+            - link "GN" [ref=f20e58] [cursor=pointer]:
+              - /url: /admin/activites?type=GN
+            - link "JDF" [ref=f20e59] [cursor=pointer]:
+              - /url: /admin/activites?type=JDF
+            - link "AG" [ref=f20e60] [cursor=pointer]:
+              - /url: /admin/activites?type=AG
+            - link "Play Test" [ref=f20e61] [cursor=pointer]:
+              - /url: /admin/activites?type=Play%20Test
+        - generic [ref=f20e62]:
+          - generic [ref=f20e63]: Lieu
+          - generic [ref=f20e64]:
+            - link "Tous" [ref=f20e65] [cursor=pointer]:
+              - /url: /admin/activites
+            - link "Auberge Yves Robert" [ref=f20e66] [cursor=pointer]:
+              - /url: /admin/activites?location=L%27auberge%20de%20jeunesse%20Yves%20Robert
+            - link "Le Natema" [ref=f20e67] [cursor=pointer]:
+              - /url: /admin/activites?location=Le%20Natema
+        - generic [ref=f20e68]:
+          - generic [ref=f20e69]: Période
+          - generic [ref=f20e70]:
+            - link "Toutes" [ref=f20e71] [cursor=pointer]:
+              - /url: /admin/activites
+            - link "À venir" [ref=f20e72] [cursor=pointer]:
+              - /url: /admin/activites?period=future
+            - link "Passées" [ref=f20e73] [cursor=pointer]:
+              - /url: /admin/activites?period=past
+      - table [ref=f20e76]:
+        - rowgroup [ref=f20e77]:
+          - row [ref=f20e78]:
+            - columnheader "Date" [ref=f20e79]
+            - columnheader "Titre" [ref=f20e80]
+            - columnheader "Type" [ref=f20e81]
+            - columnheader "Lieu" [ref=f20e82]
+            - columnheader "Inscrits" [ref=f20e83]
+            - columnheader "Proposé par" [ref=f20e84]
+            - columnheader "Actions" [ref=f20e85]
+        - rowgroup [ref=f20e86]:
+          - row [ref=f20e87]:
+            - cell "20/08/2026" [ref=f20e88]
+            - cell "Partie JDR one-shot (test edit)" [ref=f20e89]
+            - cell "JDR" [ref=f20e92]
+            - cell "—" [ref=f20e93]
+            - cell "0" [ref=f20e94]
+            - cell "—" [ref=f20e95]
+            - cell [ref=f20e96]:
+              - link "Modifier" [ref=f20e97] [cursor=pointer]:
+                - /url: /admin/activites/96/modifier
+              - link "Voir les inscrits" [ref=f20e98] [cursor=pointer]:
+                - /url: /admin/activites/96/inscrits
+              - button "Supprimer" [ref=f20e100]
+          - row [ref=f20e101]:
+            - cell "14/08/2026" [ref=f20e102]
+            - cell "Soirée in-game - GN du Crépuscule" [ref=f20e103]
+            - cell "GN" [ref=f20e106]
+            - cell "Local association" [ref=f20e107]
+            - cell "0" [ref=f20e108]
+            - cell "—" [ref=f20e109]
+            - cell [ref=f20e110]:
+              - link "Modifier" [ref=f20e111] [cursor=pointer]:
+                - /url: /admin/activites/95/modifier
+              - link "Voir les inscrits" [ref=f20e112] [cursor=pointer]:
+                - /url: /admin/activites/95/inscrits
+              - button "Supprimer" [ref=f20e114]
+          - row [ref=f20e115]:
+            - cell "14/08/2026" [ref=f20e116]
+            - cell "Week-end GN du Crépuscule" [ref=f20e117]
+            - cell "GN" [ref=f20e120]
+            - cell "Local association" [ref=f20e121]
+            - cell "0" [ref=f20e122]
+            - cell "—" [ref=f20e123]
+            - cell [ref=f20e124]:
+              - link "Modifier" [ref=f20e125] [cursor=pointer]:
+                - /url: /admin/activites/94/modifier
+              - link "Voir les inscrits" [ref=f20e126] [cursor=pointer]:
+                - /url: /admin/activites/94/inscrits
+              - button "Supprimer" [ref=f20e128]
+          - row [ref=f20e129]:
+            - cell "02/08/2026" [ref=f20e130]
+            - cell "Soirée JDS - Spéciale stratégie" [ref=f20e131]
+            - cell "JDS" [ref=f20e134]
+            - cell "Local association" [ref=f20e135]
+            - cell "0" [ref=f20e136]
+            - cell "—" [ref=f20e137]
+            - cell [ref=f20e138]:
+              - link "Modifier" [ref=f20e139] [cursor=pointer]:
+                - /url: /admin/activites/93/modifier
+              - link "Voir les inscrits" [ref=f20e140] [cursor=pointer]:
+                - /url: /admin/activites/93/inscrits
+              - button "Supprimer" [ref=f20e142]
+          - row [ref=f20e143]:
+            - cell "28/07/2026" [ref=f20e144]
+            - cell "Assemblée générale" [ref=f20e145]
+            - cell "AG" [ref=f20e148]
+            - cell "Local association" [ref=f20e149]
+            - cell "0" [ref=f20e150]
+            - cell "—" [ref=f20e151]
+            - cell [ref=f20e152]:
+              - link "Modifier" [ref=f20e153] [cursor=pointer]:
+                - /url: /admin/activites/87/modifier
+              - link "Voir les inscrits" [ref=f20e154] [cursor=pointer]:
+                - /url: /admin/activites/87/inscrits
+              - button "Supprimer" [ref=f20e156]
+          - row [ref=f20e157]:
+            - cell "25/07/2026" [ref=f20e158]
+            - cell "Senses Etch - Champs de Valoris" [ref=f20e159]
+            - cell "BOITE" [ref=f20e162]
+            - cell "Local association" [ref=f20e163]
+            - cell "0" [ref=f20e164]
+            - cell "—" [ref=f20e165]
+            - cell [ref=f20e166]:
+              - link "Modifier" [ref=f20e167] [cursor=pointer]:
+                - /url: /admin/activites/81/modifier
+              - link "Voir les inscrits" [ref=f20e168] [cursor=pointer]:
+                - /url: /admin/activites/81/inscrits
+              - button "Supprimer" [ref=f20e170]
+          - row [ref=f20e171]:
+            - cell "22/07/2026" [ref=f20e172]
+            - cell "Partie JDR - Appel de Cthulhu" [ref=f20e173]
+            - cell "JDR" [ref=f20e176]
+            - cell "Local association" [ref=f20e177]
+            - cell "0" [ref=f20e178]
+            - cell "—" [ref=f20e179]
+            - cell [ref=f20e180]:
+              - link "Modifier" [ref=f20e181] [cursor=pointer]:
+                - /url: /admin/activites/85/modifier
+              - link "Voir les inscrits" [ref=f20e182] [cursor=pointer]:
+                - /url: /admin/activites/85/inscrits
+              - button "Supprimer" [ref=f20e184]
+          - row [ref=f20e185]:
+            - cell "19/07/2026" [ref=f20e186]
+            - 'cell "Nouvel arrivage : soirée découverte" [ref=f20e187]'
+            - cell "BOITE" [ref=f20e190]
+            - cell "Local association" [ref=f20e191]
+            - cell "0" [ref=f20e192]
+            - cell "—" [ref=f20e193]
+            - cell [ref=f20e194]:
+              - link "Modifier" [ref=f20e195] [cursor=pointer]:
+                - /url: /admin/activites/89/modifier
+              - link "Voir les inscrits" [ref=f20e196] [cursor=pointer]:
+                - /url: /admin/activites/89/inscrits
+              - button "Supprimer" [ref=f20e198]
+          - row [ref=f20e199]:
+            - cell "15/07/2026" [ref=f20e200]
+            - cell "Apéro jeux après la partie" [ref=f20e201]
+            - cell "BOITE" [ref=f20e204]
+            - cell "Local association" [ref=f20e205]
+            - cell "0" [ref=f20e206]
+            - cell "—" [ref=f20e207]
+            - cell [ref=f20e208]:
+              - link "Modifier" [ref=f20e209] [cursor=pointer]:
+                - /url: /admin/activites/91/modifier
+              - link "Voir les inscrits" [ref=f20e210] [cursor=pointer]:
+                - /url: /admin/activites/91/inscrits
+          - row [ref=f20e211]:
+            - cell "15/07/2026" [ref=f20e212]
+            - cell "Partie JDR - Donjons & Dragons" [ref=f20e213]
+            - cell "JDR" [ref=f20e216]
+            - cell "Salle du premier étage" [ref=f20e217]
+            - cell "0" [ref=f20e218]
+            - cell "—" [ref=f20e219]
+            - cell [ref=f20e220]:
+              - link "Modifier" [ref=f20e221] [cursor=pointer]:
+                - /url: /admin/activites/84/modifier
+              - link "Voir les inscrits" [ref=f20e222] [cursor=pointer]:
+                - /url: /admin/activites/84/inscrits
+          - row [ref=f20e223]:
+            - cell "12/07/2026" [ref=f20e224]
+            - cell "Soirée Jeux de société Expert" [ref=f20e225]
+            - cell "JDS" [ref=f20e228]
+            - cell "Local association" [ref=f20e229]
+            - cell "0" [ref=f20e230]
+            - cell "—" [ref=f20e231]
+            - cell [ref=f20e232]:
+              - link "Modifier" [ref=f20e233] [cursor=pointer]:
+                - /url: /admin/activites/83/modifier
+              - link "Voir les inscrits" [ref=f20e234] [cursor=pointer]:
+                - /url: /admin/activites/83/inscrits
+          - row [ref=f20e235]:
+            - cell "08/07/2026" [ref=f20e236]
+            - cell "Soirée Jeux de société" [ref=f20e237]
+            - cell "JDS" [ref=f20e240]
+            - cell "Local association" [ref=f20e241]
+            - cell "0" [ref=f20e242]
+            - cell "—" [ref=f20e243]
+            - cell [ref=f20e244]:
+              - link "Modifier" [ref=f20e245] [cursor=pointer]:
+                - /url: /admin/activites/82/modifier
+              - link "Voir les inscrits" [ref=f20e246] [cursor=pointer]:
+                - /url: /admin/activites/82/inscrits
+          - row [ref=f20e247]:
+            - cell "08/07/2026" [ref=f20e248]
+            - cell "Midi jeux - déjeuner sur l'herbe" [ref=f20e249]
+            - cell "JDS" [ref=f20e252]
+            - cell "Parc à côté du local" [ref=f20e253]
+            - cell "0" [ref=f20e254]
+            - cell "—" [ref=f20e255]
+            - cell [ref=f20e256]:
+              - link "Modifier" [ref=f20e257] [cursor=pointer]:
+                - /url: /admin/activites/90/modifier
+              - link "Voir les inscrits" [ref=f20e258] [cursor=pointer]:
+                - /url: /admin/activites/90/inscrits
+          - row [ref=f20e259]:
+            - cell "05/07/2026" [ref=f20e260]
+            - cell "Repas commun - Prépa GN" [ref=f20e261]
+            - cell "GN" [ref=f20e264]
+            - cell "Local association" [ref=f20e265]
+            - cell "0" [ref=f20e266]
+            - cell "—" [ref=f20e267]
+            - cell [ref=f20e268]:
+              - link "Modifier" [ref=f20e269] [cursor=pointer]:
+                - /url: /admin/activites/92/modifier
+              - link "Voir les inscrits" [ref=f20e270] [cursor=pointer]:
+                - /url: /admin/activites/92/inscrits
+          - row [ref=f20e271]:
+            - cell "05/07/2026" [ref=f20e272]
+            - cell "Préparation GN été 2026" [ref=f20e273]
+            - cell "GN" [ref=f20e276]
+            - cell "Local + extérieur" [ref=f20e277]
+            - cell "0" [ref=f20e278]
+            - cell "—" [ref=f20e279]
+            - cell [ref=f20e280]:
+              - link "Modifier" [ref=f20e281] [cursor=pointer]:
+                - /url: /admin/activites/86/modifier
+              - link "Voir les inscrits" [ref=f20e282] [cursor=pointer]:
+                - /url: /admin/activites/86/inscrits
+      - generic [ref=f20e283]:
+        - paragraph [ref=f20e284]: 16 activités — page 1 / 2
+        - navigation [ref=f20e285]:
+          - generic [ref=f20e286]: "1"
+          - link "2" [ref=f20e287] [cursor=pointer]:
+            - /url: /admin/activites?page=2
+          - link "Suiv. →" [ref=f20e288] [cursor=pointer]:
+            - /url: /admin/activites?page=2
+  - generic [ref=f20e290]:
+    - paragraph [ref=f20e291]: Ce site utilise des cookies essentiels au fonctionnement (session, sécurité CSRF). Aucun cookie publicitaire n'est utilisé.
+    - generic [ref=f20e292]:
+      - button "Accepter" [ref=f20e293] [cursor=pointer]
+      - button "Refuser" [ref=f20e294] [cursor=pointer]
+  - region "Symfony Web Debug Toolbar" [ref=f20e295]:
+    - generic [ref=f20e298]:
+      - link "200 Redirect @ app_activity_index" [ref=f20e300] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=request
+        - generic [ref=f20e301]:
+          - generic [ref=f20e302]: "200"
+          - img "Redirect" [ref=f20e304]
+          - generic [ref=f20e307]: "@"
+          - generic [ref=f20e308]: app_activity_index
+      - link "433 ms" [ref=f20e310] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=time
+        - generic [ref=f20e311]:
+          - generic [ref=f20e312]: "433"
+          - generic [ref=f20e313]: ms
+      - link "32.0 MiB" [ref=f20e315] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=time
+        - generic [ref=f20e316]:
+          - generic [ref=f20e317]: "32.0"
+          - generic [ref=f20e318]: MiB
+      - link "Logger 2" [ref=f20e320] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=logger
+        - generic [ref=f20e321]:
+          - img "Logger" [ref=f20e322]
+          - generic [ref=f20e326]: "2"
+      - link "Cache 10 in 0.09 ms" [ref=f20e328] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=cache
+        - generic [ref=f20e329]:
+          - img "Cache" [ref=f20e330]
+          - generic [ref=f20e335]: "10"
+          - generic [ref=f20e336]: in 0.09 ms
+      - link "Security guillaume.pecquet@gmail.com" [ref=f20e338] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=security
+        - generic [ref=f20e339]:
+          - img "Security" [ref=f20e340]
+          - generic [ref=f20e344]: guillaume.pecquet@gmail.com
+      - link "Twig 23 ms" [ref=f20e346] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=twig
+        - generic [ref=f20e347]:
+          - img "Twig" [ref=f20e348]
+          - generic [ref=f20e352]: "23"
+          - generic [ref=f20e353]: ms
+      - link "5 in 3.57 ms" [ref=f20e355] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=db
+        - generic [ref=f20e356]:
+          - generic [ref=f20e362]: "5"
+          - generic [ref=f20e363]: in 3.57 ms
+      - link "Symfony 8.0.12" [ref=f20e365] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/fdf6d9?panel=config
+        - generic [ref=f20e366]:
+          - img "Symfony" [ref=f20e368]
+          - generic [ref=f20e370]: 8.0.12
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f20e371] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f20e372]

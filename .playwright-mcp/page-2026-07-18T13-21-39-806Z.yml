@@ -1,0 +1,377 @@
+- generic [active] [ref=f5e1]:
+  - heading "La Boîte à Chimère — Association Ludique Parisienne" [level=1] [ref=f5e2]
+  - generic [ref=f5e3]:
+    - img "Salle de jeu de La Boîte à Chimère" [ref=f5e4]
+    - generic [ref=f5e6]:
+      - region "Événements à la une" [ref=f5e7]:
+        - generic [ref=f5e10]:
+          - generic [ref=f5e11] [cursor=pointer]:
+            - generic [ref=f5e12]:
+              - text: Association
+              - paragraph [ref=f5e13]: "Nouvel arrivage : 15 nouveaux jeux"
+              - paragraph [ref=f5e14]: DISPONIBLES AU LOCAL
+            - generic [ref=f5e15]: VOIR LA LISTE
+          - generic [ref=f5e17] [cursor=pointer]:
+            - generic [ref=f5e18]:
+              - text: Prochain événement
+              - paragraph [ref=f5e19]: Senses Etch - Champs de Valoris
+              - paragraph [ref=f5e20]: 25 JAN
+            - generic [ref=f5e21]: S'INSCRIRE
+          - generic [ref=f5e23] [cursor=pointer]:
+            - generic [ref=f5e24]:
+              - text: Nouvel article
+              - paragraph [ref=f5e25]: "Guide : Peindre ses figurines"
+              - paragraph [ref=f5e26]: PUBLIÉ LUNDI
+            - generic [ref=f5e27]: LIRE LA SUITE
+          - generic [ref=f5e29] [cursor=pointer]:
+            - generic [ref=f5e30]:
+              - text: Vie du forum
+              - paragraph [ref=f5e31]: Organisation GN été 2026
+              - paragraph [ref=f5e32]: EN DISCUSSION
+            - generic [ref=f5e33]: PARTICIPER
+          - generic [ref=f5e35] [cursor=pointer]:
+            - generic [ref=f5e36]:
+              - text: Soirée spéciale
+              - paragraph [ref=f5e37]: Soirée Jeux de société Expert
+              - paragraph [ref=f5e38]: 12 FÉVRIER
+            - generic [ref=f5e39]: RÉSERVER
+          - generic [ref=f5e41] [cursor=pointer]:
+            - generic [ref=f5e42]:
+              - text: Association
+              - paragraph [ref=f5e43]: "Nouvel arrivage : 15 nouveaux jeux"
+              - paragraph [ref=f5e44]: DISPONIBLES AU LOCAL
+            - generic [ref=f5e45]: VOIR LA LISTE
+          - generic [ref=f5e47] [cursor=pointer]:
+            - generic [ref=f5e48]:
+              - text: Prochain événement
+              - paragraph [ref=f5e49]: Senses Etch - Champs de Valoris
+              - paragraph [ref=f5e50]: 25 JAN
+            - generic [ref=f5e51]: S'INSCRIRE
+        - generic [ref=f5e53]:
+          - button "Aller au slide 1" [ref=f5e54]
+          - button "Aller au slide 2" [ref=f5e55]
+          - button "Aller au slide 3" [ref=f5e56]
+          - button "Aller au slide 4" [ref=f5e57]
+          - button "Aller au slide 5" [ref=f5e58]
+      - generic [ref=f5e59]:
+        - generic [ref=f5e60]:
+          - link "LA BOÎTE À CHIMÈRE" [ref=f5e61] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f5e66]:
+              - generic [ref=f5e67]: LA BOÎTE
+              - generic [ref=f5e68]: À CHIMÈRE
+          - navigation [ref=f5e69]:
+            - link "ACCUEIL" [ref=f5e70] [cursor=pointer]:
+              - /url: /
+            - link "JDS" [ref=f5e71] [cursor=pointer]:
+              - /url: /jds
+            - link "JDR" [ref=f5e72] [cursor=pointer]:
+              - /url: /jdr
+            - link "GN" [ref=f5e73] [cursor=pointer]:
+              - /url: /gn
+            - link "ASSOCIATION" [ref=f5e74] [cursor=pointer]:
+              - /url: /association
+            - link "FORUM" [ref=f5e75] [cursor=pointer]:
+              - /url: https://laboiteachimere.com/forum/
+          - generic [ref=f5e76]:
+            - button "Changer de thème" [ref=f5e77]
+            - button "NOUS REJOINDRE" [ref=f5e80] [cursor=pointer]
+        - generic [ref=f5e83]:
+          - generic [ref=f5e84]:
+            - generic [ref=f5e85]:
+              - generic [ref=f5e86]: Email
+              - textbox "Email" [ref=f5e87]:
+                - /placeholder: votre@email.com
+            - generic [ref=f5e88]:
+              - generic [ref=f5e89]: Mot de passe
+              - generic [ref=f5e90]:
+                - textbox "Mot de passe" [ref=f5e91]:
+                  - /placeholder: ········
+                - button "Afficher le mot de passe" [ref=f5e92] [cursor=pointer]
+            - button "SE CONNECTER" [ref=f5e95] [cursor=pointer]
+            - button "S'INSCRIRE" [ref=f5e96] [cursor=pointer]
+          - link "Mot de passe oublié ?" [ref=f5e97] [cursor=pointer]:
+            - /url: /reset-password
+  - generic [ref=f5e98]:
+    - heading "ASSOCIATION LUDIQUE PARISIENNE" [level=2] [ref=f5e99]
+    - generic [ref=f5e100]:
+      - link [ref=f5e101] [cursor=pointer]:
+        - /url: /nos/soiree/heb
+        - img "Activité Nos soirées hebdomadaires du mardi (à partir de 19h)" [ref=f5e102]
+        - heading "Nos soirées hebdomadaires du mardi (à partir de 19h)" [level=3] [ref=f5e108]
+      - link [ref=f5e109] [cursor=pointer]:
+        - /url: /nos/soiree/biheb
+        - img "Activité Nos soirées bi-hebdomadaires du vendredi (à partir de 19h)" [ref=f5e110]
+        - heading "Nos soirées bi-hebdomadaires du vendredi (à partir de 19h)" [level=3] [ref=f5e116]
+      - link [ref=f5e117] [cursor=pointer]:
+        - /url: /nos/soiree/mensuelle
+        - img "Activité Nos après-midi mensuels du dimanche (à partir de 14h)" [ref=f5e118]
+        - heading "Nos après-midi mensuels du dimanche (à partir de 14h)" [level=3] [ref=f5e124]
+  - main [ref=f5e126]:
+    - generic [ref=f5e127]:
+      - complementary [ref=f5e128]:
+        - generic [ref=f5e130]:
+          - heading "ÉVÉNEMENTS À VENIR" [level=2] [ref=f5e131]
+          - article [ref=f5e132]:
+            - generic [ref=f5e133]:
+              - link "← Juin" [ref=f5e134] [cursor=pointer]:
+                - /url: /?month=6&year=2026
+              - link "Juillet 2026" [ref=f5e135] [cursor=pointer]:
+                - /url: /?month=7&year=2026&day=0
+              - link "Août →" [ref=f5e136] [cursor=pointer]:
+                - /url: /?month=8&year=2026
+            - generic [ref=f5e137]:
+              - link "Tous" [ref=f5e138] [cursor=pointer]:
+                - /url: /?month=7&year=2026
+              - link "Filtrer par JDS" [ref=f5e139] [cursor=pointer]:
+                - /url: /?month=7&year=2026&type=JDS
+                - text: JDS
+              - link "Filtrer par JDR" [ref=f5e140] [cursor=pointer]:
+                - /url: /?month=7&year=2026&type=JDR
+                - text: JDR
+              - link "Filtrer par GN" [ref=f5e141] [cursor=pointer]:
+                - /url: /?month=7&year=2026&type=GN
+                - text: GN
+              - link "Filtrer par JDF" [ref=f5e142] [cursor=pointer]:
+                - /url: /?month=7&year=2026&type=JDF
+                - text: JDF
+              - link "Filtrer par AG" [ref=f5e143] [cursor=pointer]:
+                - /url: /?month=7&year=2026&type=AG
+                - text: AG
+            - generic [ref=f5e144]:
+              - generic [ref=f5e148]:
+                - generic [ref=f5e149]: Lu
+                - generic [ref=f5e150]: Ma
+                - generic [ref=f5e151]: Me
+                - generic [ref=f5e152]: Je
+                - generic [ref=f5e153]: Ve
+                - generic [ref=f5e154]: Sa
+                - generic [ref=f5e155]: Di
+                - link "1" [ref=f5e158] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=1
+                - link "2" [ref=f5e159] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=2
+                - link "3" [ref=f5e161] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=3
+                - link "4" [ref=f5e162] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=4
+                - link "5 2" [ref=f5e163] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=5
+                  - generic [ref=f5e164]: "5"
+                  - generic [ref=f5e165]: "2"
+                - link "6" [ref=f5e166] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=6
+                - link "7" [ref=f5e167] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=7
+                - link "8 2" [ref=f5e168] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=8
+                  - generic [ref=f5e169]: "8"
+                  - generic [ref=f5e170]: "2"
+                - link "9" [ref=f5e171] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=9
+                - link "10" [ref=f5e172] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=10
+                - link "11" [ref=f5e173] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=11
+                - link "12" [ref=f5e174] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=12
+                - link "13" [ref=f5e176] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=13
+                - link "14" [ref=f5e177] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=14
+                - link "15 2" [ref=f5e178] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=15
+                  - generic [ref=f5e179]: "15"
+                  - generic [ref=f5e180]: "2"
+                - link "16" [ref=f5e181] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=16
+                - link "17" [ref=f5e182] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=17
+                - link "18" [ref=f5e183] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=18
+                - link "19" [ref=f5e184] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=19
+                - link "20" [ref=f5e186] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=20
+                - link "21" [ref=f5e187] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=21
+                - link "22" [ref=f5e188] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=22
+                - link "23" [ref=f5e190] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=23
+                - link "24" [ref=f5e191] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=24
+                - link "25" [ref=f5e192] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=25
+                - link "26" [ref=f5e194] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=26
+                - link "27" [ref=f5e195] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=27
+                - link "28" [ref=f5e196] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=28
+                - link "29" [ref=f5e198] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=29
+                - link "30" [ref=f5e199] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=30
+                - link "31" [ref=f5e200] [cursor=pointer]:
+                  - /url: /?month=7&year=2026&day=31
+              - generic [ref=f5e202]:
+                - generic [ref=f5e203]:
+                  - generic [ref=f5e204]:
+                    - generic [ref=f5e205]:
+                      - generic [ref=f5e206]: BOITE
+                      - generic [ref=f5e207]: 19 JUL
+                    - 'heading "Nouvel arrivage : soirée découverte" [level=3] [ref=f5e208]'
+                    - paragraph [ref=f5e209]: Test des 15 nouveaux jeux arrivés au local. Inscription conseillée.
+                  - button "S'INSCRIRE" [ref=f5e210] [cursor=pointer]
+                - generic [ref=f5e211]:
+                  - generic [ref=f5e212]:
+                    - generic [ref=f5e213]:
+                      - generic [ref=f5e214]: JDR
+                      - generic [ref=f5e215]: 22 JUL
+                    - heading "Partie JDR - Appel de Cthulhu" [level=3] [ref=f5e216]
+                    - paragraph [ref=f5e217]: One-shot horreur. Places limitées.
+                  - button "S'INSCRIRE" [ref=f5e218] [cursor=pointer]
+                - generic [ref=f5e219]:
+                  - generic [ref=f5e220]:
+                    - generic [ref=f5e221]:
+                      - generic [ref=f5e222]: BOITE
+                      - generic [ref=f5e223]: 25 JUL
+                    - heading "Senses Etch - Champs de Valoris" [level=3] [ref=f5e224]
+                    - paragraph [ref=f5e225]: Soirée découverte du jeu Senses Etch dans l'univers Champs de Valoris.
+                  - button "S'INSCRIRE" [ref=f5e226] [cursor=pointer]
+                - generic [ref=f5e227]:
+                  - generic [ref=f5e228]:
+                    - generic [ref=f5e229]:
+                      - generic [ref=f5e230]: AG
+                      - generic [ref=f5e231]: 28 JUL
+                    - heading "Assemblée générale" [level=3] [ref=f5e232]
+                    - paragraph [ref=f5e233]: "AG annuelle de l'association. Ordre du jour : bilan, budget, élections."
+                  - button "S'INSCRIRE" [ref=f5e234] [cursor=pointer]
+      - generic [ref=f5e235]:
+        - heading "DERNIÈRES CHIMÈRES" [level=2] [ref=f5e236]
+        - generic [ref=f5e237]:
+          - article [ref=f5e238]:
+            - 'link "Illustration de l''article : COMPTE-RENDU : L''ASSAUT DES DRAGONS 0/3 COMPTE-RENDU : L''ASSAUT DES DRAGONS" [ref=f5e239] [cursor=pointer]':
+              - /url: /nouvelles/compte-rendu-assaut-des-dragons
+              - 'img "Illustration de l''article : COMPTE-RENDU : L''ASSAUT DES DRAGONS" [ref=f5e240]'
+              - generic [ref=f5e242]: 0/3
+              - 'heading "COMPTE-RENDU : L''ASSAUT DES DRAGONS" [level=3] [ref=f5e244]'
+          - article [ref=f5e245]:
+            - generic [ref=f5e246]:
+              - 'img "Illustration de l''article : REPORTAGE PHOTO : GN DU CRÉPUSCULE" [ref=f5e247]'
+              - generic [ref=f5e249]: 0/0
+              - 'heading "REPORTAGE PHOTO : GN DU CRÉPUSCULE" [level=3] [ref=f5e251]'
+          - article [ref=f5e252]:
+            - generic [ref=f5e253]:
+              - 'img "Illustration de l''article : GUIDE : PEINDRE SES FIGURINES" [ref=f5e254]'
+              - generic [ref=f5e256]: 0/3
+              - 'heading "GUIDE : PEINDRE SES FIGURINES" [level=3] [ref=f5e258]'
+          - article [ref=f5e259]:
+            - generic [ref=f5e260]:
+              - 'img "Illustration de l''article : NOUVEAUTÉ : LES SORTIES DE FÉVRIER" [ref=f5e261]'
+              - generic [ref=f5e263]: NEW
+              - 'heading "NOUVEAUTÉ : LES SORTIES DE FÉVRIER" [level=3] [ref=f5e265]'
+        - region [ref=f5e266]:
+          - heading "FILTRER LES ARTICLES" [level=3] [ref=f5e267]
+          - generic [ref=f5e268]:
+            - generic [ref=f5e269] [cursor=pointer]:
+              - generic [ref=f5e270]: Fantasy
+              - checkbox "Fantasy" [checked] [ref=f5e272]
+            - generic [ref=f5e274] [cursor=pointer]:
+              - generic [ref=f5e275]: Science-Fiction
+              - checkbox "Science-Fiction" [checked] [ref=f5e277]
+            - generic [ref=f5e279] [cursor=pointer]:
+              - generic [ref=f5e280]: Horreur
+              - checkbox "Horreur" [checked] [ref=f5e282]
+        - region [ref=f5e285]:
+          - heading "VOIR LES ARCHIVES" [level=3] [ref=f5e286]
+          - generic [ref=f5e287]:
+            - generic [ref=f5e288]:
+              - generic [ref=f5e289]: Année 2025
+              - generic [ref=f5e290]: Bientôt
+            - generic [ref=f5e291]:
+              - generic [ref=f5e292]: Année 2024
+              - generic [ref=f5e293]: Bientôt
+            - generic [ref=f5e294]:
+              - generic [ref=f5e295]: Archives antérieures
+              - generic [ref=f5e296]: Bientôt
+  - generic [ref=f5e298]:
+    - generic [ref=f5e299]:
+      - heading "VIE DU FORUM" [level=2] [ref=f5e300]
+      - link "VOIR LE FORUM" [ref=f5e301] [cursor=pointer]:
+        - /url: https://laboiteachimere.com/forum/
+    - generic [ref=f5e302]:
+      - article [ref=f5e303]:
+        - generic [ref=f5e304]:
+          - img "Avatar de Stratégies pour Gloomhaven" [ref=f5e306]
+          - generic [ref=f5e307]:
+            - paragraph [ref=f5e308]: "Stratégies pour Gloomhaven :"
+            - paragraph [ref=f5e309]: Il y a 33 min.
+      - article [ref=f5e310]:
+        - generic [ref=f5e311]:
+          - img "Avatar de Nouvelle campagne D&D" [ref=f5e313]
+          - generic [ref=f5e314]:
+            - paragraph [ref=f5e315]: "Nouvelle campagne D&D :"
+            - paragraph [ref=f5e316]: Il y a 30 min.
+      - article [ref=f5e317]:
+        - generic [ref=f5e318]:
+          - img "Avatar de Organisation GN été 2026" [ref=f5e320]
+          - generic [ref=f5e321]:
+            - paragraph [ref=f5e322]: "Organisation GN été 2026 :"
+            - paragraph [ref=f5e323]: Il y a 1h.
+  - contentinfo [ref=f5e324]:
+    - generic [ref=f5e325]:
+      - generic [ref=f5e326]:
+        - heading "COMMUNAUTÉ & RESSOURCES" [level=3] [ref=f5e327]
+        - paragraph [ref=f5e328]: Newsletter
+        - generic [ref=f5e329]:
+          - textbox "Pour s'inscrire..." [ref=f5e330]
+          - button "S'inscrire" [ref=f5e331]
+      - generic [ref=f5e334]:
+        - heading "SOCIALS" [level=3] [ref=f5e335]
+        - generic [ref=f5e336]:
+          - link "Facebook" [ref=f5e337] [cursor=pointer]:
+            - /url: https://www.facebook.com/laboiteachimere
+          - img "Instagram (bientôt disponible)" [ref=f5e340]
+          - img "YouTube (bientôt disponible)" [ref=f5e343]
+      - generic [ref=f5e346]:
+        - heading "PAGES IMPORTANTES" [level=3] [ref=f5e347]
+        - generic [ref=f5e348]:
+          - list [ref=f5e349]:
+            - listitem [ref=f5e350]:
+              - link "Nouvelles" [ref=f5e351] [cursor=pointer]:
+                - /url: /nouvelles
+            - listitem [ref=f5e352]:
+              - link "Qui sommes-nous" [ref=f5e353] [cursor=pointer]:
+                - /url: /qui-sommes-nous
+            - listitem [ref=f5e354]:
+              - link "Sociétés" [ref=f5e355] [cursor=pointer]:
+                - /url: /societes
+          - list [ref=f5e356]:
+            - listitem [ref=f5e357]:
+              - link "Événements" [ref=f5e358] [cursor=pointer]:
+                - /url: /evenements
+            - listitem [ref=f5e359]:
+              - link "Mentions légales" [ref=f5e360] [cursor=pointer]:
+                - /url: /mentions-legales
+            - listitem [ref=f5e361]:
+              - link "Contact" [ref=f5e362] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=f5e363]:
+              - button "Gestion des cookies" [ref=f5e364]
+    - paragraph [ref=f5e366]: © 2026 LA BOÎTE À CHIMÈRE. Tous droits réservés.
+  - generic [ref=f5e368]:
+    - paragraph [ref=f5e369]: Ce site utilise des cookies essentiels au fonctionnement (session, sécurité CSRF). Aucun cookie publicitaire n'est utilisé.
+    - generic [ref=f5e370]:
+      - button "Accepter" [ref=f5e371] [cursor=pointer]
+      - button "Refuser" [ref=f5e372] [cursor=pointer]
+  - region "Symfony Web Debug Toolbar" [ref=f5e373]:
+    - generic [ref=f5e376]:
+      - link "Symfony Loading…" [ref=f5e378] [cursor=pointer]:
+        - /url: http://devboitechimere.test/_profiler/c27719?panel=request
+        - generic [ref=f5e379]:
+          - img "Symfony" [ref=f5e380]
+          - generic [ref=f5e382]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f5e383] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f5e384]

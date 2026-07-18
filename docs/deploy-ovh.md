@@ -60,6 +60,8 @@ cp .env.prod.dist .env.local
 nano .env.local   # APP_SECRET, DATABASE_URL, MAILER_DSN, DEFAULT_URI
 ```
 
+Le compte mail de prod est `superuser@guillaumepecquet.ovh` (récupérer le mot de passe depuis le manager OVH / espace mail) — à renseigner dans `MAILER_DSN`.
+
 Générer un secret :
 
 ```bash
@@ -116,7 +118,7 @@ chmod +x bin/deploy.sh
 
 - [ ] Site joignable en HTTPS
 - [ ] Login admin fonctionne
-- [ ] Envoi d’email (reset password / inscription) OK
+- [ ] Envoi d’email (reset password / inscription) OK, expéditeur `superuser@guillaumepecquet.ovh`
 - [ ] Upload images articles OK (`public/images` writable)
 - [ ] `APP_DEBUG=0`, profiler absent
 - [ ] Pas de fixtures chargées
