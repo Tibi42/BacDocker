@@ -55,6 +55,16 @@ final class HtmlSanitizer
 
     private function cleanNode(\DOMNode $node): void
     {
+        // 1. Recurse into children first (bottom-up) so they are cleaned before we modify the parent
+        $children = [];
+        foreach ($node->childNodes as $child) {
+            $children[] = $child;
+        }
+        foreach ($children as $child) {
+            $this->cleanNode($child);
+        }
+
+        // 2. Clean the node itself
         if ($node instanceof \DOMElement) {
             $tag = strtolower($node->tagName);
 
@@ -64,7 +74,7 @@ final class HtmlSanitizer
             }
 
             if (!\in_array($tag, self::ALLOWED_TAGS, true)) {
-                // Remplacer le nœud interdit par ses enfants
+                // Remplacer le nœud interdit par ses enfants (déjà nettoyés)
                 while ($node->firstChild) {
                     $node->parentNode?->insertBefore($node->firstChild, $node);
                 }
@@ -95,15 +105,6 @@ final class HtmlSanitizer
                     $node->removeAttribute('target');
                 }
             }
-        }
-
-        // Copier la liste : cleanNode peut modifier l'arbre
-        $children = [];
-        foreach ($node->childNodes as $child) {
-            $children[] = $child;
-        }
-        foreach ($children as $child) {
-            $this->cleanNode($child);
         }
     }
 

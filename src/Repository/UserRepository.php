@@ -53,12 +53,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Retourne les utilisateurs filtrés par période d'inscription, rôle et recherche texte.
-     * Utilisé par la liste admin des utilisateurs.
-     *
-     * @return User[]
+     * QueryBuilder pour la liste admin (pagination KnpPaginator).
      */
-    public function findAllFiltered(?\DateTimeImmutable $from = null, ?\DateTimeImmutable $to = null, ?string $role = null, ?string $search = null): array
+    public function findAllFilteredQb(?\DateTimeImmutable $from = null, ?\DateTimeImmutable $to = null, ?string $role = null, ?string $search = null): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->createQueryBuilder('u')
             ->orderBy('u.createdAt', 'DESC')
@@ -86,7 +83,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->setParameter('search', '%' . $search . '%');
         }
 
-        return $qb->getQuery()->getResult();
+        return $qb;
+    }
+
+    /**
+     * Retourne les utilisateurs filtrés par période d'inscription, rôle et recherche texte.
+     * Utilisé par l'export CSV (tous les résultats, sans pagination).
+     *
+     * @return User[]
+     */
+    public function findAllFiltered(?\DateTimeImmutable $from = null, ?\DateTimeImmutable $to = null, ?string $role = null, ?string $search = null): array
+    {
+        return $this->findAllFilteredQb($from, $to, $role, $search)->getQuery()->getResult();
     }
 
     /**

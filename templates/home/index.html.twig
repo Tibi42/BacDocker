@@ -33,13 +33,18 @@
 </script>
 {% endblock %}
 
+{% block stylesheets %}
+	<link rel="preload" as="image" href="{{ asset('images/hero/hero.webp') }}" type="image/webp" fetchpriority="high">
+	{{ parent() }}
+{% endblock %}
+
 {% block importmap %}{{ importmap(['app', 'carousel.js']) }}{% endblock %}
 
 {% block body %}
 <h1 class="sr-only">La Boîte à Chimère — Association Ludique Parisienne</h1>
 	<!-- Hero Section avec Carousel, Header et NOS MONDES -->
 	<section id="home" class="relative w-full min-h-[600px] lg:min-h-[700px] overflow-hidden mb-12 lg:mb-0">
-		<img src="{{ asset('images/hero/hero.webp') }}" alt="Salle de jeu de La Boîte à Chimère" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover">
+		<img src="{{ asset('images/hero/hero.webp') }}" alt="Salle de jeu de La Boîte à Chimère" width="1920" height="1080" fetchpriority="high" decoding="sync" class="absolute inset-0 h-full w-full object-cover">
 		<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
 
 		{% set slides = carousel_slides() %}
@@ -62,7 +67,7 @@
 					<div class="overflow-hidden rounded-2xl">
 						<div id="carousel" class="flex h-auto" style="transform: translateX(0%); touch-action: pan-y;">
 							{% for slide in slides %}
-								{% set btnUrl = slide.btn_url|default('') %}
+								{% set btnUrl = slide.btn_url|default('')|safe_url %}
 								{% if btnUrl %}
 									<a href="{{ btnUrl }}" class="carousel-events-slide relative group cursor-pointer flex flex-shrink-0 flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-5 lg:px-6 lg:py-4 w-full min-w-full overflow-hidden hover:bg-white/5 transition-colors">
 										<div class="flex-1">
@@ -105,31 +110,31 @@
 			</header>
 
 <!-- ÉVÉNEMENTS À VENIR (Mobile only - inside hero for layout flow). Turbo-frame : mise à jour partielle pour ne pas fermer le menu / modales. -->
-			<turbo-frame id="calendar-frame">
+			<turbo-frame id="calendar-frame" class="calendar-turbo-frame">
 				<div id="calendar" class="lg:hidden mx-auto max-w-[1240px] px-8 mb-8">
 					<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6">ÉVÉNEMENTS À VENIR</h2>
 					<article class="bg-custom-primary p-5 rounded-xl border border-custom relative shadow-2xl glass-card">
 						{# Navigation mois #}
 						<div class="flex items-center justify-between mb-4">
-							<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
+							<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
 								{{ calendarMonthName }} {{ calendarYear }}
 							</a>
-							<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}#calendar" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
+							<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
 						</div>
 						{# Filtres par type #}
 						<div class="grid grid-cols-3 gap-2 mb-4">
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}#calendar"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}" data-turbo-action="advance"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType is null ? 'bg-custom-orange text-gray-900' : 'bg-custom-tertiary text-text-secondary hover:text-gray-900' }}">Tous</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}#calendar" aria-label="Filtrer par JDS"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDS"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDS' ? 'bg-emerald-500 text-gray-900' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40' }}">JDS</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}#calendar" aria-label="Filtrer par JDR"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDR"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDR' ? 'bg-violet-500 text-white' : 'bg-violet-500/20 text-violet-400 hover:bg-violet-500/40' }}">JDR</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}#calendar" aria-label="Filtrer par GN"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}" data-turbo-action="advance" aria-label="Filtrer par GN"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'GN' ? 'bg-red-500 text-white' : 'bg-red-500/20 text-red-400 hover:bg-red-500/40' }}">GN</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}#calendar" aria-label="Filtrer par JDF"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDF"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDF' ? 'bg-sky-500 text-gray-900' : 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/40' }}">JDF</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}#calendar" aria-label="Filtrer par AG"
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}" data-turbo-action="advance" aria-label="Filtrer par AG"
 							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'AG' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/40' }}">AG</a>
 						</div>
 						<div class="flex gap-4 mb-6">
@@ -148,25 +153,18 @@
 												or (calendarYear == nowYear and calendarMonth > nowMonth)
 												or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
 											{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
-											{% set isClickable = is_granted('ROLE_USER') and (isToday or isFuture) %}
 											{% set isPast = not isFuture and not isToday %}
 											{% if day in daysWithActivities %}
-												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}#calendar" class="calendar-day-event block py-2 rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
+												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-event block py-2 rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
 													<span>{{ day }}</span>
 													{% if (activitiesCountByDay[day] ?? 1) > 1 %}
 														<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
 													{% endif %}
 												</a>
 											{% elseif isToday %}
-												{% if isClickable %}
-													<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2" title="Ajouter un événement">{{ day }}</button>
-												{% else %}
-													<span class="py-2 text-custom-orange font-bold underline underline-offset-2">{{ day }}</span>
-												{% endif %}
-											{% elseif isClickable %}
-												<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="calendar-day-empty block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-text-primary" title="Ajouter un événement">{{ day }}</button>
+												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2 {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
 											{% else %}
-												<span class="calendar-day-empty py-2 {{ isPast ? 'text-text-secondary' : 'text-text-primary' }}">{{ day }}</span>
+												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-empty block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer {{ isPast ? 'text-text-secondary' : 'text-text-primary' }} {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
 											{% endif %}
 										{% else %}
 											<span class="py-2"></span>
@@ -214,6 +212,11 @@
 								   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
 									+ Ajouter une activité
 								</button>
+							{% elseif not is_granted('ROLE_USER') and selectedDayIsFuture %}
+								<p class="text-[10px] text-text-secondary text-center mt-3">
+									<a href="{{ path('app_home', { open: 'login' }) }}" data-turbo="false" class="text-custom-orange font-bold uppercase tracking-wider hover:underline">Connectez-vous</a>
+									pour proposer une activité.
+								</p>
 							{% endif %}
 						{% else %}
 							{% for activity in activities %}
@@ -251,7 +254,7 @@
 					<div class="grid gap-6">
 						{% for world in worlds %}
 							<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}-mobile" class="group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg">
-								<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover">
+								<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
 								<div class="absolute inset-0 image-overlay"></div>
 								<div class="absolute left-4 top-4 glass h-8 w-8 flex items-center justify-center rounded-lg text-cyan-400">
 									<svg class="h-4 w-4" fill="currentColor" viewbox="0 0 24 24">
@@ -275,7 +278,7 @@
 		<div class="grid gap-6 lg:grid-cols-3">
 			{% for world in worlds %}
 				<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}" class="reveal delay-{{ loop.index }}00 card-premium group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg border border-custom">
-					<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
+					<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
 					<div class="absolute inset-0 image-overlay"></div>
 					<div class="absolute left-4 top-4 glass h-8 w-8 flex items-center justify-center rounded-lg text-cyan-400">
 						<svg class="h-4 w-4" fill="currentColor" viewbox="0 0 24 24">
@@ -302,31 +305,31 @@
 
 				<!-- Section ÉVÉNEMENTS À VENIR (Sidebar - Desktop). Turbo-frame : mise à jour partielle pour ne pas fermer les modales. -->
 				<aside id="calendar-desktop" class="lg:col-span-12 order-4 lg:order-1 space-y-10">
-					<turbo-frame id="calendar-desktop-frame">
+					<turbo-frame id="calendar-desktop-frame" class="calendar-turbo-frame">
 						<div class="hidden lg:block">
 							<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8">ÉVÉNEMENTS À VENIR</h2>
 							<article class="bg-custom-primary p-5 lg:p-6 rounded-xl border border-custom relative shadow-2xl glass-card">
 								{# Navigation mois #}
 								<div class="flex items-center justify-between mb-4">
-									<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
+									<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
 										{{ calendarMonthName }} {{ calendarYear }}
 									</a>
-									<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}#calendar-desktop" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
+									<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
 								</div>
 								{# Filtres par type #}
 								<div class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}#calendar-desktop"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}" data-turbo-action="advance"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType is null ? 'bg-custom-orange text-gray-900' : 'bg-custom-tertiary text-text-secondary hover:text-gray-900' }}">Tous</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}#calendar-desktop" aria-label="Filtrer par JDS"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDS"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDS' ? 'bg-emerald-500 text-gray-900' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40' }}">JDS</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}#calendar-desktop" aria-label="Filtrer par JDR"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDR"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDR' ? 'bg-violet-500 text-white' : 'bg-violet-500/20 text-violet-400 hover:bg-violet-500/40' }}">JDR</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}#calendar-desktop" aria-label="Filtrer par GN"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}" data-turbo-action="advance" aria-label="Filtrer par GN"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'GN' ? 'bg-red-500 text-white' : 'bg-red-500/20 text-red-400 hover:bg-red-500/40' }}">GN</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}#calendar-desktop" aria-label="Filtrer par JDF"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDF"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDF' ? 'bg-sky-500 text-gray-900' : 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/40' }}">JDF</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}#calendar-desktop" aria-label="Filtrer par AG"
+									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}" data-turbo-action="advance" aria-label="Filtrer par AG"
 									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'AG' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/40' }}">AG</a>
 								</div>
 								<div class="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
@@ -348,25 +351,18 @@
 																or (calendarYear == nowYear and calendarMonth > nowMonth)
 																or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
 															{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
-															{% set isClickable = is_granted('ROLE_USER') and (isToday or isFuture) %}
 															{% set isPast = not isFuture and not isToday %}
 															{% if day in daysWithActivities %}
-																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}#calendar-desktop" class="calendar-day-event block py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : ''  }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
+																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-event block py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : ''  }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
 																	<span>{{ day }}</span>
 																	{% if (activitiesCountByDay[day] ?? 1) > 1 %}
 																		<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
 																	{% endif %}
 																</a>
 															{% elseif isToday %}
-																{% if isClickable %}
-																	<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2" title="Ajouter un événement">{{ day }}</button>
-																{% else %}
-																	<span class="py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center text-custom-orange font-bold underline underline-offset-2">{{ day }}</span>
-																{% endif %}
-															{% elseif isClickable %}
-																<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(day)}) }}" class="calendar-day-empty block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-text-primary" title="Ajouter un événement">{{ day }}</button>
+																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2 {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
 															{% else %}
-																<span class="calendar-day-empty py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center {{ isPast ? 'text-text-secondary' : 'text-text-primary' }}">{{ day }}</span>
+																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-empty block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer {{ isPast ? 'text-text-secondary' : 'text-text-primary' }} {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
 															{% endif %}
 														{% else %}
 															<span class="py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center"></span>
@@ -422,6 +418,11 @@
 												   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
 													+ Ajouter une activité
 												</button>
+											{% elseif not is_granted('ROLE_USER') and selectedDayIsFuture %}
+												<p class="text-[10px] text-text-secondary text-center mt-3">
+													<a href="{{ path('app_home', { open: 'login' }) }}" data-turbo="false" class="text-custom-orange font-bold uppercase tracking-wider hover:underline">Connectez-vous</a>
+													pour proposer une activité.
+												</p>
 											{% endif %}
 										{% else %}
 											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
@@ -489,20 +490,21 @@
 						{% set articles = featured_articles() %}
 						{% for article in articles %}
 							<article class="reveal delay-{{ loop.index }}00">
-								{% if article.url is defined and article.url %}
-									<a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium" style="min-height: 220px;">
+								{% set articleUrl = article.url|default('')|safe_url %}
+								{% if articleUrl %}
+									<a href="{{ articleUrl }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium" style="min-height: 220px;">
 								{% elseif article.hasContent and article.id %}
 									<a href="{{ path('app_article_show', {id: article.id}) }}" class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium" style="min-height: 220px;">
 								{% else %}
 									<div class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium" style="min-height: 220px;">
 								{% endif %}
-									<img src="{{ asset('images/articles/' ~ article.image) }}" alt="Illustration de l'article : {{ article.title }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
+									<img src="{{ asset('images/articles/' ~ (article.image|prefer_webp)) }}" alt="Illustration de l'article : {{ article.title }}" loading="lazy" decoding="async" width="640" height="440" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
 									<div class="absolute inset-0 image-overlay"></div>
 									<span class="absolute right-3 top-3 bg-custom-orange px-2 py-1 rounded text-[9px] font-bold text-gray-900 uppercase tracking-widest shadow-lg">{{ article.tag }}</span>
 									<div class="absolute bottom-4 left-4 right-4 z-10">
 										<h3 class="text-sm font-bold leading-tight text-text-primary uppercase">{{ article.title }}</h3>
 									</div>
-								{% if (article.url is defined and article.url) or (article.hasContent and article.id) %}
+								{% if articleUrl or (article.hasContent and article.id) %}
 									</a>
 								{% else %}
 									</div>

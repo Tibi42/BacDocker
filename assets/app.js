@@ -1,5 +1,7 @@
 import '@hotwired/turbo';
 import './stimulus_bootstrap.js';
+// Charge les listeners CSRF (double-submit) même hors éléments data-controller
+import './controllers/csrf_protection_controller.js';
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -12,6 +14,7 @@ import './reveal.js';
 import './theme_toggle.js';
 import './join_panel.js';
 import './modal.js';
+import './calendar_turbo.js';
 import './cookie_consent.js';
 import './admin_url_mask.js';
 

@@ -11,14 +11,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
     name: 'load-fixtures',
-    description: 'Load fixture users (dev only — refuses prod unless --force)',
+    description: 'Load fixture users (dev/test only — refused in production)',
 )]
 class LoadFixturesCommand extends Command
 {
@@ -31,15 +30,10 @@ class LoadFixturesCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this->addOption('force', null, InputOption::VALUE_NONE, 'Allow running outside the dev environment');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this->environment === 'prod' && !$input->getOption('force')) {
-            $output->writeln('<error>Refusé en production. Utilisez --force uniquement si vous savez ce que vous faites.</error>');
+        if ($this->environment === 'prod') {
+            $output->writeln('<error>Refusé en production.</error>');
 
             return Command::FAILURE;
         }

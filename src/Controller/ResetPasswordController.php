@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
+use App\Util\RateLimitKey;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,7 +45,10 @@ class ResetPasswordController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $limiter = $this->passwordResetLimiter->create($request->getClientIp());
+            $limiter = $this->passwordResetLimiter->create(RateLimitKey::forIpAndIdentifier(
+                $request->getClientIp() ?? 'unknown',
+                (string) $form->get('email')->getData(),
+            ));
             if (!$limiter->consume()->isAccepted()) {
                 $this->addFlash('reset_password_error', 'Trop de demandes. Veuillez réessayer dans quelques minutes.');
 
@@ -154,20 +158,14 @@ class ResetPasswordController extends AbstractController
 
         try {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
-        } catch (TooManyPasswordRequestsException $e) {
-            $availableAt = $e->getAvailableAt();
-            $waitMinutes = $availableAt ? (int) ceil((($availableAt->getTimestamp() - time()) / 60)) : 60;
-            $this->addFlash('reset_password_error', sprintf(
-                'Un email de réinitialisation a déjà été envoyé. Veuillez patienter encore %d minute(s) avant d\'en demander un nouveau.',
-                $waitMinutes
-            ));
-            return $this->redirectToRoute('app_forgot_password_request');
-        } catch (ResetPasswordExceptionInterface $e) {
+        } catch (TooManyPasswordRequestsException) {
+            return $this->redirectToRoute('app_check_email');
+        } catch (ResetPasswordExceptionInterface) {
             return $this->redirectToRoute('app_check_email');
         }
 
         $email = (new TemplatedEmail())
-            ->from(new Address('noreply@laboitechimere.fr', 'La Boîte à Chimère'))
+            ->from(new Address('noreply@laboiteachimere.fr', 'La Boîte à Chimère'))
             ->to((string) $user->getEmail())
             ->subject('Réinitialisation de votre mot de passe')
             ->htmlTemplate('reset_password/email.html.twig')

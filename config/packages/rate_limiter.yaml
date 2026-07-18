@@ -16,3 +16,7 @@ framework:
             policy: 'fixed_window'
             limit: 10
             interval: '15 minutes'
+        activity_proposal:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'

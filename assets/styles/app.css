@@ -445,3 +445,50 @@ html.light-mode .calendar-grid .text-amber-400 {
 #cookie-accept, #mobile-join-btn, .text-gray-900 {
     color: #111827 !important;
 }
+
+/* Calendrier Turbo Frame : feedback de chargement fluide */
+.calendar-turbo-frame {
+    display: block;
+    position: relative;
+    transition: opacity 150ms ease;
+}
+
+.calendar-turbo-frame[busy] {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.calendar-turbo-frame[busy]::after {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(248, 116, 44, 0.25);
+    border-top-color: #f8742c;
+    border-radius: 50%;
+    animation: calendar-frame-spin 0.6s linear infinite;
+    z-index: 5;
+}
+
+@keyframes calendar-frame-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.modal-spinner {
+    display: inline-block;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid rgba(248, 116, 44, 0.25);
+    border-top-color: #f8742c;
+    border-radius: 50%;
+    animation: calendar-frame-spin 0.6s linear infinite;
+}
+
+.modal-spinner-sm {
+    width: 1rem;
+    height: 1rem;
+}

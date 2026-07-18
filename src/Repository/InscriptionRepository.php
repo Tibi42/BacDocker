@@ -17,6 +17,16 @@ class InscriptionRepository extends ServiceEntityRepository
         parent::__construct($registry, Inscription::class);
     }
 
+    public function countForActivity(int $activityId): int
+    {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->andWhere('i.activity = :activityId')
+            ->setParameter('activityId', $activityId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function hasAlreadyRegistered(int $activityId, string $email): bool
     {
         return (int) $this->createQueryBuilder('i')

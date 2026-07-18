@@ -38,7 +38,7 @@
 					<div class="overflow-hidden rounded-2xl">
 						<div id="carousel" class="flex h-auto" style="transform: translateX(0%); touch-action: pan-y;">
 							{% for slide in slides %}
-								{% set btnUrl = slide.btn_url|default('') %}
+								{% set btnUrl = slide.btn_url|default('')|safe_url %}
 								{% if btnUrl %}
 									<a href="{{ btnUrl }}" class="carousel-events-slide relative group cursor-pointer flex flex-shrink-0 flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-5 lg:px-6 lg:py-4 w-full min-w-full overflow-hidden hover:bg-white/5 transition-colors">
 										<div class="flex-1">

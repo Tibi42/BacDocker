@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Inscription;
 use App\Repository\ActivityRepository;
 use App\Repository\InscriptionRepository;
+use App\Validator\PasswordPolicy;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Espace personnel de l'utilisateur connecté.
@@ -77,7 +79,7 @@ class UserDashboardController extends AbstractController
      * et la correspondance entre le nouveau mot de passe et sa confirmation.
      */
     #[Route('/mon-espace/changer-mot-de-passe', name: 'app_user_change_password', methods: ['POST'])]
-    public function changePassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    public function changePassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator): Response
     {
         if (!$this->isCsrfTokenValid('change_password', $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
@@ -85,17 +87,17 @@ class UserDashboardController extends AbstractController
         }
 
         $user = $this->getUser();
-        $currentPassword = $request->request->get('current_password', '');
-        $newPassword = $request->request->get('new_password', '');
-        $confirmPassword = $request->request->get('confirm_password', '');
+        $currentPassword = (string) $request->request->get('current_password', '');
+        $newPassword = (string) $request->request->get('new_password', '');
+        $confirmPassword = (string) $request->request->get('confirm_password', '');
 
         if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
             $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        if (strlen($newPassword) < 12) {
-            $this->addFlash('error', 'Le nouveau mot de passe doit contenir au moins 12 caractères.');
+        foreach ($validator->validate($newPassword, PasswordPolicy::constraints()) as $violation) {
+            $this->addFlash('error', $violation->getMessage());
             return $this->redirectToRoute('app_user_dashboard');
         }
 
@@ -149,15 +151,29 @@ class UserDashboardController extends AbstractController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        $genericChangeEmailFlash = 'Si cette adresse est disponible, un email de confirmation vous a été envoyé.';
+
         $existing = $em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $newEmail]);
         if ($existing) {
-            $this->addFlash('error', 'Cette adresse email est déjà utilisée par un autre compte.');
+            try {
+                $alert = (new TemplatedEmail())
+                    ->from('noreply@laboiteachimere.fr')
+                    ->to((string) $user->getEmail())
+                    ->subject('Tentative de changement d\'adresse email')
+                    ->htmlTemplate('emails/email_change_attempt_alert.html.twig')
+                    ->context(['username' => $user->getUsername()]);
+                $mailer->send($alert);
+            } catch (\Throwable) {
+            }
+            $this->addFlash('success', $genericChangeEmailFlash);
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        // Stocker le nouvel email dans le token (préfixe pending:) jusqu'à confirmation
+        // Token dédié + email en attente dans une colonne séparée (TTL 15 minutes)
         $token = bin2hex(random_bytes(32));
-        $user->setEmailVerificationToken('email_change:' . $token . ':' . $newEmail);
+        $user->setPendingEmail($newEmail);
+        $user->setEmailVerificationToken($token);
+        $user->setEmailVerificationExpiresAt(new \DateTimeImmutable('+15 minutes'));
         $em->flush();
 
         $confirmUrl = $this->generateUrl('app_confirm_email_change', [
@@ -176,7 +192,7 @@ class UserDashboardController extends AbstractController
             ]);
         $mailer->send($email);
 
-        $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $newEmail . '. Cliquez sur le lien pour finaliser le changement.');
+        $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $newEmail . '. Le lien est valable 15 minutes.');
 
         return $this->redirectToRoute('app_user_dashboard');
     }
@@ -185,14 +201,21 @@ class UserDashboardController extends AbstractController
     public function confirmEmailChange(string $token, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        $stored = $user->getEmailVerificationToken() ?? '';
+        $storedToken = $user->getEmailVerificationToken() ?? '';
 
-        if (!str_starts_with($stored, 'email_change:' . $token . ':')) {
+        if ($storedToken === '' || !hash_equals($storedToken, $token)) {
             $this->addFlash('error', 'Ce lien de confirmation est invalide ou a expiré.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        $newEmail = substr($stored, strlen('email_change:' . $token . ':'));
+        if ($user->isEmailVerificationTokenExpired()) {
+            $user->clearEmailVerificationState();
+            $em->flush();
+            $this->addFlash('error', 'Ce lien de confirmation a expiré. Veuillez relancer le changement d\'email.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        $newEmail = $user->getPendingEmail();
         if (!$newEmail || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('error', 'Ce lien de confirmation est invalide.');
             return $this->redirectToRoute('app_user_dashboard');
@@ -201,13 +224,13 @@ class UserDashboardController extends AbstractController
         $existing = $em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $newEmail]);
         if ($existing && $existing->getId() !== $user->getId()) {
             $this->addFlash('error', 'Cette adresse email est déjà utilisée.');
-            $user->setEmailVerificationToken(null);
+            $user->clearEmailVerificationState();
             $em->flush();
             return $this->redirectToRoute('app_user_dashboard');
         }
 
         $user->setEmail($newEmail);
-        $user->setEmailVerificationToken(null);
+        $user->clearEmailVerificationState();
         $em->flush();
 
         $this->addFlash('success', 'Votre adresse email a été mise à jour.');
@@ -312,8 +335,11 @@ class UserDashboardController extends AbstractController
      * en base pour éviter tout accès résiduel.
      */
     #[Route('/mon-espace/supprimer', name: 'app_user_delete_account', methods: ['POST'])]
-    public function deleteAccount(Request $request, EntityManagerInterface $em): Response
-    {
+    public function deleteAccount(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+    ): Response {
         if ($this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Les administrateurs ne peuvent pas supprimer leur compte depuis cette page.');
             return $this->redirectToRoute('app_user_dashboard');
@@ -325,6 +351,12 @@ class UserDashboardController extends AbstractController
         }
 
         $user = $this->getUser();
+        $currentPassword = (string) $request->request->get('current_password', '');
+
+        if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+            $this->addFlash('error', 'Mot de passe incorrect. La suppression du compte a été annulée.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
 
         // Invalider la session avant suppression
         $request->getSession()->invalidate();

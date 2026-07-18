@@ -66,7 +66,7 @@ php bin/console make:controller
 | `/admin/carousel` | `Admin\CarouselController` | Carousel CRUD |
 | `/admin/inscriptions` | `Admin\ActivityRegisterController` | Registration management |
 
-**Security note**: `/admin/*` routes are not yet protected by `access_control` in `security.yaml` (commented out). Admin protection should be added before production.
+**Security note**: `/admin/*` requires `ROLE_ADMIN` and `/mon-espace` requires `ROLE_USER` via `access_control` in `security.yaml`.
 
 ### Key Patterns
 

@@ -1,7 +1,12 @@
 // assets/modal.js
-// Gestion de la modal d'ajout d'événement depuis le calendrier.
-// La modal est en overlay fixe (z-[9999]) défini dans base.html.twig.
-// Le JS toglle simplement la classe "hidden".
+// Modale d'activité / inscription : overlay immédiat + spinner, puis contenu.
+
+const MODAL_LOADING_HTML = `
+<div class="flex flex-col items-center justify-center py-14 gap-4" data-modal-loading aria-live="polite" aria-busy="true">
+    <span class="modal-spinner" aria-hidden="true"></span>
+    <p class="text-[10px] font-extrabold uppercase tracking-widest text-text-secondary">Chargement…</p>
+</div>
+`;
 
 function openModal() {
     const modal = document.getElementById('activity-modal');
@@ -24,7 +29,29 @@ function closeModal() {
     }
 }
 
-// Clic sur un jour du calendrier → fetch le formulaire
+function setSubmitLoading(form, isLoading) {
+    form.querySelectorAll('button[type="submit"]').forEach((btn) => {
+        if (isLoading) {
+            if (!btn.dataset.originalHtml) {
+                btn.dataset.originalHtml = btn.innerHTML;
+            }
+            btn.disabled = true;
+            btn.setAttribute('aria-busy', 'true');
+            btn.innerHTML = `
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="modal-spinner modal-spinner-sm" aria-hidden="true"></span>
+                    Envoi…
+                </span>
+            `;
+        } else if (btn.dataset.originalHtml) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+            btn.innerHTML = btn.dataset.originalHtml;
+        }
+    });
+}
+
+// Clic → overlay + spinner immédiatement, puis fetch du formulaire
 document.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-modal-url]');
     if (!link) return;
@@ -32,7 +59,10 @@ document.addEventListener('click', async (e) => {
     e.preventDefault();
     const url = link.getAttribute('data-modal-url');
     const frame = document.getElementById('activity-modal-frame');
-    if (!frame) return;
+    if (!frame || !url) return;
+
+    frame.innerHTML = MODAL_LOADING_HTML;
+    openModal();
 
     try {
         const response = await fetch(url, {
@@ -48,10 +78,18 @@ document.addEventListener('click', async (e) => {
         const doc = parser.parseFromString(html, 'text/html');
         const remoteFrame = doc.querySelector('turbo-frame#activity-modal-frame');
         frame.innerHTML = remoteFrame ? remoteFrame.innerHTML : html;
-        openModal();
-    } catch (err) {
+    } catch {
         window.location.href = url;
     }
+});
+
+// Feedback immédiat à la soumission d'un formulaire dans la modale
+document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    if (!form.closest('#activity-modal')) return;
+
+    setSubmitLoading(form, true);
 });
 
 // Fermer au clic sur le backdrop

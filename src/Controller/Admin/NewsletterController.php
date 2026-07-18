@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\NewsletterSubscriber;
 use App\Repository\NewsletterSubscriberRepository;
+use App\Util\CsvCellSanitizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +43,7 @@ class NewsletterController extends AbstractController
 
             foreach ($subscribers as $subscriber) {
                 fputcsv($handle, [
-                    $subscriber->getEmail(),
+                    CsvCellSanitizer::sanitize((string) $subscriber->getEmail()),
                     $subscriber->getCreatedAt()?->format('d/m/Y H:i'),
                     $subscriber->getConfirmedAt()?->format('d/m/Y H:i'),
                 ]);

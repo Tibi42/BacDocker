@@ -48,8 +48,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ['default' => true])]
     private bool $isVerified = true;
 
-    #[ORM\Column(length: 64, nullable: true)]
+    #[ORM\Column(length: 512, nullable: true)]
     private ?string $emailVerificationToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $emailVerificationExpiresAt = null;
+
+    /** Nouvelle adresse en attente de confirmation (changement d'email). */
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $pendingEmail = null;
 
     #[ORM\Column(options: ['default' => true])]
     private bool $newsletterOptIn = true;
@@ -152,9 +159,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function regenerateEmailVerificationToken(): static
+    public function getEmailVerificationExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->emailVerificationExpiresAt;
+    }
+
+    public function setEmailVerificationExpiresAt(?\DateTimeImmutable $emailVerificationExpiresAt): static
+    {
+        $this->emailVerificationExpiresAt = $emailVerificationExpiresAt;
+        return $this;
+    }
+
+    public function regenerateEmailVerificationToken(int $ttlSeconds = 86400): static
     {
         $this->emailVerificationToken = bin2hex(random_bytes(32));
+        $this->emailVerificationExpiresAt = new \DateTimeImmutable('+' . $ttlSeconds . ' seconds');
+
+        return $this;
+    }
+
+    public function isEmailVerificationTokenExpired(): bool
+    {
+        return $this->emailVerificationExpiresAt !== null
+            && $this->emailVerificationExpiresAt < new \DateTimeImmutable();
+    }
+
+    public function getPendingEmail(): ?string
+    {
+        return $this->pendingEmail;
+    }
+
+    public function setPendingEmail(?string $pendingEmail): static
+    {
+        $this->pendingEmail = $pendingEmail;
+
+        return $this;
+    }
+
+    public function clearEmailVerificationState(): static
+    {
+        $this->emailVerificationToken = null;
+        $this->emailVerificationExpiresAt = null;
+        $this->pendingEmail = null;
+
         return $this;
     }
 

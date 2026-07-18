@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\ActivityType;
 use App\Repository\ActivityRepository;
 use App\Repository\InscriptionRepository;
+use App\Util\CsvCellSanitizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -125,11 +126,11 @@ class ActivityController extends AbstractController
             foreach ($activities as $activity) {
                 fputcsv($handle, [
                     $activity->getStartAt()->format('d/m/Y'),
-                    $activity->getTitle(),
-                    $activity->getType() ?? '',
-                    $activity->getLocation() ?? '',
+                    CsvCellSanitizer::sanitize((string) $activity->getTitle()),
+                    CsvCellSanitizer::sanitize((string) ($activity->getType() ?? '')),
+                    CsvCellSanitizer::sanitize((string) ($activity->getLocation() ?? '')),
                     $activity->getStatus() === Activity::STATUS_PUBLISHED ? 'Publiée' : 'En attente',
-                    $activity->getProposedBy()?->getEmail() ?? '',
+                    CsvCellSanitizer::sanitize((string) ($activity->getProposedBy()?->getEmail() ?? '')),
                     $activity->getMaxParticipants() ?? '',
                 ], ';');
             }

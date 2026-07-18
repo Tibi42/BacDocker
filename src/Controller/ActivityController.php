@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -46,8 +47,10 @@ class ActivityController extends AbstractController
      */
     #[Route('/activite/nouvelle', name: 'app_activity_new_public', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request): Response
-    {
+    public function new(
+        Request $request,
+        RateLimiterFactoryInterface $activityProposalLimiter,
+    ): Response {
         $activity = new Activity();
 
         // Pré-remplir startAt depuis le paramètre GET ?date=Y-m-d
@@ -64,6 +67,14 @@ class ActivityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var \App\Entity\User $user */
+            $user = $this->getUser();
+            $limiter = $activityProposalLimiter->create('user_' . $user->getId());
+            if (!$limiter->consume()->isAccepted()) {
+                $this->addFlash('error', 'Trop de propositions envoyées. Veuillez réessayer plus tard.');
+                return $this->redirectToRoute('app_home');
+            }
+
             $publishNow = $this->isGranted('ROLE_ADMIN') && $request->request->get('publish_now');
             $activity->setStatus($publishNow ? Activity::STATUS_PUBLISHED : Activity::STATUS_PENDING);
             $activity->setProposedBy($this->getUser());

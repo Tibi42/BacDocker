@@ -10,8 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use App\Validator\PasswordPolicy;
 
 class UserType extends AbstractType
 {
@@ -36,7 +35,6 @@ class UserType extends AbstractType
                     'Super administrateur' => 'ROLE_SUPER_ADMIN',
                 ] : [
                     'Utilisateur' => 'ROLE_USER',
-                    'Administrateur' => 'ROLE_ADMIN',
                 ],
                 'multiple' => true,
                 'expanded' => true,
@@ -48,10 +46,7 @@ class UserType extends AbstractType
                 'label' => 'Mot de passe',
                 'mapped' => false,
                 'required' => true,
-                'constraints' => [
-                    new NotBlank(message: 'Le mot de passe est obligatoire.'),
-                    new Length(min: 12, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères.'),
-                ],
+                'constraints' => PasswordPolicy::constraints(),
                 'attr' => ['placeholder' => 'Minimum 12 caractères'],
             ]);
         }

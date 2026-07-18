@@ -34,11 +34,11 @@ final class SecurityHeadersSubscriber implements EventSubscriberInterface
         $headers = $event->getResponse()->headers;
 
         $headers->set('X-Content-Type-Options', 'nosniff');
-        $headers->set('X-XSS-Protection', '1; mode=block');
         // data: requis par AssetMapper (imports CSS → module JS vide en data:)
+        // unsafe-inline requis par les scripts/styles inline admin (Quill, Flatpickr) et AssetMapper.
         $headers->set(
             'Content-Security-Policy',
-            "default-src 'self'; script-src 'self' 'unsafe-inline' data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
+            "default-src 'self'; script-src 'self' 'unsafe-inline' data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
         );
         $headers->set('X-Frame-Options', 'DENY');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -46,6 +46,8 @@ final class SecurityHeadersSubscriber implements EventSubscriberInterface
 
         if ($this->environment === 'prod') {
             $headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            $csp = (string) $headers->get('Content-Security-Policy');
+            $headers->set('Content-Security-Policy', $csp . '; upgrade-insecure-requests');
         }
     }
 }

@@ -4,15 +4,21 @@ namespace App\Tests\Unit;
 
 use App\Entity\CarouselSlide;
 use App\Repository\CarouselSlideRepository;
+use App\Security\HtmlSanitizer;
 use App\Twig\CarouselExtension;
 use PHPUnit\Framework\TestCase;
 
 class CarouselExtensionTest extends TestCase
 {
+    private function createExtension(CarouselSlideRepository $repo): CarouselExtension
+    {
+        return new CarouselExtension($repo, new HtmlSanitizer());
+    }
+
     public function testRegistersTwigFunction(): void
     {
         $repo = $this->createStub(CarouselSlideRepository::class);
-        $extension = new CarouselExtension($repo);
+        $extension = $this->createExtension($repo);
 
         $functions = $extension->getFunctions();
 
@@ -27,7 +33,7 @@ class CarouselExtensionTest extends TestCase
             ->method('findActiveOrderByPosition')
             ->willReturn([]);
 
-        $extension = new CarouselExtension($repo);
+        $extension = $this->createExtension($repo);
         $slides = $extension->getCarouselSlides();
 
         $this->assertCount(5, $slides);
@@ -51,7 +57,7 @@ class CarouselExtensionTest extends TestCase
             ->method('findActiveOrderByPosition')
             ->willReturn([$slide]);
 
-        $extension = new CarouselExtension($repo);
+        $extension = $this->createExtension($repo);
         $slides = $extension->getCarouselSlides();
 
         $this->assertCount(1, $slides);
@@ -64,6 +70,23 @@ class CarouselExtensionTest extends TestCase
         $this->assertSame('/event/1', $slides[0]['btn_url']);
     }
 
+    public function testStripsUnsafeBtnUrls(): void
+    {
+        $slide = new CarouselSlide();
+        $slide->setTag('Hack');
+        $slide->setBtnUrl('javascript:alert(1)');
+
+        $repo = $this->createMock(CarouselSlideRepository::class);
+        $repo->expects($this->once())
+            ->method('findActiveOrderByPosition')
+            ->willReturn([$slide]);
+
+        $extension = $this->createExtension($repo);
+        $slides = $extension->getCarouselSlides();
+
+        $this->assertNull($slides[0]['btn_url']);
+    }
+
     public function testFallsBackToDefaultsForNullEntityFields(): void
     {
         $slide = new CarouselSlide();
@@ -74,7 +97,7 @@ class CarouselExtensionTest extends TestCase
             ->method('findActiveOrderByPosition')
             ->willReturn([$slide]);
 
-        $extension = new CarouselExtension($repo);
+        $extension = $this->createExtension($repo);
         $slides = $extension->getCarouselSlides();
 
         $this->assertCount(1, $slides);

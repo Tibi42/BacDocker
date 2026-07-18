@@ -5,13 +5,18 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Security\AdminUserAuthorization;
+use App\Util\CsvCellSanitizer;
+use App\Validator\PasswordPolicy;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/admin/utilisateurs', name: 'app_admin_user_')]
 class UserController extends AbstractController
@@ -24,7 +29,7 @@ class UserController extends AbstractController
     }
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(Request $request): Response
+    public function index(Request $request, PaginatorInterface $paginator): Response
     {
         $from = $request->query->get('from');
         $to = $request->query->get('to');
@@ -34,8 +39,16 @@ class UserController extends AbstractController
         $fromDate = $from ? (\DateTimeImmutable::createFromFormat('Y-m-d', $from) ?: null) : null;
         $toDate = $to ? (\DateTimeImmutable::createFromFormat('Y-m-d', $to) ?: null) : null;
 
+        $qb = $this->userRepository->findAllFilteredQb($fromDate, $toDate, $role, $search);
+
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            16
+        );
+
         return $this->render('admin/user/index.html.twig', [
-            'users' => $this->userRepository->findAllFiltered($fromDate, $toDate, $role, $search),
+            'pagination' => $pagination,
             'from' => $from,
             'to' => $to,
             'role' => $role,
@@ -51,6 +64,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->sanitizeUserRoles($user);
             $user->setPassword($this->passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
             $user->setIsVerified(true);
             $this->entityManager->persist($user);
@@ -68,15 +82,15 @@ class UserController extends AbstractController
     #[Route('/{id}/modifier', name: 'edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user): Response
     {
-        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
-            $this->addFlash('error', 'Seul un super administrateur peut modifier un autre super administrateur.');
-            return $this->redirectToRoute('app_admin_user_index');
+        if ($response = $this->denyUnlessCanManagePrivilegedUser($user)) {
+            return $response;
         }
 
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true, 'is_super_admin' => $this->isGranted('ROLE_SUPER_ADMIN')]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->sanitizeUserRoles($user);
             $this->entityManager->flush();
             $this->addFlash('success', 'Utilisateur mis à jour.');
 
@@ -90,18 +104,22 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/changer-mot-de-passe', name: 'change_password', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function changePassword(Request $request, User $user): Response
+    public function changePassword(Request $request, User $user, ValidatorInterface $validator): Response
     {
+        if ($response = $this->denyUnlessCanManagePrivilegedUser($user)) {
+            return $response;
+        }
+
         if (!$this->isCsrfTokenValid('change_password' . $user->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
             return $this->redirectToRoute('app_admin_user_edit', ['id' => $user->getId()]);
         }
 
-        $password = $request->request->get('new_password', '');
-        $confirm  = $request->request->get('confirm_password', '');
+        $password = (string) $request->request->get('new_password', '');
+        $confirm  = (string) $request->request->get('confirm_password', '');
 
-        if (mb_strlen($password) < 12) {
-            $this->addFlash('error', 'Le mot de passe doit faire au moins 12 caractères.');
+        foreach ($validator->validate($password, PasswordPolicy::constraints()) as $violation) {
+            $this->addFlash('error', $violation->getMessage());
             return $this->redirectToRoute('app_admin_user_edit', ['id' => $user->getId()]);
         }
 
@@ -125,9 +143,8 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_admin_user_index');
         }
 
-        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
-            $this->addFlash('error', 'Seul un super administrateur peut suspendre un autre super administrateur.');
-            return $this->redirectToRoute('app_admin_user_index');
+        if ($response = $this->denyUnlessCanManagePrivilegedUser($user)) {
+            return $response;
         }
 
         if (!$this->isCsrfTokenValid('suspend' . $user->getId(), $request->request->get('_token'))) {
@@ -165,9 +182,9 @@ class UserController extends AbstractController
             foreach ($users as $user) {
                 $roles = array_filter($user->getRoles(), fn(string $r) => $r !== 'ROLE_USER');
                 fputcsv($handle, [
-                    $user->getUsername(),
-                    $user->getEmail(),
-                    implode(', ', $roles) ?: 'Utilisateur',
+                    CsvCellSanitizer::sanitize((string) $user->getUsername()),
+                    CsvCellSanitizer::sanitize((string) $user->getEmail()),
+                    CsvCellSanitizer::sanitize(implode(', ', $roles) ?: 'Utilisateur'),
                     $user->isSuspended() ? 'Oui' : 'Non',
                     $user->getCreatedAt()?->format('d/m/Y H:i') ?? '',
                 ], ';');
@@ -183,93 +200,6 @@ class UserController extends AbstractController
         return $response;
     }
 
-    #[Route('/import-csv', name: 'import_csv', methods: ['POST'])]
-    public function importCsv(Request $request): Response
-    {
-        if (!$this->isCsrfTokenValid('import_users', $request->request->get('_token'))) {
-            $this->addFlash('error', 'Jeton de sécurité invalide.');
-            return $this->redirectToRoute('app_admin_user_index');
-        }
-
-        $file = $request->files->get('csv_file');
-        if (!$file || $file->getClientOriginalExtension() !== 'csv') {
-            $this->addFlash('error', 'Veuillez fournir un fichier CSV valide.');
-            return $this->redirectToRoute('app_admin_user_index');
-        }
-
-        $handle = fopen($file->getPathname(), 'r');
-        // Skip BOM if present
-        $bom = fread($handle, 3);
-        if ($bom !== "\xEF\xBB\xBF") {
-            rewind($handle);
-        }
-
-        $header = fgetcsv($handle, 0, ';');
-        if (!$header) {
-            fclose($handle);
-            $this->addFlash('error', 'Fichier CSV vide ou mal formaté.');
-            return $this->redirectToRoute('app_admin_user_index');
-        }
-
-        $created = 0;
-        $skipped = 0;
-        $lineNumber = 1;
-
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
-            $lineNumber++;
-            if (count($row) < 2) {
-                $skipped++;
-                continue;
-            }
-
-            $username = trim($row[0] ?? '');
-            $email = trim($row[1] ?? '');
-
-            if (!$username || !$email) {
-                $skipped++;
-                continue;
-            }
-
-            // Skip if user already exists
-            $existing = $this->userRepository->findOneBy(['email' => $email]);
-            if ($existing) {
-                $skipped++;
-                continue;
-            }
-
-            $user = new User();
-            $user->setUsername($username);
-            $user->setEmail($email);
-
-            // Parse roles if provided — seuls les SUPER_ADMIN peuvent attribuer des rôles admin
-            $rolesStr = trim($row[2] ?? '');
-            if ($rolesStr && $rolesStr !== 'Utilisateur' && $this->isGranted('ROLE_SUPER_ADMIN')) {
-                $allowedRoles = ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_SUPER_ADMIN'];
-                $roles = array_values(array_filter(
-                    array_map('trim', explode(',', $rolesStr)),
-                    fn(string $r) => in_array($r, $allowedRoles, true)
-                ));
-                $user->setRoles($roles);
-            }
-
-            $user->setIsVerified(true);
-
-            // Generate a random password (user will need to reset it)
-            $randomPassword = bin2hex(random_bytes(16));
-            $user->setPassword($this->passwordHasher->hashPassword($user, $randomPassword));
-
-            $this->entityManager->persist($user);
-            $created++;
-        }
-
-        fclose($handle);
-        $this->entityManager->flush();
-
-        $this->addFlash('success', $created . ' utilisateur(s) importé(s), ' . $skipped . ' ignoré(s).');
-
-        return $this->redirectToRoute('app_admin_user_index');
-    }
-
     #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(Request $request, User $user): Response
     {
@@ -278,9 +208,8 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_admin_user_index');
         }
 
-        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
-            $this->addFlash('error', 'Seul un super administrateur peut supprimer un autre super administrateur.');
-            return $this->redirectToRoute('app_admin_user_index');
+        if ($response = $this->denyUnlessCanManagePrivilegedUser($user)) {
+            return $response;
         }
 
         if (!$this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
@@ -294,5 +223,30 @@ class UserController extends AbstractController
         $this->addFlash('success', 'Utilisateur « ' . $email . ' » supprimé.');
 
         return $this->redirectToRoute('app_admin_user_index');
+    }
+
+    /**
+     * Empêche un admin simple d'attribuer des rôles privilégiés via manipulation du formulaire.
+     */
+    private function sanitizeUserRoles(User $user): void
+    {
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+            return;
+        }
+
+        $user->setRoles(array_values(array_filter(
+            $user->getRoles(),
+            fn(string $role) => $role === 'ROLE_USER',
+        )));
+    }
+
+    private function denyUnlessCanManagePrivilegedUser(User $user): ?Response
+    {
+        if (AdminUserAuthorization::isPrivilegedAccount($user) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'Seul un super administrateur peut gérer un compte administrateur.');
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        return null;
     }
 }

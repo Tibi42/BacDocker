@@ -34,7 +34,7 @@ class SecurityHeadersSubscriberTest extends TestCase
         $subscriber->onKernelResponse($event);
 
         $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
-        $this->assertSame('1; mode=block', $response->headers->get('X-XSS-Protection'));
+        $this->assertNull($response->headers->get('X-XSS-Protection'));
         $this->assertSame('DENY', $response->headers->get('X-Frame-Options'));
         $this->assertSame('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
         $this->assertNotNull($response->headers->get('Content-Security-Policy'));
@@ -58,6 +58,7 @@ class SecurityHeadersSubscriberTest extends TestCase
         $subscriber->onKernelResponse($event);
 
         $this->assertSame('max-age=31536000; includeSubDomains', $response->headers->get('Strict-Transport-Security'));
+        $this->assertStringContainsString('upgrade-insecure-requests', (string) $response->headers->get('Content-Security-Policy'));
     }
 
     public function testSkipsSubRequests(): void

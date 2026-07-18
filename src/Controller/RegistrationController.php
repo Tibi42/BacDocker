@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Util\RateLimitKey;
+use App\Validator\PasswordPolicy;
+use App\Validator\UserAccountRules;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +17,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Contrôleur d'inscription des nouveaux utilisateurs.
@@ -33,14 +37,18 @@ final class RegistrationController extends AbstractController
         UserRepository $userRepository,
         MailerInterface $mailer,
         RateLimiterFactoryInterface $registrationLimiter,
+        ValidatorInterface $validator,
     ): Response {
-        $limiter = $registrationLimiter->create($request->getClientIp() ?? 'unknown');
+        $email = trim((string) $request->request->get('email'));
+        $limiter = $registrationLimiter->create(RateLimitKey::forIpAndIdentifier(
+            $request->getClientIp() ?? 'unknown',
+            $email !== '' ? $email : 'anonymous',
+        ));
         if (!$limiter->consume()->isAccepted()) {
             $this->addFlash('register_error', 'Trop de tentatives. Veuillez réessayer dans quelques minutes.');
             return $this->redirectToRoute('app_home', ['open' => 'register']);
         }
 
-        $email = trim((string) $request->request->get('email'));
         $username = trim((string) $request->request->get('username'));
         $password = (string) $request->request->get('password');
         $csrfToken = (string) $request->request->get('_csrf_token');
@@ -51,14 +59,14 @@ final class RegistrationController extends AbstractController
         }
 
         $errors = [];
-        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (UserAccountRules::emailError($email) !== null) {
             $errors[] = 'Veuillez entrer une adresse email valide.';
         }
-        if (!$username || mb_strlen($username) < 3 || !preg_match('/^[\w\-.\ ]+$/u', $username)) {
-            $errors[] = 'Le nom d\'utilisateur doit faire au moins 3 caractères et ne contenir que des lettres, chiffres, espaces, tirets, points et underscores.';
+        if ($usernameError = UserAccountRules::usernameError($username)) {
+            $errors[] = $usernameError;
         }
-        if (mb_strlen($password) < 12) {
-            $errors[] = 'Le mot de passe doit faire au moins 12 caractères.';
+        foreach ($validator->validate($password, PasswordPolicy::constraints()) as $violation) {
+            $errors[] = $violation->getMessage();
         }
 
         if ($errors) {
@@ -68,13 +76,12 @@ final class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_home', ['open' => 'register', 'email' => $email]);
         }
 
-        if ($userRepository->findOneBy(['email' => $email])) {
-            $this->addFlash('register_error', 'Cette adresse email est déjà utilisée.');
+        // Message identique en cas de succès ou d'email déjà pris (anti-énumération).
+        $genericConfirmFlash = 'Si cette adresse email est disponible, un email de confirmation vous a été envoyé. Vérifiez votre boîte de réception (et vos spams).';
+
+        if ($userRepository->findOneBy(['email' => $email]) || $userRepository->findOneBy(['username' => $username])) {
+            $this->addFlash('success', $genericConfirmFlash);
             return $this->redirectToRoute('app_home', ['open' => 'login']);
-        }
-        if ($userRepository->findOneBy(['username' => $username])) {
-            $this->addFlash('register_error', 'Ce nom d\'utilisateur est déjà pris.');
-            return $this->redirectToRoute('app_home', ['open' => 'register', 'email' => $email]);
         }
 
         $user = new User();
@@ -121,7 +128,7 @@ final class RegistrationController extends AbstractController
             $mailer->send($adminNotif);
         }
 
-        $this->addFlash('success', 'Compte créé ! Un email de confirmation vous a été envoyé. Cliquez sur le lien pour activer votre compte.');
+        $this->addFlash('success', $genericConfirmFlash);
 
         return $this->redirectToRoute('app_home', ['open' => 'login']);
     }
@@ -139,8 +146,20 @@ final class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_home', ['open' => 'login']);
         }
 
+        if ($user->isEmailVerificationTokenExpired()) {
+            $user->clearEmailVerificationState();
+            $entityManager->flush();
+            $this->addFlash('error', 'Ce lien de confirmation a expiré. Veuillez vous réinscrire.');
+            return $this->redirectToRoute('app_home', ['open' => 'register']);
+        }
+
+        if ($user->getPendingEmail() !== null) {
+            $this->addFlash('error', 'Ce lien de confirmation est invalide.');
+            return $this->redirectToRoute('app_home', ['open' => 'login']);
+        }
+
         $user->setIsVerified(true);
-        $user->setEmailVerificationToken(null);
+        $user->clearEmailVerificationState();
         $entityManager->flush();
 
         $this->addFlash('success', 'Votre email est confirmé. Vous pouvez maintenant vous connecter.');

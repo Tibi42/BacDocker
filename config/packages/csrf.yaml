@@ -1,4 +1,5 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# CSRF : login/logout en session (fiable sans JS).
+# « submit » reste stateless pour les formulaires Symfony + Turbo.
 framework:
     form:
         csrf_protection:
@@ -7,5 +8,3 @@ framework:
     csrf_protection:
         stateless_token_ids:
             - submit
-            - authenticate
-            - logout

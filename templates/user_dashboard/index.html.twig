@@ -303,18 +303,22 @@
 			<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="document.getElementById('delete-account-modal').classList.add('hidden')"></div>
 			<div class="relative bg-custom-secondary border border-custom rounded-2xl shadow-2xl p-6 mx-4 max-w-md w-full">
 				<h3 class="text-lg font-bold text-text-primary mb-2">Confirmer la suppression</h3>
-				<p class="text-sm text-text-secondary mb-6">Êtes-vous sûr de vouloir supprimer définitivement votre compte <span class="text-custom-orange font-bold">{{ app.user.username }}</span> ? Cette action est irréversible.</p>
-				<div class="flex items-center gap-3 justify-end">
+				<p class="text-sm text-text-secondary mb-4">Êtes-vous sûr de vouloir supprimer définitivement votre compte <span class="text-custom-orange font-bold">{{ app.user.username }}</span> ? Cette action est irréversible.</p>
+				<form method="post" action="{{ path('app_user_delete_account') }}" class="space-y-4">
+					<div>
+						<label for="delete-account-password" class="block text-xs font-bold uppercase tracking-wider text-text-primary mb-1">Confirmez avec votre mot de passe</label>
+						<input type="password" id="delete-account-password" name="current_password" required autocomplete="current-password" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-3 text-text-primary focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
+					</div>
+					<div class="flex items-center gap-3 justify-end">
 					<button type="button" onclick="document.getElementById('delete-account-modal').classList.add('hidden')" class="rounded-lg border border-custom px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
 						Annuler
 					</button>
-					<form method="post" action="{{ path('app_user_delete_account') }}">
 						<input type="hidden" name="_token" value="{{ csrf_token('delete_my_account') }}">
 						<button type="submit" class="rounded-lg bg-red-500 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-white hover:bg-red-600 transition-all">
 							Supprimer définitivement
 						</button>
-					</form>
-				</div>
+					</div>
+				</form>
 			</div>
 		</div>
 	{% endif %}

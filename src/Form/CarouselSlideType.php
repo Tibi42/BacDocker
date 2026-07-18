@@ -9,7 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CarouselSlideType extends AbstractType
 {
@@ -81,6 +83,24 @@ class CarouselSlideType extends AbstractType
                 'label_attr' => $labelAttr,
                 'required' => false,
                 'attr' => array_merge($inputAttr, ['placeholder' => 'Ex : /activite/1/inscrire ou https://...']),
+                'help' => 'Uniquement un chemin relatif (/…) ou une URL http(s).',
+                'help_attr' => ['class' => 'text-[10px] text-text-secondary mt-1 block'],
+                'constraints' => [
+                    new Callback(function (?string $value, ExecutionContextInterface $context): void {
+                        if ($value === null || $value === '') {
+                            return;
+                        }
+                        $value = trim($value);
+                        if (str_starts_with($value, '/') && !str_starts_with($value, '//')) {
+                            return;
+                        }
+                        $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
+                        if (!\in_array($scheme, ['http', 'https'], true)) {
+                            $context->buildViolation('L\'URL doit être un chemin relatif (/…) ou commencer par http:// ou https://.')
+                                ->addViolation();
+                        }
+                    }),
+                ],
             ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Repository\CarouselSlideRepository;
+use App\Security\HtmlSanitizer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -18,6 +19,7 @@ class CarouselExtension extends AbstractExtension
 {
     public function __construct(
         private readonly CarouselSlideRepository $carouselSlideRepository,
+        private readonly HtmlSanitizer $htmlSanitizer,
     ) {
     }
 
@@ -44,7 +46,7 @@ class CarouselExtension extends AbstractExtension
                     'date' => $s->getDate() ?? '',
                     'btn_text' => $s->getBtnText() ?? '',
                     'btn_class' => $s->getBtnClass() ?? 'bg-custom-orange group-hover:bg-orange-600 shadow-custom-orange/20',
-                    'btn_url' => $s->getBtnUrl(),
+                    'btn_url' => $this->sanitizeBtnUrl($s->getBtnUrl()),
                 ];
             }
             return $slides;
@@ -97,5 +99,14 @@ class CarouselExtension extends AbstractExtension
                 'btn_url' => null,
             ],
         ];
+    }
+
+    private function sanitizeBtnUrl(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+
+        return $this->htmlSanitizer->isSafeUrl($url) ? $url : null;
     }
 }

@@ -27,14 +27,6 @@
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
 					Export CSV
 				</a>
-				<button type="button" onclick="document.getElementById('import-csv-input').click()" class="inline-flex items-center gap-2 rounded-lg border border-custom bg-custom-secondary py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-custom-orange hover:border-custom-orange transition-all">
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-					Import CSV
-				</button>
-				<form id="import-csv-form" method="post" action="{{ path('app_admin_user_import_csv') }}" enctype="multipart/form-data" class="hidden">
-					<input type="hidden" name="_token" value="{{ csrf_token('import_users') }}">
-					<input type="file" id="import-csv-input" name="csv_file" accept=".csv" onchange="document.getElementById('import-csv-form').submit()">
-				</form>
 				<a href="{{ path('app_admin_user_new') }}" class="inline-flex items-center gap-2 rounded-lg bg-custom-orange py-3 px-5 text-sm font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all shadow-lg shadow-custom-orange/20">
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
 					Nouvel utilisateur
@@ -70,10 +62,10 @@
 			{% endif %}
 		</form>
 
-		{% if users|length > 0 %}
+		{% if pagination.totalItemCount > 0 %}
 			{# Vue mobile : cartes #}
 			<div class="lg:hidden space-y-3">
-				{% for user in users %}
+				{% for user in pagination %}
 					{% set isSuperAdmin = 'ROLE_SUPER_ADMIN' in user.roles %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ user == app.user ? 'border-custom-orange/30 bg-custom-orange/5' : '' }} {{ user.suspended ? 'opacity-50' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
@@ -133,7 +125,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for user in users %}
+							{% for user in pagination %}
 								{% set isSuperAdmin = 'ROLE_SUPER_ADMIN' in user.roles %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ user == app.user ? 'bg-custom-orange/5' : '' }} {{ user.suspended ? 'opacity-50' : '' }}">
 									<td class="px-4 py-3">
@@ -180,6 +172,39 @@
 					</table>
 				</div>
 			</div>
+
+			{# Pagination #}
+			{% if pagination.pageCount > 1 %}
+				<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+					<p class="text-xs text-text-secondary">
+						{{ pagination.totalItemCount }} utilisateur{{ pagination.totalItemCount > 1 ? 's' : '' }}
+						— page {{ pagination.currentPageNumber }} / {{ pagination.pageCount }}
+					</p>
+					<nav class="flex items-center gap-1">
+						{% if pagination.currentPageNumber > 1 %}
+							<a href="{{ path('app_admin_user_index', app.request.query.all|merge({page: pagination.currentPageNumber - 1})) }}"
+							   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">&larr; Préc.</a>
+						{% endif %}
+
+						{% for page in 1..pagination.pageCount %}
+							{% if page == pagination.currentPageNumber %}
+								<span class="px-3 py-2 rounded-lg text-xs font-bold bg-custom-orange text-text-primary">{{ page }}</span>
+							{% elseif page == 1 or page == pagination.pageCount or (page >= pagination.currentPageNumber - 2 and page <= pagination.currentPageNumber + 2) %}
+								<a href="{{ path('app_admin_user_index', app.request.query.all|merge({page: page})) }}"
+								   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">{{ page }}</a>
+							{% elseif page == 2 or page == pagination.pageCount - 1 %}
+								<span class="px-1 text-text-secondary">…</span>
+							{% endif %}
+						{% endfor %}
+
+						{% if pagination.currentPageNumber < pagination.pageCount %}
+							<a href="{{ path('app_admin_user_index', app.request.query.all|merge({page: pagination.currentPageNumber + 1})) }}"
+							   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">Suiv. &rarr;</a>
+						{% endif %}
+					</nav>
+				</div>
+			{% endif %}
+
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">
 				<p class="text-text-secondary mb-4">Aucun utilisateur pour le moment.</p>

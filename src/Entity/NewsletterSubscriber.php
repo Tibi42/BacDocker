@@ -53,6 +53,9 @@ class NewsletterSubscriber
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $unsubscribedAt = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $tokenExpiresAt = null;
+
     /**
      * Lifecycle callback : initialise createdAt et génère le token de confirmation
      * à la première persistance (token = 64 caractères hexadécimaux).
@@ -61,7 +64,7 @@ class NewsletterSubscriber
     public function setCreatedAtValue(): void
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->token = bin2hex(random_bytes(32));
+        $this->regenerateToken();
     }
 
     public function getId(): ?int
@@ -88,10 +91,29 @@ class NewsletterSubscriber
     /**
      * Génère un nouveau token (utile quand on renvoie un email de confirmation).
      */
-    public function regenerateToken(): static
+    public function regenerateToken(int $ttlSeconds = 172800): static
     {
         $this->token = bin2hex(random_bytes(32));
+        $this->tokenExpiresAt = new \DateTimeImmutable('+' . $ttlSeconds . ' seconds');
+
         return $this;
+    }
+
+    public function getTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->tokenExpiresAt;
+    }
+
+    public function setTokenExpiresAt(?\DateTimeImmutable $tokenExpiresAt): static
+    {
+        $this->tokenExpiresAt = $tokenExpiresAt;
+        return $this;
+    }
+
+    public function isTokenExpired(): bool
+    {
+        return $this->tokenExpiresAt !== null
+            && $this->tokenExpiresAt < new \DateTimeImmutable();
     }
 
     public function getStatus(): string
@@ -139,6 +161,8 @@ class NewsletterSubscriber
     {
         $this->status = self::STATUS_CONFIRMED;
         $this->confirmedAt = new \DateTimeImmutable();
+        $this->tokenExpiresAt = null;
+
         return $this;
     }
 

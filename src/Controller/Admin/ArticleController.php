@@ -6,10 +6,10 @@ use App\Entity\Article;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
 use App\Security\HtmlSanitizer;
+use App\Service\ImageReencoder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,6 +21,7 @@ class ArticleController extends AbstractController
         private readonly ArticleRepository $articleRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly HtmlSanitizer $htmlSanitizer,
+        private readonly ImageReencoder $imageReencoder,
     ) {
     }
 
@@ -77,10 +78,14 @@ class ArticleController extends AbstractController
             $deleteImages = $request->request->all('delete_gallery_images');
             $currentGallery = $article->getGallery() ?? [];
             foreach ($deleteImages as $delImg) {
-                if (($key = array_search($delImg, $currentGallery)) !== false) {
+                $safeName = basename((string) $delImg);
+                if (!preg_match('/^[a-zA-Z0-9._-]+$/', $safeName)) {
+                    continue;
+                }
+                if (($key = array_search($safeName, $currentGallery, true)) !== false) {
                     unset($currentGallery[$key]);
-                    $filePath = $this->getParameter('articles_images_directory') . '/' . $delImg;
-                    if (file_exists($filePath)) {
+                    $filePath = $this->getParameter('articles_images_directory') . '/' . $safeName;
+                    if (is_file($filePath)) {
                         @unlink($filePath);
                     }
                 }
@@ -141,22 +146,20 @@ class ArticleController extends AbstractController
     {
         $imageFile = $form->get('imageFile')->getData();
         if ($imageFile) {
-            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = preg_replace('/[^a-zA-Z0-9_]/', '', strtolower($originalFilename));
-            if (empty($safeFilename)) {
-                $safeFilename = 'article';
-            }
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+            $safeFilename = 'article-' . uniqid();
+            $newFilename = $this->imageReencoder->reencode(
+                $imageFile,
+                $this->getParameter('articles_images_directory'),
+                $safeFilename,
+            );
 
-            try {
-                $imageFile->move(
-                    $this->getParameter('articles_images_directory'),
-                    $newFilename
-                );
-                $article->setImage($newFilename);
-            } catch (FileException $e) {
-                $this->addFlash('error', 'Erreur lors du transfert de l\'image.');
+            if ($newFilename === null) {
+                $this->addFlash('error', 'Erreur lors du traitement de l\'image.');
+
+                return;
             }
+
+            $article->setImage($newFilename);
         }
     }
 
@@ -166,22 +169,19 @@ class ArticleController extends AbstractController
         if ($galleryFiles) {
             $currentGallery = $article->getGallery() ?? [];
             foreach ($galleryFiles as $file) {
-                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = preg_replace('/[^a-zA-Z0-9_]/', '', strtolower($originalFilename));
-                if (empty($safeFilename)) {
-                    $safeFilename = 'gallery';
-                }
-                $newFilename = 'gallery-'.$safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+                $safeFilename = 'gallery-' . uniqid();
+                $newFilename = $this->imageReencoder->reencode(
+                    $file,
+                    $this->getParameter('articles_images_directory'),
+                    $safeFilename,
+                );
 
-                try {
-                    $file->move(
-                        $this->getParameter('articles_images_directory'),
-                        $newFilename
-                    );
-                    $currentGallery[] = $newFilename;
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors du transfert d\'une image de la galerie.');
+                if ($newFilename === null) {
+                    $this->addFlash('error', 'Erreur lors du traitement d\'une image de la galerie.');
+                    continue;
                 }
+
+                $currentGallery[] = $newFilename;
             }
             $article->setGallery($currentGallery);
         }

@@ -34,7 +34,9 @@ export function generateCsrfToken (formElement) {
 
     if (!csrfCookie && nameCheck.test(csrfToken)) {
         csrfField.setAttribute('data-csrf-protection-cookie-value', csrfCookie = csrfToken);
-        csrfField.defaultValue = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
+        csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
+        csrfField.value = csrfToken;
+        csrfField.defaultValue = csrfToken;
     }
     csrfField.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -77,5 +79,5 @@ export function removeCsrfToken (formElement) {
     }
 }
 
-/* stimulusFetch: 'lazy' */
+/* stimulusFetch: 'eager' — requis pour login/logout (formulaires sans data-controller) */
 export default 'csrf-protection-controller';

@@ -53,9 +53,9 @@ class HomeController extends AbstractController
             $filterType = null;
         }
 
-        // Pré-sélectionner le jour courant si on est sur le mois en cours et qu'aucun jour n'est explicitement demandé
-        $defaultDay = ($month === $currentMonth && $year === $currentYear) ? $today : 0;
-        $selectedDay = (int) $request->query->get('day', $defaultDay);
+        // À l'ouverture : afficher toutes les activités du mois (day=0).
+        // Un jour précis n'est sélectionné que s'il est passé en query string.
+        $selectedDay = (int) $request->query->get('day', 0);
 
         // Limiter à un mois valide
         $month = max(1, min(12, $month));

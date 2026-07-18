@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture implements FixtureGroupInterface
@@ -16,18 +17,24 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
     }
 
     public function __construct(
-        private readonly UserPasswordHasherInterface $hasher
+        private readonly UserPasswordHasherInterface $hasher,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
     ) {}
 
     public function load(ObjectManager $manager): void
     {
+        if ($this->environment === 'prod') {
+            throw new \RuntimeException('Les fixtures utilisateurs sont interdites en production.');
+        }
+
         // Comptes de développement uniquement — ne jamais y mettre d'identifiants réels.
         $users = [
             [
-                'email'    => 'superadmin@example.com',
+                'email'    => 'guillaume.Pecquet@gmail.com',
                 'username' => 'superadmin',
                 'roles'    => ['ROLE_SUPER_ADMIN'],
-                'password' => 'DevSuperAdmin!12',
+                'password' => '112358134AaBb&',
             ],
             [
                 'email'    => 'admin@example.com',
@@ -42,6 +49,16 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
                 'password' => 'DevUserPass!12',
             ],
         ];
+
+        // Utilisateurs supplémentaires pour tester la pagination admin (username unique).
+        foreach (range('a', 'p') as $letter) {
+            $users[] = [
+                'email'    => sprintf('user%s@example.com', $letter),
+                'username' => 'user' . $letter,
+                'roles'    => ['ROLE_USER'],
+                'password' => 'DevUserPass!12',
+            ];
+        }
 
         foreach ($users as $data) {
             $user = new User();

@@ -34,6 +34,7 @@ security:
             logout:
                 path: app_logout
                 target: app_home
+                enable_csrf: true
                 csrf_token_id: logout
                 csrf_parameter: _csrf_token
 
@@ -48,6 +49,7 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/mon-espace, roles: ROLE_USER }
+        - { path: ^/activite/\d+/inscrire, roles: ROLE_USER }
 
 when@test:
     security:
@@ -59,5 +61,13 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+when@prod:
+    security:
+        access_control:
+            - { path: ^/admin, roles: ROLE_ADMIN, requires_channel: https }
+            - { path: ^/mon-espace, roles: ROLE_USER, requires_channel: https }
+            - { path: ^/activite/\d+/inscrire, roles: ROLE_USER, requires_channel: https }
+            - { path: ^/, requires_channel: https }
 
 

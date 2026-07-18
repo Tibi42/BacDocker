@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\NewsletterSubscriber;
 use App\Repository\NewsletterSubscriberRepository;
+use App\Util\RateLimitKey;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,14 +48,18 @@ final class NewsletterController extends AbstractController
             return $this->redirectToReferer($request);
         }
 
-        // Rate limiting by IP
-        $limiter = $newsletterSubscribeLimiter->create($request->getClientIp());
+        // Rate limiting by IP + email
+        $email = trim((string) $request->request->get('email'));
+        $limiter = $newsletterSubscribeLimiter->create(RateLimitKey::forIpAndIdentifier(
+            $request->getClientIp() ?? 'unknown',
+            $email !== '' ? $email : 'anonymous',
+        ));
         if (!$limiter->consume()->isAccepted()) {
             $this->addFlash('newsletter_error', 'Trop de tentatives. Veuillez réessayer dans quelques minutes.');
             return $this->redirectToReferer($request);
         }
 
-        $email = trim((string) $request->request->get('email'));
+        $genericFlash = 'Si cette adresse est éligible, un email de confirmation vous a été envoyé.';
 
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('newsletter_error', 'Veuillez entrer une adresse email valide.');
@@ -65,7 +70,7 @@ final class NewsletterController extends AbstractController
 
         if ($existing) {
             if ($existing->getStatus() === NewsletterSubscriber::STATUS_CONFIRMED) {
-                $this->addFlash('newsletter_info', 'Cette adresse est déjà inscrite à notre newsletter.');
+                $this->addFlash('newsletter_success', $genericFlash);
                 return $this->redirectToReferer($request);
             }
 
@@ -75,7 +80,7 @@ final class NewsletterController extends AbstractController
                 $existing->regenerateToken();
                 $this->entityManager->flush();
                 $this->sendConfirmationEmail($mailer, $existing);
-                $this->addFlash('newsletter_success', 'Un email de confirmation vous a été envoyé.');
+                $this->addFlash('newsletter_success', $genericFlash);
                 return $this->redirectToReferer($request);
             }
 
@@ -83,7 +88,7 @@ final class NewsletterController extends AbstractController
             $existing->regenerateToken();
             $this->entityManager->flush();
             $this->sendConfirmationEmail($mailer, $existing);
-            $this->addFlash('newsletter_success', 'Un email de confirmation vous a été renvoyé.');
+            $this->addFlash('newsletter_success', $genericFlash);
             return $this->redirectToReferer($request);
         }
 
@@ -94,7 +99,7 @@ final class NewsletterController extends AbstractController
 
         $this->sendConfirmationEmail($mailer, $subscriber);
 
-        $this->addFlash('newsletter_success', 'Merci ! Un email de confirmation vous a été envoyé.');
+        $this->addFlash('newsletter_success', $genericFlash);
         return $this->redirectToReferer($request);
     }
 
@@ -107,6 +112,14 @@ final class NewsletterController extends AbstractController
             return $this->render('newsletter/result.html.twig', [
                 'title' => 'Lien invalide',
                 'message' => 'Ce lien de confirmation est invalide ou a expiré.',
+                'success' => false,
+            ]);
+        }
+
+        if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_PENDING && $subscriber->isTokenExpired()) {
+            return $this->render('newsletter/result.html.twig', [
+                'title' => 'Lien expiré',
+                'message' => 'Ce lien de confirmation a expiré. Veuillez vous réinscrire à la newsletter.',
                 'success' => false,
             ]);
         }

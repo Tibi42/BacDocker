@@ -29,7 +29,7 @@ class NewActivityProposalNotification extends Notification implements EmailNotif
     public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): EmailMessage
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('noreply@laboitechimere.fr', 'La Boîte à Chimère'))
+            ->from(new Address('noreply@laboiteachimere.fr', 'La Boîte à Chimère'))
             ->to($recipient->getEmail())
             ->subject('Nouvelle proposition en attente : ' . $this->activity->getTitle())
             ->htmlTemplate('emails/activity_proposed_admin.html.twig')
