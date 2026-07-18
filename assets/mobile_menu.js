@@ -1,3 +1,25 @@
+import { isShortMobileViewport } from './join_panel.js';
+
+/**
+ * Sur écran court (voir isShortMobileViewport), déplace le bouton de
+ * déconnexion au-dessus du copyright pour former un pied de page groupé,
+ * et rend la nav défilable pour ne jamais pousser ce pied de page hors écran.
+ */
+function relocateLogoutToFooter() {
+    const logoutForm = document.getElementById('mobile-logout-form');
+    const footer = document.getElementById('mobile-menu-footer');
+    const nav = document.querySelector('#mobile-menu-content nav');
+    if (!logoutForm || !footer) return;
+
+    if (isShortMobileViewport()) {
+        footer.insertBefore(logoutForm, footer.firstChild);
+        if (nav) nav.classList.add('flex-1', 'min-h-0', 'overflow-y-auto');
+    } else if (nav) {
+        nav.appendChild(logoutForm);
+        nav.classList.remove('flex-1', 'min-h-0', 'overflow-y-auto');
+    }
+}
+
 /**
  * Initialise le menu de navigation mobile (drawer / tiroir latéral).
  *
@@ -31,6 +53,7 @@ function initMobileMenu() {
         drawer.classList.add('menu-open');
         btn.classList.add('hidden');
         document.body.style.overflow = 'hidden';
+        relocateLogoutToFooter();
     }
 
     function close() {

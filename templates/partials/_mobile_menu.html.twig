@@ -19,7 +19,7 @@
 			{% endif %}
 			<hr class="border-custom my-4">
 			{% if app.user %}
-				<form method="post" action="{{ path('app_logout') }}" data-turbo="false">
+				<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
 					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
 					<button type="submit" class="mt-2 w-full rounded-lg bg-custom-orange px-6 py-4 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 shadow-lg shadow-custom-orange/20 hover:bg-orange-600 transition-all block">
 						DÉCONNEXION
@@ -57,7 +57,7 @@
 				</div>
 			{% endif %}
 		</nav>
-		<div class="absolute bottom-10 left-8 right-8 text-center">
+		<div id="mobile-menu-footer" class="absolute bottom-10 left-8 right-8 flex flex-col items-center gap-3 text-center">
 			<p class="text-[10px] uppercase tracking-widest text-text-secondary font-bold">&copy; LA BOÎTE À CHIMÈRE</p>
 		</div>
 	</div>
