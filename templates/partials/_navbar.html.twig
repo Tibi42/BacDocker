@@ -20,7 +20,7 @@
 		</div>
 	</a>
 
-	<nav class="hidden lg:flex items-center gap-10">
+	<nav class="hidden min-[1100px]:flex items-center gap-10">
 		<a href="{{ path('app_home') }}" data-turbo="false" class="text-[13px] font-bold uppercase tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
 		<a href="{{ path('app_jds') }}" data-turbo="false" class="text-[13px] font-bold uppercase tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">JDS</a>
 		<a href="{{ path('app_jdr') }}" data-turbo="false" class="text-[13px] font-bold uppercase tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">JDR</a>
@@ -48,19 +48,19 @@
 			</svg>
 		</button>
 		{% if app.user %}
-			<form method="post" action="{{ path('app_logout') }}" class="hidden lg:block" data-turbo="false">
+			<form method="post" action="{{ path('app_logout') }}" class="hidden min-[1100px]:block" data-turbo="false">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
 				<button type="submit" class="rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer transition-all hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 shadow-lg shadow-custom-orange/20">
 					DÉCONNEXION
 				</button>
 			</form>
 		{% else %}
-			<button type="button" id="join-btn" class="hidden lg:block rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer transition-all hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 shadow-lg shadow-custom-orange/20">
+			<button type="button" id="join-btn" class="hidden min-[1100px]:block rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer transition-all hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 shadow-lg shadow-custom-orange/20">
 				NOUS REJOINDRE
 			</button>
 		{% endif %}
 		{# Hamburger Menu Button #}
-		<button id="mobile-menu-btn" type="button" class="lg:hidden flex flex-col gap-1.5 p-2 z-[100] text-text-primary" aria-label="Menu principal">
+		<button id="mobile-menu-btn" type="button" class="min-[1100px]:hidden flex flex-col gap-1.5 p-2 z-[100] text-text-primary" aria-label="Menu principal">
 			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
 			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
 			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
