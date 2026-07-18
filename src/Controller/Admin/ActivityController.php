@@ -296,7 +296,7 @@ class ActivityController extends AbstractController
         foreach ($inscriptions as $i) {
             try {
                 $email = (new TemplatedEmail())
-                    ->from('noreply@laboiteachimere.fr')
+                    ->from('boiteachimere@guillaumepecquet.ovh')
                     ->to($i->getParticipantEmail())
                     ->subject('Événement annulé : ' . $title)
                     ->htmlTemplate('emails/activity_cancelled.html.twig')

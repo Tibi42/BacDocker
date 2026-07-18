@@ -240,6 +240,21 @@ function bootJoinPanel() {
                 headerBar.classList.add('rounded-b-none', 'border-b-0');
             }
         }
+
+        // Idem sur mobile : ouvrir le tiroir de menu et le formulaire de connexion,
+        // sinon la redirection ?open=login n'affiche rien de visible en dessous de lg.
+        const drawer = document.getElementById('mobile-menu-drawer');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileForm = document.getElementById('mobile-join-form');
+        const mobileBtn = document.getElementById('mobile-join-btn');
+        if (drawer && mobileMenuBtn && mobileForm && mobileBtn) {
+            drawer.classList.remove('pointer-events-none');
+            drawer.classList.add('menu-open');
+            mobileMenuBtn.classList.add('hidden');
+            document.body.style.overflow = 'hidden';
+            mobileForm.style.maxHeight = mobileForm.scrollHeight + 'px';
+            mobileBtn.classList.add('ring-2', 'ring-white/30');
+        }
     }
 }
 

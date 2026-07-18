@@ -157,7 +157,7 @@ class UserDashboardController extends AbstractController
         if ($existing) {
             try {
                 $alert = (new TemplatedEmail())
-                    ->from('noreply@laboiteachimere.fr')
+                    ->from('boiteachimere@guillaumepecquet.ovh')
                     ->to((string) $user->getEmail())
                     ->subject('Tentative de changement d\'adresse email')
                     ->htmlTemplate('emails/email_change_attempt_alert.html.twig')
@@ -181,7 +181,7 @@ class UserDashboardController extends AbstractController
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $email = (new TemplatedEmail())
-            ->from('noreply@laboiteachimere.fr')
+            ->from('boiteachimere@guillaumepecquet.ovh')
             ->to($newEmail)
             ->subject('Confirmez votre nouvelle adresse email')
             ->htmlTemplate('emails/email_change_confirm.html.twig')
@@ -275,7 +275,7 @@ class UserDashboardController extends AbstractController
                 }
                 try {
                     $email = (new TemplatedEmail())
-                        ->from('noreply@laboiteachimere.fr')
+                        ->from('boiteachimere@guillaumepecquet.ovh')
                         ->to($i->getParticipantEmail())
                         ->subject('Événement annulé : ' . $activityTitle)
                         ->htmlTemplate('emails/activity_cancelled.html.twig')

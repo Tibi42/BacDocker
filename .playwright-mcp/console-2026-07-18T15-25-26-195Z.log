@@ -1,0 +1,6 @@
+[    2650ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-89ALySO.js:20
+[    2650ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[    2650ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[  114386ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-89ALySO.js:20
+[  114386ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[  114387ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6

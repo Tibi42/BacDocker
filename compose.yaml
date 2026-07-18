@@ -11,14 +11,14 @@ services:
       database:
         condition: service_healthy # ← Attend que MySQL soit prêt
     environment:
-      DATABASE_URL: "mysql://${DB_USER:-app}:${DB_PASSWORD:-Rapupyxe112358134&}@database:3306/${DB_NAME:-bacbdd}?serverVersion=8.0&charset=utf8mb4"
+      DATABASE_URL: "mysql://${DB_USER:-app}:${DB_PASSWORD:-changeme}@database:3306/${DB_NAME:-bacbdd}?serverVersion=8.0&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
       APP_ENV: prod
     restart: unless-stopped
   nginx:
     image: nginx:1.27-alpine
     ports:
-      - "8080:80" # ← localhost:8080 → nginx:80
+      - "127.0.0.1:8080:80" # ← localhost:8080 → nginx:80
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./public:/app/public:ro # ← NGINX a besoin des fichiers statiques
@@ -29,10 +29,10 @@ services:
   database:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-changeme}
       MYSQL_DATABASE: ${DB_NAME:-bacbdd}
-      MYSQL_USER: ${MYSQL_USER:-root}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Rapupyxe112358134&}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-changeme}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -46,18 +46,18 @@ services:
   mailer:
     image: axllent/mailpit
     ports:
-      - "1025:1025" # ← SMTP
-      - "8025:8025" # ← Interface web pour voir les emails
+      - "127.0.0.1:1025:1025" # ← SMTP
+      - "127.0.0.1:8025:8025" # ← Interface web pour voir les emails
     restart: unless-stopped
 
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
-      - "8081:80" # ← localhost:8081
+      - "127.0.0.1:8081:80" # ← localhost:8081
     environment:
       PMA_HOST: database
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_USER: ${MYSQL_USER:-app}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-changeme}
     depends_on:
       - database
     restart: unless-stopped

@@ -99,7 +99,7 @@ final class RegistrationController extends AbstractController
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $welcomeEmail = (new TemplatedEmail())
-            ->from('noreply@laboiteachimere.fr')
+            ->from('boiteachimere@guillaumepecquet.ovh')
             ->to($user->getEmail())
             ->subject('Confirmez votre inscription — La Boîte à Chimère')
             ->htmlTemplate('emails/registration_confirm.html.twig')
@@ -113,7 +113,7 @@ final class RegistrationController extends AbstractController
         if ($admins) {
             $adminUrl = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL);
             $adminNotif = (new TemplatedEmail())
-                ->from('noreply@laboiteachimere.fr')
+                ->from('boiteachimere@guillaumepecquet.ovh')
                 ->subject('Nouvelle inscription : ' . $user->getUsername())
                 ->htmlTemplate('emails/registration_admin_notify.html.twig')
                 ->context([

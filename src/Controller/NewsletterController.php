@@ -175,7 +175,7 @@ final class NewsletterController extends AbstractController
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $email = (new TemplatedEmail())
-            ->from('newsletter@laboiteachimere.fr')
+            ->from('boiteachimere@guillaumepecquet.ovh')
             ->to($subscriber->getEmail())
             ->subject('Confirmez votre inscription à la newsletter - La Boîte à Chimère')
             ->htmlTemplate('emails/newsletter_confirmation.html.twig')

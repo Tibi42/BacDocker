@@ -1,0 +1,3 @@
+[    1012ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-EKQ_RPv.js:17
+[    1012ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
+[    1013ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6

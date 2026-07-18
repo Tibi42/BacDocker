@@ -69,7 +69,7 @@ document.addEventListener('click', async (e) => {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             credentials: 'same-origin',
         });
-        if (!response.ok) {
+        if (!response.ok || response.redirected) {
             window.location.href = url;
             return;
         }

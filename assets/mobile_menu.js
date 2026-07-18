@@ -46,6 +46,9 @@ function initMobileMenu() {
     document.querySelectorAll('.mobile-nav-link').forEach(link => {
         link.addEventListener('click', close);
     });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) close();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initMobileMenu);

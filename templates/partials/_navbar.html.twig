@@ -1,6 +1,6 @@
-<div class="header-container mx-auto max-w-[1240px] lg:max-w-[1360px] px-7 lg:px-12 py-3 bg-custom-secondary rounded-xl shadow-2xl border border-custom flex items-center justify-between">
-	<a href="{{ path('app_home') }}" data-turbo="false" class="flex items-center gap-4 transition-all hover:opacity-80 z-[75]">
-		<div class="h-10 w-10 shrink-0">
+<div class="header-container mx-auto max-w-[1240px] lg:max-w-[1360px] px-4 sm:px-7 lg:px-12 py-3 bg-custom-secondary rounded-xl shadow-2xl border border-custom flex items-center justify-between gap-3">
+	<a href="{{ path('app_home') }}" data-turbo="false" class="flex items-center gap-2 sm:gap-4 min-w-0 transition-all hover:opacity-80 z-[75]">
+		<div class="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
 			<svg class="h-full w-full" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 				<path d="M20 2L36 12v16L20 38L4 28V12L20 2z" stroke="url(#logo)" stroke-width="1.5" fill="none"/>
 				<path d="M20 8l10 6v8l-10 6-10-6v-8l10-6z" stroke="url(#logo2)" stroke-width="1" fill="none"/>
@@ -14,9 +14,9 @@
 				</defs>
 			</svg>
 		</div>
-		<div class="flex flex-col leading-[0.9]">
-			<span class="text-base font-extrabold uppercase tracking-tight text-text-primary leading-none">LA BOÎTE</span>
-			<span class="text-base font-extrabold uppercase tracking-tight text-text-primary leading-none">À CHIMÈRE</span>
+		<div class="flex flex-col leading-[0.9] min-w-0">
+			<span class="text-[11px] sm:text-sm lg:text-base font-extrabold uppercase tracking-tight text-text-primary leading-none whitespace-nowrap">LA BOÎTE</span>
+			<span class="text-[11px] sm:text-sm lg:text-base font-extrabold uppercase tracking-tight text-text-primary leading-none whitespace-nowrap">À CHIMÈRE</span>
 		</div>
 	</a>
 
@@ -35,11 +35,11 @@
 		{% endif %}
 	</nav>
 
-	<div class="flex items-center gap-4">
+	<div class="flex items-center gap-2 sm:gap-4 shrink-0">
 		{% if app.user %}
 			<span class="hidden xl:block text-[11px] font-bold uppercase tracking-[0.1em] text-text-secondary mr-2">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></span>
 		{% endif %}
-		<button type="button" onclick="window.__toggleTheme()" class="theme-toggle-btn p-2.5 rounded-lg bg-custom-tertiary border border-custom text-text-secondary hover:text-text-primary transition-all z-[75]" aria-label="Changer de thème">
+		<button type="button" onclick="window.__toggleTheme()" class="theme-toggle-btn p-2 sm:p-2.5 rounded-lg bg-custom-tertiary border border-custom text-text-secondary hover:text-text-primary transition-all z-[75]" aria-label="Changer de thème">
 			<svg class="h-5 w-5 sun-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
 			</svg>
