@@ -53,9 +53,9 @@
 
 		<!-- Données Mondes -->
 		{% set worlds = [
-            { id: 'jdr', name: 'Nos soirées hebdomadaires du mardi (à partir de 19h)', image: 'jdr.webp', icon: 'M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45-2.6 5.2-4.3-2.15V4.18zM5.1 7.63L12 4.18v8.55l-4.3 2.15-2.6-5.2zm0 8.74l2.6-5.2 4.3 2.15v4.32L5.1 16.37zm12.8 0l-6.9 3.45v-4.32l4.3-2.15 2.6 5.2z', route: 'app_nos_soiree_heb' },
-            { id: 'jds', name: 'Nos soirées bi-hebdomadaires du vendredi (à partir de 19h)', image: 'jds.webp', icon: 'M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1v1a2 2 0 0 1-2 2h-1v1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-1H7a2 2 0 0 1-2-2v-1H4a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h1v-1a2 2 0 0 1 2-2h1v-1a2 2 0 0 1 2-2h1V9a2 2 0 0 1 2-2h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z', route: 'app_nos_soiree_biheb' },
-            { id: 'gn', name: 'Nos après-midi mensuels du dimanche (à partir de 14h)', image: 'gn.webp', icon: 'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z', route: 'app_nos_soiree_mensuelle' }
+            { id: 'jdr', name: 'Nos soirées hebdomadaires du mardi (à partir de 19h)', image: 'jdr.webp', imageSmall: 'jdr-480.webp', icon: 'M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45-2.6 5.2-4.3-2.15V4.18zM5.1 7.63L12 4.18v8.55l-4.3 2.15-2.6-5.2zm0 8.74l2.6-5.2 4.3 2.15v4.32L5.1 16.37zm12.8 0l-6.9 3.45v-4.32l4.3-2.15 2.6 5.2z', route: 'app_nos_soiree_heb' },
+            { id: 'jds', name: 'Nos soirées bi-hebdomadaires du vendredi (à partir de 19h)', image: 'jds.webp', imageSmall: 'jds-480.webp', icon: 'M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1v1a2 2 0 0 1-2 2h-1v1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-1H7a2 2 0 0 1-2-2v-1H4a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h1v-1a2 2 0 0 1 2-2h1v-1a2 2 0 0 1 2-2h1V9a2 2 0 0 1 2-2h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z', route: 'app_nos_soiree_biheb' },
+            { id: 'gn', name: 'Nos après-midi mensuels du dimanche (à partir de 14h)', image: 'gn.webp', imageSmall: 'gn-480.webp', icon: 'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z', route: 'app_nos_soiree_mensuelle' }
         ] %}
 
 		<!-- Contenu par-dessus l'image hero -->
@@ -254,7 +254,7 @@
 					<div class="grid gap-6">
 						{% for world in worlds %}
 							<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}-mobile" class="group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg">
-								<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
+								<img src="{{ asset('images/cards/' ~ world.image) }}" srcset="{{ asset('images/cards/' ~ world.imageSmall) }} 480w, {{ asset('images/cards/' ~ world.image) }} 740w" sizes="100vw" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
 								<div class="absolute inset-0 image-overlay"></div>
 								<div class="absolute left-4 top-4 glass h-8 w-8 flex items-center justify-center rounded-lg text-cyan-400">
 									<svg class="h-4 w-4" fill="currentColor" viewbox="0 0 24 24">
@@ -278,7 +278,7 @@
 		<div class="grid gap-6 lg:grid-cols-3">
 			{% for world in worlds %}
 				<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}" class="reveal delay-{{ loop.index }}00 card-premium group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg border border-custom">
-					<img src="{{ asset('images/cards/' ~ world.image) }}" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
+					<img src="{{ asset('images/cards/' ~ world.image) }}" srcset="{{ asset('images/cards/' ~ world.imageSmall) }} 480w, {{ asset('images/cards/' ~ world.image) }} 740w" sizes="(min-width: 1024px) 400px, 100vw" alt="Activité {{ world.name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
 					<div class="absolute inset-0 image-overlay"></div>
 					<div class="absolute left-4 top-4 glass h-8 w-8 flex items-center justify-center rounded-lg text-cyan-400">
 						<svg class="h-4 w-4" fill="currentColor" viewbox="0 0 24 24">
