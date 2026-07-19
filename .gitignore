@@ -28,3 +28,7 @@ docker/volumes/
 ###> playwright-mcp ###
 /.playwright-mcp/
 ###< playwright-mcp ###
+
+###> local worktrees ###
+.worktrees/
+###< local worktrees ###
