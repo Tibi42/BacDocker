@@ -144,7 +144,8 @@ class BoardGameRepositoryTest extends TestCase
         $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->willReturnCallback(function (string $where) use (&$andWhereCallIndex, $expectedAndWheres, $qb) {
-                $this->assertSame($expectedAndWheres[$andWhereCallIndex], $where);
+                $normalize = static fn (string $s): string => str_replace("\r\n", "\n", $s);
+                $this->assertSame($normalize($expectedAndWheres[$andWhereCallIndex]), $normalize($where));
                 $andWhereCallIndex++;
 
                 return $qb;
@@ -195,7 +196,8 @@ class BoardGameRepositoryTest extends TestCase
         $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->willReturnCallback(function (string $where) use (&$andWhereCallIndex, $expectedAndWheres, $qb) {
-                $this->assertSame($expectedAndWheres[$andWhereCallIndex], $where);
+                $normalize = static fn (string $s): string => str_replace("\r\n", "\n", $s);
+                $this->assertSame($normalize($expectedAndWheres[$andWhereCallIndex]), $normalize($where));
                 $andWhereCallIndex++;
 
                 return $qb;
