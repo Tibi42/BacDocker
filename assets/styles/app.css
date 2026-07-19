@@ -436,10 +436,19 @@ html.light-mode .calendar-grid .text-amber-400 {
 #mobile-menu-content {
     transform: translateX(100%);
     transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 #mobile-menu-drawer.menu-open #mobile-menu-content {
     transform: translateX(0);
+}
+
+#mobile-menu-content > .overflow-y-auto {
+    flex: 1 1 auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Force high contrast dark text color for accessibility */

@@ -1,29 +1,35 @@
 <div id="mobile-menu-drawer" class="fixed inset-0 z-[95] lg:hidden pointer-events-none">
 	<div id="mobile-menu-overlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-	<div id="mobile-menu-content" class="absolute top-0 right-0 bottom-0 w-[min(100%,320px)] max-w-[85vw] bg-custom-secondary border-l border-custom shadow-2xl flex flex-col pt-20">
-		{% if app.user %}
-			<p class="shrink-0 px-6 sm:px-8 text-xs font-bold uppercase tracking-wider text-text-secondary text-center mb-4">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></p>
-		{% endif %}
+	<div id="mobile-menu-content" class="absolute top-0 right-0 bottom-0 w-[min(100%,320px)] max-w-[85vw] bg-custom-secondary border-l border-custom shadow-2xl flex flex-col overflow-hidden pt-[4.5rem]">
+		<div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 sm:px-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+			{% if app.user %}
+				<p class="text-xs font-bold uppercase tracking-wider text-text-secondary text-center mb-5">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></p>
+			{% endif %}
 
-		<nav class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 sm:px-8 pb-4">
-			<div class="flex flex-col gap-5 sm:gap-6 py-1">
-				<a href="{{ path('app_home') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
-				<a href="{{ path('app_jds') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDS</a>
-				<a href="{{ path('app_jdr') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDR</a>
-				<a href="{{ path('app_gn') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_gn' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">GN</a>
-				<a href="{{ path('app_association') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_association' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ASSOCIATION</a>
-				<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest text-text-secondary hover:text-custom-orange transition-colors">FORUM</a>
+			<nav class="flex flex-col gap-5" aria-label="Navigation mobile">
+				<a href="{{ path('app_home') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
+				<a href="{{ path('app_jds') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDS</a>
+				<a href="{{ path('app_jdr') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDR</a>
+				<a href="{{ path('app_gn') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_gn' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">GN</a>
+				<a href="{{ path('app_association') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_association' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ASSOCIATION</a>
+				<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug text-text-secondary hover:text-custom-orange transition-colors">FORUM</a>
 				{% if app.user %}
-					<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">MON ESPACE</a>
+					<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">MON ESPACE</a>
 				{% endif %}
 				{% if is_granted('ROLE_ADMIN') %}
-					<a href="{{ path('admin') }}" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
+					<a href="{{ path('admin') }}" class="mobile-nav-link block py-1.5 text-base sm:text-lg font-bold uppercase tracking-widest leading-snug text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
 				{% endif %}
-			</div>
+			</nav>
 
-			{# ── Formulaire connexion mobile (dans la zone scrollable) ── #}
-			{% if not app.user %}
-				<div class="mt-4">
+			<div class="mt-8 pt-6 border-t border-custom flex flex-col gap-4">
+				{% if app.user %}
+					<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
+						<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+						<button type="submit" class="w-full rounded-lg bg-custom-orange px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 shadow-lg shadow-custom-orange/20 hover:bg-orange-600 transition-all">
+							DÉCONNEXION
+						</button>
+					</form>
+				{% else %}
 					<button id="mobile-join-btn" type="button" class="w-full rounded-lg bg-custom-orange px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 cursor-pointer shadow-lg shadow-custom-orange/20 hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all">
 						NOUS REJOINDRE
 					</button>
@@ -50,21 +56,10 @@
 							<a href="{{ path('app_forgot_password_request') }}" class="block text-center text-xs text-text-secondary hover:text-custom-orange transition-colors mt-1">Mot de passe oublié ?</a>
 						</form>
 					</div>
-				</div>
-			{% endif %}
-		</nav>
+				{% endif %}
 
-		{# Pied de page fixe : déconnexion toujours sous les liens, jamais superposée #}
-		<div id="mobile-menu-footer" class="shrink-0 border-t border-custom px-6 sm:px-8 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col items-stretch gap-3">
-			{% if app.user %}
-				<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-					<button type="submit" class="w-full rounded-lg bg-custom-orange px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 shadow-lg shadow-custom-orange/20 hover:bg-orange-600 transition-all">
-						DÉCONNEXION
-					</button>
-				</form>
-			{% endif %}
-			<p class="text-[10px] uppercase tracking-widest text-text-secondary font-bold text-center">&copy; {{ "now"|date("Y") }} LA BOÎTE À CHIMÈRE</p>
+				<p class="text-[10px] uppercase tracking-widest text-text-secondary font-bold text-center pb-2">&copy; {{ "now"|date("Y") }} LA BOÎTE À CHIMÈRE</p>
+			</div>
 		</div>
 	</div>
 </div>
