@@ -2,13 +2,15 @@
 
 namespace App\EventSubscriber;
 
+use App\Twig\CspExtension;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Ajoute les en-têtes de sécurité HTTP à chaque réponse principale.
+ * Génère un nonce CSP par requête et pose les en-têtes de sécurité HTTP.
  */
 final class SecurityHeadersSubscriber implements EventSubscriberInterface
 {
@@ -21,8 +23,21 @@ final class SecurityHeadersSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            KernelEvents::REQUEST => ['onKernelRequest', 512],
             KernelEvents::RESPONSE => 'onKernelResponse',
         ];
+    }
+
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
+        $request = $event->getRequest();
+        if (!$request->attributes->has(CspExtension::REQUEST_ATTRIBUTE)) {
+            $request->attributes->set(CspExtension::REQUEST_ATTRIBUTE, base64_encode(random_bytes(16)));
+        }
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -32,14 +47,17 @@ final class SecurityHeadersSubscriber implements EventSubscriberInterface
         }
 
         $headers = $event->getResponse()->headers;
+        $nonce = (string) $event->getRequest()->attributes->get(CspExtension::REQUEST_ATTRIBUTE, '');
 
         $headers->set('X-Content-Type-Options', 'nosniff');
-        // Quill / Flatpickr / AssetMapper : scripts et styles self-hostés sous /vendor et /assets.
-        // unsafe-inline encore requis pour styles Quill et quelques handlers admin (onclick).
-        // CDN tiers volontairement exclus (supply-chain).
+        // Scripts : nonce (plus de unsafe-inline). Styles : unsafe-inline encore requis (Quill).
+        $scriptSrc = $nonce !== ''
+            ? "script-src 'self' 'nonce-{$nonce}' data:"
+            : "script-src 'self' data:";
+
         $headers->set(
             'Content-Security-Policy',
-            "default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
+            "default-src 'self'; {$scriptSrc}; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
         );
         $headers->set('X-Frame-Options', 'DENY');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');

@@ -81,11 +81,11 @@ class UserEntityTest extends TestCase
     {
         $user = new User();
 
-        $this->assertTrue($user->isNewsletterOptIn());
-
-        $user->setNewsletterOptIn(false);
-
         $this->assertFalse($user->isNewsletterOptIn());
+
+        $user->setNewsletterOptIn(true);
+
+        $this->assertTrue($user->isNewsletterOptIn());
     }
 
     public function testPendingEmailAndVerificationToken(): void

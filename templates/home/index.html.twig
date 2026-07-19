@@ -5,7 +5,7 @@
 
 {% block description %}La Boîte à Chimère est une association parisienne dédiée aux jeux de rôle, jeux de société, GN et figurines. Rejoignez notre communauté et participez à nos soirées hebdomadaires !{% endblock %}
 {% block jsonld %}
-<script type="application/ld+json">
+<script type="application/ld+json" nonce="{{ csp_nonce() }}">
 [
   {
     "@context": "https://schema.org",
@@ -38,7 +38,7 @@
 	{{ parent() }}
 {% endblock %}
 
-{% block importmap %}{{ importmap(['app', 'carousel.js']) }}{% endblock %}
+{% block importmap %}{{ importmap(['app', 'carousel.js'], { nonce: csp_nonce() }) }}{% endblock %}
 
 {% block body %}
 <h1 class="sr-only">La Boîte à Chimère — Association Ludique Parisienne</h1>
@@ -775,27 +775,5 @@
 	</div>
 {% endif %}
 
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script>
-		function initTogglePassword() {
-			document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
-				if (btn._togglePasswordInit) return;
-				btn._togglePasswordInit = true;
-				btn.addEventListener('click', function () {
-					var input = document.getElementById(btn.dataset.togglePassword);
-					if (!input) return;
-					var isHidden = input.type === 'password';
-					input.type = isHidden ? 'text' : 'password';
-					btn.querySelectorAll('.eye-closed').forEach(function (el) { el.classList.toggle('hidden', isHidden); });
-					btn.querySelectorAll('.eye-open').forEach(function (el) { el.classList.toggle('hidden', !isHidden); });
-				});
-			});
-		}
-		document.addEventListener('DOMContentLoaded', initTogglePassword);
-		document.addEventListener('turbo:load', initTogglePassword);
-	</script>
 {% endblock %}
 

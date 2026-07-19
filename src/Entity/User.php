@@ -58,8 +58,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $pendingEmail = null;
 
-    #[ORM\Column(options: ['default' => true])]
-    private bool $newsletterOptIn = true;
+    #[ORM\Column(options: ['default' => false])]
+    private bool $newsletterOptIn = false;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;

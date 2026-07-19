@@ -22,7 +22,7 @@
         {% endblock %}
         {# ── JSON-LD Organisation ── #}
         {% block jsonld %}
-        <script type="application/ld+json">
+        <script type="application/ld+json" nonce="{{ csp_nonce() }}">
         {
           "@context": "https://schema.org",
           "@type": "Organization",
@@ -47,10 +47,10 @@
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {% block importmap %}{{ importmap('app', { nonce: csp_nonce() }) }}{% endblock %}
         {% endblock %}
-        <script>
-            // Thème : appliquer immédiatement + définir le toggle (inline = fonctionne toujours)
+        <script nonce="{{ csp_nonce() }}">
+            // Thème : appliquer immédiatement + définir le toggle (inline = anti-FOUC)
             (function(){
                 var h=document.documentElement;
                 var s=localStorage.getItem('theme');

@@ -109,7 +109,7 @@
 	</div>
 
 	<script src="/vendor/quill/quill.js"></script>
-	<script>
+	<script nonce="{{ csp_nonce() }}">
 		function sanitizePreviewHtml(html) {
 			var allowed = ['P','BR','STRONG','B','EM','I','U','S','UL','OL','LI','A','H1','H2','H3','H4','H5','H6','BLOCKQUOTE','SPAN','DIV'];
 			var template = document.createElement('template');

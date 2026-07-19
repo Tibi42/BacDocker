@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * entraîne la suppression en cascade de toutes ses inscriptions.
  */
 #[ORM\Entity(repositoryClass: InscriptionRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_inscription_activity_email', columns: ['activity_id', 'participant_email'])]
 #[ORM\HasLifecycleCallbacks]
 class Inscription
 {

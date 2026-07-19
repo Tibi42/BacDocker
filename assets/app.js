@@ -17,6 +17,7 @@ import './modal.js';
 import './calendar_turbo.js';
 import './cookie_consent.js';
 import './admin_url_mask.js';
+import './ui_actions.js';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 

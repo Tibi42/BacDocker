@@ -35,9 +35,8 @@
 					<label class="block text-sm font-medium text-text-secondary mb-1">Nouveau mot de passe</label>
 					<div class="relative">
 						<input type="password" name="new_password" id="new_password" placeholder="Minimum 12 caractères" minlength="12"
-							oninput="checkPasswordMatch()"
 							class="w-full rounded-lg border border-custom bg-custom-tertiary px-3 py-2 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
-						<button type="button" onclick="togglePwd(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer" tabindex="-1">
+						<button type="button" data-toggle-pwd class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer" tabindex="-1">
 							<svg class="h-5 w-5 eye-on" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
 							<svg class="h-5 w-5 eye-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
 						</button>
@@ -47,9 +46,8 @@
 					<label class="block text-sm font-medium text-text-secondary mb-1">Confirmer le mot de passe</label>
 					<div class="relative">
 						<input type="password" name="confirm_password" id="confirm_password" placeholder="Répétez le mot de passe"
-							oninput="checkPasswordMatch()"
 							class="w-full rounded-lg border border-custom bg-custom-tertiary px-3 py-2 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
-						<button type="button" onclick="togglePwd(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer" tabindex="-1">
+						<button type="button" data-toggle-pwd class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer" tabindex="-1">
 							<svg class="h-5 w-5 eye-on" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
 							<svg class="h-5 w-5 eye-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
 						</button>
@@ -62,39 +60,4 @@
 			</form>
 		</div>
 	</div>
-
-	<script>
-	function togglePwd(btn) {
-		const input = btn.closest('.relative').querySelector('input');
-		const eyeOn = btn.querySelector('.eye-on');
-		const eyeOff = btn.querySelector('.eye-off');
-		if (input.type === 'password') {
-			input.type = 'text';
-			eyeOn.classList.add('hidden');
-			eyeOff.classList.remove('hidden');
-		} else {
-			input.type = 'password';
-			eyeOn.classList.remove('hidden');
-			eyeOff.classList.add('hidden');
-		}
-	}
-
-	function checkPasswordMatch() {
-		const pwd = document.getElementById('new_password').value;
-		const confirm = document.getElementById('confirm_password').value;
-		const indicator = document.getElementById('password-match-indicator');
-		if (!confirm) {
-			indicator.classList.add('hidden');
-			return;
-		}
-		indicator.classList.remove('hidden');
-		if (pwd === confirm) {
-			indicator.textContent = '✓ Les mots de passe sont identiques';
-			indicator.className = 'mt-1 text-xs font-medium text-emerald-400';
-		} else {
-			indicator.textContent = '✗ Les mots de passe ne correspondent pas';
-			indicator.className = 'mt-1 text-xs font-medium text-red-400';
-		}
-	}
-	</script>
 {% endblock %}

@@ -15,7 +15,7 @@
 	{{ parent() }}
 	<script src="/vendor/flatpickr/flatpickr.min.js"></script>
 	<script src="/vendor/flatpickr/l10n/fr.js"></script>
-	<script>
+	<script nonce="{{ csp_nonce() }}">
 		(function initActivityDatePicker() {
 			function run() {
 				var input = document.querySelector('.activity-date-picker');

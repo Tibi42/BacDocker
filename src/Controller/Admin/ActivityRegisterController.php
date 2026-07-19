@@ -79,39 +79,52 @@ class ActivityRegisterController extends AbstractController
             } else {
                 $registered = false;
                 $becameFull = false;
+                $duplicate = false;
 
-                $entityManager->wrapInTransaction(function () use (
-                    $entityManager,
-                    $inscriptionRepository,
-                    $id,
-                    $inscription,
-                    &$registered,
-                    &$becameFull,
-                ): void {
-                    /** @var Activity|null $locked */
-                    $locked = $entityManager->find(Activity::class, $id, LockMode::PESSIMISTIC_WRITE);
-                    if (!$locked) {
-                        return;
-                    }
+                try {
+                    $entityManager->wrapInTransaction(function () use (
+                        $entityManager,
+                        $inscriptionRepository,
+                        $id,
+                        $inscription,
+                        &$registered,
+                        &$becameFull,
+                        &$duplicate,
+                    ): void {
+                        /** @var Activity|null $locked */
+                        $locked = $entityManager->find(Activity::class, $id, LockMode::PESSIMISTIC_WRITE);
+                        if (!$locked) {
+                            return;
+                        }
 
-                    $max = $locked->getMaxParticipants();
-                    if ($max !== null && $inscriptionRepository->countForActivity($locked->getId()) >= $max) {
-                        $becameFull = true;
+                        $email = (string) $inscription->getParticipantEmail();
+                        if ($inscriptionRepository->hasAlreadyRegistered($locked->getId(), $email)) {
+                            $duplicate = true;
 
-                        return;
-                    }
+                            return;
+                        }
 
-                    $inscription->setActivity($locked);
-                    $entityManager->persist($inscription);
-                    $registered = true;
-                });
+                        $max = $locked->getMaxParticipants();
+                        if ($max !== null && $inscriptionRepository->countForActivity($locked->getId()) >= $max) {
+                            $becameFull = true;
 
-                if ($becameFull) {
-                    $this->addFlash('error', 'Cet événement est complet, les inscriptions sont fermées.');
-                    return $this->redirectToRoute('app_home');
+                            return;
+                        }
+
+                        $inscription->setActivity($locked);
+                        $entityManager->persist($inscription);
+                        $registered = true;
+                    });
+                } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+                    $duplicate = true;
                 }
 
-                if ($registered) {
+                if ($duplicate) {
+                    $alreadyRegistered = true;
+                } elseif ($becameFull) {
+                    $this->addFlash('error', 'Cet événement est complet, les inscriptions sont fermées.');
+                    return $this->redirectToRoute('app_home');
+                } elseif ($registered) {
                     $template = $isAjax
                         ? 'admin/activity_register/_register_frame.html.twig'
                         : 'admin/activity_register/register.html.twig';

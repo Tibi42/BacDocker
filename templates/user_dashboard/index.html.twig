@@ -12,7 +12,7 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script>
+	<script nonce="{{ csp_nonce() }}">
 		function initPasswordMismatch() {
 			const pwd = document.getElementById('new_password');
 			const confirm = document.getElementById('confirm_password');
@@ -338,7 +338,7 @@
 						<h3 class="text-sm font-bold text-text-primary mb-1">Changer d'adresse email</h3>
 						<p class="text-xs text-text-secondary">Email actuel : <span class="text-amber-400 font-medium">{{ app.user.email }}</span></p>
 					</div>
-					<button type="button" onclick="document.getElementById('change-email-form').classList.toggle('hidden')" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
+					<button type="button" data-toggle-hidden="change-email-form" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
 						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
 						Modifier
 					</button>
@@ -366,7 +366,7 @@
 						<h3 class="text-sm font-bold text-text-primary mb-1">Changer de mot de passe</h3>
 						<p class="text-xs text-text-secondary">Choisissez un nouveau mot de passe sécurisé.</p>
 					</div>
-					<button type="button" onclick="document.getElementById('change-password-form').classList.toggle('hidden')" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
+					<button type="button" data-toggle-hidden="change-password-form" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
 						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
 						Modifier
 					</button>
@@ -422,7 +422,7 @@
 						{% endif %}
 					</div>
 					{% if app.user.newsletterOptIn %}
-						<button type="button" onclick="document.getElementById('unsubscribe-newsletter-modal').classList.remove('hidden')" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
+						<button type="button" data-show="unsubscribe-newsletter-modal" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all self-start">
 							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
 							Se désabonner
 						</button>
@@ -442,7 +442,7 @@
 							<h3 class="text-sm font-bold text-text-primary mb-1">Supprimer mon compte</h3>
 							<p class="text-xs text-text-secondary">Cette action est irréversible. Toutes vos données seront définitivement effacées.</p>
 						</div>
-						<button type="button" onclick="document.getElementById('delete-account-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition-all self-start">
+						<button type="button" data-show="delete-account-modal" class="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition-all self-start">
 							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
 							Supprimer
 						</button>
@@ -455,12 +455,12 @@
 	{# ── Modale désabonnement newsletter ── #}
 	{% if app.user.newsletterOptIn %}
 		<div id="unsubscribe-newsletter-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
-			<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="document.getElementById('unsubscribe-newsletter-modal').classList.add('hidden')"></div>
+			<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" data-hide="unsubscribe-newsletter-modal"></div>
 			<div class="relative bg-custom-secondary border border-custom rounded-2xl shadow-2xl p-6 mx-4 max-w-md w-full">
 				<h3 class="text-lg font-bold text-text-primary mb-2">Se désabonner de la newsletter</h3>
 				<p class="text-sm text-text-secondary mb-6">Vous ne recevrez plus nos emails d'information et d'actualité. Vous pouvez vous réabonner à tout moment en contactant l'association.</p>
 				<div class="flex items-center gap-3 justify-end">
-					<button type="button" onclick="document.getElementById('unsubscribe-newsletter-modal').classList.add('hidden')" class="cursor-pointer rounded-lg border border-custom px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
+					<button type="button" data-hide="unsubscribe-newsletter-modal" class="cursor-pointer rounded-lg border border-custom px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
 						Annuler
 					</button>
 					<form method="post" action="{{ path('app_user_newsletter') }}">
@@ -477,7 +477,7 @@
 	{# ── Modale de confirmation ── #}
 	{% if not is_granted('ROLE_ADMIN') %}
 		<div id="delete-account-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
-			<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="document.getElementById('delete-account-modal').classList.add('hidden')"></div>
+			<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" data-hide="delete-account-modal"></div>
 			<div class="relative bg-custom-secondary border border-custom rounded-2xl shadow-2xl p-6 mx-4 max-w-md w-full">
 				<h3 class="text-lg font-bold text-text-primary mb-2">Confirmer la suppression</h3>
 				<p class="text-sm text-text-secondary mb-4">Êtes-vous sûr de vouloir supprimer définitivement votre compte <span class="text-custom-orange font-bold">{{ app.user.username }}</span> ? Cette action est irréversible.</p>
@@ -487,7 +487,7 @@
 						<input type="password" id="delete-account-password" name="current_password" required autocomplete="current-password" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-3 text-text-primary focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
 					</div>
 					<div class="flex items-center gap-3 justify-end">
-					<button type="button" onclick="document.getElementById('delete-account-modal').classList.add('hidden')" class="rounded-lg border border-custom px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
+					<button type="button" data-hide="delete-account-modal" class="rounded-lg border border-custom px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
 						Annuler
 					</button>
 						<input type="hidden" name="_token" value="{{ csrf_token('delete_my_account') }}">

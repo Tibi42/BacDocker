@@ -32,7 +32,7 @@
             <h3 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-6">Galerie photos</h3>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {% for img in article.gallery %}
-                    <div class="relative group overflow-hidden rounded-xl border border-custom bg-custom-secondary/40 aspect-[4/3] cursor-pointer shadow-md hover:shadow-custom-orange/10 hover:border-custom-orange/50 transition-all duration-300 transform hover:-translate-y-1" onclick="openLightbox('{{ asset('images/articles/' ~ img) }}')">
+                    <div class="relative group overflow-hidden rounded-xl border border-custom bg-custom-secondary/40 aspect-[4/3] cursor-pointer shadow-md hover:shadow-custom-orange/10 hover:border-custom-orange/50 transition-all duration-300 transform hover:-translate-y-1" data-lightbox-open="{{ asset('images/articles/' ~ img) }}">
                         <img src="{{ asset('images/articles/' ~ img) }}" alt="Galerie : {{ article.title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                             <span class="text-white text-xs font-bold uppercase tracking-wider bg-custom-orange/90 px-3 py-1.5 rounded-lg shadow-lg">Agrandir</span>
@@ -50,20 +50,20 @@
 
 <!-- Lightbox Modal -->
 {% if article.gallery is not empty %}
-    <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md opacity-0 transition-all duration-300 ease-out" onclick="closeLightbox(event)">
+    <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md opacity-0 transition-all duration-300 ease-out" data-lightbox-close>
         <!-- Bouton Fermer -->
-        <button class="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all cursor-pointer focus:outline-none" onclick="closeLightbox(event)">
+        <button type="button" class="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all cursor-pointer focus:outline-none" data-lightbox-close>
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
 
         <!-- Conteneur d'image principale -->
-        <div class="relative max-w-4xl max-h-[85vh] p-2 flex items-center justify-center" onclick="event.stopPropagation()">
+        <div class="relative max-w-4xl max-h-[85vh] p-2 flex items-center justify-center" data-lightbox-stop>
             <img id="lightbox-img" src="" alt="Agrandissement" class="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl border border-white/10 scale-95 transition-transform duration-300 ease-out">
         </div>
     </div>
 
-    <script>
-        function openLightbox(src) {
+    <script nonce="{{ csp_nonce() }}">
+        window.openLightbox = function(src) {
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
 
@@ -77,9 +77,9 @@
             }, 10);
 
             document.body.style.overflow = 'hidden';
-        }
+        };
 
-        function closeLightbox(event) {
+        window.closeLightbox = function(event) {
             if (event) event.stopPropagation();
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
@@ -95,13 +95,13 @@
             }, 300);
 
             document.body.style.overflow = '';
-        }
+        };
 
         document.addEventListener('keydown', function(e) {
             const lightbox = document.getElementById('lightbox');
             if (lightbox && lightbox.classList.contains('opacity-100')) {
                 if (e.key === 'Escape') {
-                    closeLightbox();
+                    window.closeLightbox();
                 }
             }
         });

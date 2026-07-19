@@ -57,7 +57,7 @@
 
     <div class="mt-8 pt-6 border-t border-custom flex justify-between">
         <a href="{{ path('app_nouvelles') }}" class="text-xs text-text-secondary hover:text-custom-orange transition-colors">&larr; Retour aux actualités</a>
-        <button onclick="window.close();" class="text-xs text-custom-orange font-bold uppercase hover:underline">Fermer cet onglet</button>
+        <button type="button" data-close-window class="text-xs text-custom-orange font-bold uppercase hover:underline">Fermer cet onglet</button>
     </div>
 </article>
 {% endblock %}

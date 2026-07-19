@@ -1,27 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block importmap %}{{ importmap(['app', 'carousel.js']) }}{% endblock %}
+{% block importmap %}{{ importmap(['app', 'carousel.js'], { nonce: csp_nonce() }) }}{% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
-	<script>
-	function initTogglePassword() {
-		document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
-			if (btn._togglePasswordInit) return;
-			btn._togglePasswordInit = true;
-			btn.addEventListener('click', function () {
-				var input = document.getElementById(btn.dataset.togglePassword);
-				if (!input) return;
-				var isHidden = input.type === 'password';
-				input.type = isHidden ? 'text' : 'password';
-				btn.querySelectorAll('.eye-closed').forEach(function (el) { el.classList.toggle('hidden', isHidden); });
-				btn.querySelectorAll('.eye-open').forEach(function (el) { el.classList.toggle('hidden', !isHidden); });
-			});
-		});
-	}
-	document.addEventListener('DOMContentLoaded', initTogglePassword);
-	document.addEventListener('turbo:load', initTogglePassword);
-	</script>
 {% endblock %}
 
 {% block body %}

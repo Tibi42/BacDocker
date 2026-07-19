@@ -14,20 +14,4 @@
 			{{ include('admin/user/_form.html.twig', { form: form, button_label: 'Créer l\'utilisateur', form_action: path('app_admin_user_new') }) }}
 		</div>
 	</div>
-	<script>
-	function togglePwd(btn) {
-		const input = btn.closest('.relative').querySelector('input');
-		const eyeOn = btn.querySelector('.eye-on');
-		const eyeOff = btn.querySelector('.eye-off');
-		if (input.type === 'password') {
-			input.type = 'text';
-			eyeOn.classList.add('hidden');
-			eyeOff.classList.remove('hidden');
-		} else {
-			input.type = 'password';
-			eyeOn.classList.remove('hidden');
-			eyeOff.classList.add('hidden');
-		}
-	}
-	</script>
 {% endblock %}
