@@ -136,7 +136,23 @@
       "Bash(openssl s_client -connect ssl0.ovh.net:465 -servername ssl0.ovh.net)",
       "Bash(echo \"EXIT_CODE=$?\")",
       "Bash(openssl version *)",
-      "Bash(openssl s_client -connect ssl0.ovh.net:465 -servername ssl0.ovh.net -showcerts)"
+      "Bash(openssl s_client -connect ssl0.ovh.net:465 -servername ssl0.ovh.net -showcerts)",
+      "Bash(npm -v)",
+      "Bash(npx --version)",
+      "Bash(npx --yes lighthouse --version)",
+      "Bash(where chrome.exe)",
+      "Bash(where \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\")",
+      "Read(//c/Program Files/Google/Chrome/Application//**)",
+      "Bash(export CHROME_PATH=\"/c/Program Files/Google/Chrome/Application/chrome.exe\")",
+      "Bash(mkdir -p /c/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/5d0cf60a-a25a-4c45-be66-6bf2389a610d/scratchpad)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output=html --output-path=/c/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/5d0cf60a-a25a-4c45-be66-6bf2389a610d/scratchpad/lh-prod '--chrome-flags=--headless=new --no-sandbox' --preset=perf --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(rm -f /c/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/5d0cf60a-a25a-4c45-be66-6bf2389a610d/scratchpad/lh-prod.report.*)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output=html --output-path=/c/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/5d0cf60a-a25a-4c45-be66-6bf2389a610d/scratchpad/lh-prod2 '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod3 '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4 '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(rm -f lh-prod3 lh-prod4)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod3.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)"
     ]
   }
 }

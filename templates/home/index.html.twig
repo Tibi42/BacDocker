@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block stylesheets %}
-	<link rel="preload" as="image" href="{{ asset('images/hero/hero.webp') }}" type="image/webp" fetchpriority="high">
+	<link rel="preload" as="image" href="{{ asset('images/hero/hero.webp') }}" imagesrcset="{{ asset('images/hero/hero-720.webp') }} 720w, {{ asset('images/hero/hero.webp') }} 1024w" imagesizes="100vw" type="image/webp" fetchpriority="high">
 	{{ parent() }}
 {% endblock %}
 
@@ -44,7 +44,7 @@
 <h1 class="sr-only">La Boîte à Chimère — Association Ludique Parisienne</h1>
 	<!-- Hero Section avec Carousel, Header et NOS MONDES -->
 	<section id="home" class="relative w-full min-h-[600px] lg:min-h-[700px] overflow-hidden mb-12 lg:mb-0">
-		<img src="{{ asset('images/hero/hero.webp') }}" alt="Salle de jeu de La Boîte à Chimère" width="1920" height="1080" fetchpriority="high" decoding="sync" class="absolute inset-0 h-full w-full object-cover">
+		<img src="{{ asset('images/hero/hero.webp') }}" srcset="{{ asset('images/hero/hero-720.webp') }} 720w, {{ asset('images/hero/hero.webp') }} 1024w" sizes="100vw" alt="Salle de jeu de La Boîte à Chimère" width="1024" height="1024" fetchpriority="high" decoding="sync" class="absolute inset-0 h-full w-full object-cover">
 		<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
 
 		{% set slides = carousel_slides() %}

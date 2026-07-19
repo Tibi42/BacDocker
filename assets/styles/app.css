@@ -470,6 +470,7 @@ html.light-mode .calendar-grid .text-amber-400 {
     border-top-color: #f8742c;
     border-radius: 50%;
     animation: calendar-frame-spin 0.6s linear infinite;
+    will-change: transform;
     z-index: 5;
 }
 
@@ -487,6 +488,7 @@ html.light-mode .calendar-grid .text-amber-400 {
     border-top-color: #f8742c;
     border-radius: 50%;
     animation: calendar-frame-spin 0.6s linear infinite;
+    will-change: transform;
 }
 
 .modal-spinner-sm {
