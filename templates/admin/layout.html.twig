@@ -41,6 +41,13 @@
                 Carrousel
             </a>
 
+            <a href="{{ path('app_admin_ludotheque_index') }}"
+               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors
+                      {{ current starts with 'app_admin_ludotheque' ? 'bg-custom-orange text-text-primary' : 'text-text-primary hover:text-custom-orange hover:bg-white/5' }}">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Ludothèque
+            </a>
+
             <a href="{{ path('app_admin_article_index') }}"
                class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors
                       {{ current starts with 'app_admin_article' ? 'bg-custom-orange text-text-primary' : 'text-text-primary hover:text-custom-orange hover:bg-white/5' }}">

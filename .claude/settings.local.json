@@ -161,7 +161,11 @@
       "Bash(cat)",
       "Bash(C:/laragon/bin/nginx/nginx-1.28.2/nginx.exe -t -c C:/laragon/bin/nginx/../../../tmp/nginxtest/conf/test.conf -p C:/laragon/bin/nginx/nginx-1.28.2)",
       "Bash(C:/laragon/bin/nginx/nginx-1.28.2/nginx.exe -t -c C:/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/385ac3bf-68fc-4745-abcc-91974611c35d/scratchpad/nginxtest/test.conf)",
-      "Bash(npx --yes lighthouse https://guillaumepecquet.ovh/ --output=json --output-path=lh-after.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)"
+      "Bash(npx --yes lighthouse https://guillaumepecquet.ovh/ --output=json --output-path=lh-after.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(uv run *)",
+      "Bash(py --version)",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python3 *)",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 uv run *)"
     ]
   }
 }

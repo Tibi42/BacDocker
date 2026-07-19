@@ -37,7 +37,10 @@
 
 	<div class="flex items-center gap-2 sm:gap-4 shrink-0">
 		{% if app.user %}
-			<span class="hidden xl:block text-[11px] font-bold uppercase tracking-[0.1em] text-text-secondary mr-2">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></span>
+			<span class="hidden xl:flex flex-col leading-tight text-[11px] font-bold uppercase tracking-[0.1em] text-text-secondary mr-2">
+				<span>Bienvenue</span>
+				<span class="text-custom-orange">{{ app.user.username }}</span>
+			</span>
 		{% endif %}
 		<button type="button" onclick="window.__toggleTheme()" class="theme-toggle-btn p-2 sm:p-2.5 rounded-lg bg-custom-tertiary border border-custom text-text-secondary hover:text-text-primary transition-all z-[75]" aria-label="Changer de thème">
 			<svg class="h-5 w-5 sun-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24">
