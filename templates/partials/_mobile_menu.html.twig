@@ -1,64 +1,70 @@
 <div id="mobile-menu-drawer" class="fixed inset-0 z-[95] lg:hidden pointer-events-none">
 	<div id="mobile-menu-overlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-	<div id="mobile-menu-content" class="absolute top-0 right-0 bottom-0 w-[280px] bg-custom-secondary border-l border-custom shadow-2xl pt-20 px-8">
+	<div id="mobile-menu-content" class="absolute top-0 right-0 bottom-0 w-[min(100%,320px)] max-w-[85vw] bg-custom-secondary border-l border-custom shadow-2xl flex flex-col pt-20">
 		{% if app.user %}
-			<p class="text-xs font-bold uppercase tracking-wider text-text-secondary text-center mb-6">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></p>
+			<p class="shrink-0 px-6 sm:px-8 text-xs font-bold uppercase tracking-wider text-text-secondary text-center mb-4">Bienvenue <span class="text-custom-orange">{{ app.user.username }}</span></p>
 		{% endif %}
-		<nav class="flex flex-col gap-6">
-			<a href="{{ path('app_home') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
-			<a href="{{ path('app_jds') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDS</a>
-			<a href="{{ path('app_jdr') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDR</a>
-			<a href="{{ path('app_gn') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_gn' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">GN</a>
-			<a href="{{ path('app_association') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_association' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ASSOCIATION</a>
-			<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest text-text-secondary hover:text-custom-orange transition-colors">FORUM</a>
-			{% if app.user %}
-				<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="mobile-nav-link text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">MON ESPACE</a>
-			{% endif %}
-			{% if is_granted('ROLE_ADMIN') %}
-				<a href="{{ path('admin') }}" class="text-lg font-bold uppercase tracking-widest text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
-			{% endif %}
-			<hr id="mobile-menu-separator" class="border-custom my-4">
-			{% if app.user %}
-				<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-					<button type="submit" class="mt-2 w-full rounded-lg bg-custom-orange px-6 py-4 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 shadow-lg shadow-custom-orange/20 hover:bg-orange-600 transition-all block">
-						DÉCONNEXION
-					</button>
-				</form>
-			{% else %}
-				<button id="mobile-join-btn" type="button" class="mt-2 w-full rounded-lg bg-custom-orange px-6 py-4 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 cursor-pointer shadow-lg shadow-custom-orange/20 hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all">
-					NOUS REJOINDRE
-				</button>
-			{% endif %}
-			{# ── Formulaire connexion mobile ── #}
+
+		<nav class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 sm:px-8 pb-4">
+			<div class="flex flex-col gap-5 sm:gap-6 py-1">
+				<a href="{{ path('app_home') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
+				<a href="{{ path('app_jds') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDS</a>
+				<a href="{{ path('app_jdr') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">JDR</a>
+				<a href="{{ path('app_gn') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_gn' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">GN</a>
+				<a href="{{ path('app_association') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_association' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">ASSOCIATION</a>
+				<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest text-text-secondary hover:text-custom-orange transition-colors">FORUM</a>
+				{% if app.user %}
+					<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'text-custom-orange' : 'text-text-primary/70 hover:text-custom-orange' }} transition-colors">MON ESPACE</a>
+				{% endif %}
+				{% if is_granted('ROLE_ADMIN') %}
+					<a href="{{ path('admin') }}" class="mobile-nav-link block py-1 text-base sm:text-lg font-bold uppercase tracking-widest text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
+				{% endif %}
+			</div>
+
+			{# ── Formulaire connexion mobile (dans la zone scrollable) ── #}
 			{% if not app.user %}
-				<div id="mobile-join-form" class="overflow-hidden" style="max-height:0;transition:max-height 0.3s ease">
-					{% if login_error is defined and login_error %}<p class="mb-2 text-xs font-semibold text-red-400 text-center">{{ login_error.messageKey|trans(login_error.messageData, 'security') }}</p>{% endif %}
-					<form action="{{ path('app_login') }}" method="post" data-turbo="false" class="flex flex-col gap-3 pt-4">
-						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-						<div>
-							<label for="mobile-join-username" class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Email</label>
-							<input type="email" id="mobile-join-username" name="_username" value="{{ last_username|default('') }}" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange {{ (login_error is defined and login_error) ? 'border-red-500' : '' }}" placeholder="votre@email.com" autocomplete="email">
-						</div>
-						<div>
-							<label for="mobile-join-password" class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Mot de passe</label>
-							<div class="relative">
-								<input type="password" id="mobile-join-password" name="_password" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange" placeholder="········" autocomplete="current-password">
-								<button type="button" data-toggle-password="mobile-join-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-custom-orange hover:scale-110 transition-all cursor-pointer" tabindex="-1" aria-label="Afficher le mot de passe">
-									<svg class="w-5 h-5 eye-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-									<svg class="w-5 h-5 eye-open hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-								</button>
+				<div class="mt-4">
+					<button id="mobile-join-btn" type="button" class="w-full rounded-lg bg-custom-orange px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 cursor-pointer shadow-lg shadow-custom-orange/20 hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all">
+						NOUS REJOINDRE
+					</button>
+					<div id="mobile-join-form" class="overflow-hidden" style="max-height:0;transition:max-height 0.3s ease">
+						{% if login_error is defined and login_error %}<p class="mb-2 text-xs font-semibold text-red-400 text-center">{{ login_error.messageKey|trans(login_error.messageData, 'security') }}</p>{% endif %}
+						<form action="{{ path('app_login') }}" method="post" data-turbo="false" class="flex flex-col gap-3 pt-4">
+							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+							<div>
+								<label for="mobile-join-username" class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Email</label>
+								<input type="email" id="mobile-join-username" name="_username" value="{{ last_username|default('') }}" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange {{ (login_error is defined and login_error) ? 'border-red-500' : '' }}" placeholder="votre@email.com" autocomplete="email">
 							</div>
-						</div>
-						<button type="submit" class="w-full rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20">SE CONNECTER</button>
-						<button type="button" data-open-register class="w-full rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20">S'INSCRIRE</button>
-						<a href="{{ path('app_forgot_password_request') }}" class="block text-center text-xs text-text-secondary hover:text-custom-orange transition-colors mt-1">Mot de passe oublié ?</a>
-					</form>
+							<div>
+								<label for="mobile-join-password" class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Mot de passe</label>
+								<div class="relative">
+									<input type="password" id="mobile-join-password" name="_password" class="w-full rounded-lg border border-custom bg-custom-tertiary px-4 py-2.5 pr-10 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange" placeholder="········" autocomplete="current-password">
+									<button type="button" data-toggle-password="mobile-join-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-custom-orange hover:scale-110 transition-all cursor-pointer" tabindex="-1" aria-label="Afficher le mot de passe">
+										<svg class="w-5 h-5 eye-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+										<svg class="w-5 h-5 eye-open hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+									</button>
+								</div>
+							</div>
+							<button type="submit" class="w-full rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20">SE CONNECTER</button>
+							<button type="button" data-open-register class="w-full rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20">S'INSCRIRE</button>
+							<a href="{{ path('app_forgot_password_request') }}" class="block text-center text-xs text-text-secondary hover:text-custom-orange transition-colors mt-1">Mot de passe oublié ?</a>
+						</form>
+					</div>
 				</div>
 			{% endif %}
 		</nav>
-		<div id="mobile-menu-footer" class="absolute bottom-10 left-8 right-8 flex flex-col items-center gap-3 text-center">
-			<p class="text-[10px] uppercase tracking-widest text-text-secondary font-bold">&copy; {{ "now"|date("Y") }} LA BOÎTE À CHIMÈRE</p>
+
+		{# Pied de page fixe : déconnexion toujours sous les liens, jamais superposée #}
+		<div id="mobile-menu-footer" class="shrink-0 border-t border-custom px-6 sm:px-8 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col items-stretch gap-3">
+			{% if app.user %}
+				<form id="mobile-logout-form" method="post" action="{{ path('app_logout') }}" data-turbo="false">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+					<button type="submit" class="w-full rounded-lg bg-custom-orange px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-gray-900 shadow-lg shadow-custom-orange/20 hover:bg-orange-600 transition-all">
+						DÉCONNEXION
+					</button>
+				</form>
+			{% endif %}
+			<p class="text-[10px] uppercase tracking-widest text-text-secondary font-bold text-center">&copy; {{ "now"|date("Y") }} LA BOÎTE À CHIMÈRE</p>
 		</div>
 	</div>
 </div>

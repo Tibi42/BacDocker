@@ -1,28 +1,3 @@
-import { isShortMobileViewport } from './join_panel.js';
-
-/**
- * Sur écran court (voir isShortMobileViewport), déplace le bouton de
- * déconnexion au-dessus du copyright pour former un pied de page groupé,
- * et rend la nav défilable pour ne jamais pousser ce pied de page hors écran.
- */
-function relocateLogoutToFooter() {
-    const logoutForm = document.getElementById('mobile-logout-form');
-    const footer = document.getElementById('mobile-menu-footer');
-    const nav = document.querySelector('#mobile-menu-content nav');
-    const separator = document.getElementById('mobile-menu-separator');
-    if (!logoutForm || !footer) return;
-
-    if (isShortMobileViewport()) {
-        footer.insertBefore(logoutForm, footer.firstChild);
-        if (nav) nav.classList.add('flex-1', 'min-h-0', 'overflow-y-auto');
-        if (separator) separator.classList.add('hidden');
-    } else if (nav) {
-        nav.appendChild(logoutForm);
-        nav.classList.remove('flex-1', 'min-h-0', 'overflow-y-auto');
-        if (separator) separator.classList.remove('hidden');
-    }
-}
-
 /**
  * Initialise le menu de navigation mobile (drawer / tiroir latéral).
  *
@@ -32,6 +7,9 @@ function relocateLogoutToFooter() {
  *   de listeners sur DOMContentLoaded + turbo:load.
  * - Bloque le scroll du body quand le menu est ouvert.
  * - Ferme le menu au clic sur l'overlay ou sur un lien de navigation.
+ *
+ * Layout : colonne flex avec nav scrollable + pied de page fixe
+ * (déconnexion / copyright) — plus besoin de déplacer le DOM.
  */
 function initMobileMenu() {
     const btn = document.getElementById('mobile-menu-btn');
@@ -56,7 +34,6 @@ function initMobileMenu() {
         drawer.classList.add('menu-open');
         btn.classList.add('hidden');
         document.body.style.overflow = 'hidden';
-        relocateLogoutToFooter();
     }
 
     function close() {
