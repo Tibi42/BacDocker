@@ -150,6 +150,105 @@
 			{% endif %}
 		</div>
 
+		{# ── Ludothèque ── #}
+		<div class="mb-8">
+			<h2 class="text-lg font-bold text-text-primary uppercase tracking-wide mb-4">Ludothèque</h2>
+			{% if boardGames|length > 0 %}
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+					{% for boardGame in boardGames %}
+						{% set isOwn = boardGame.borrower and app.user and boardGame.borrower.id == app.user.id %}
+						<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card flex flex-col gap-2">
+							<div>
+								<h3 class="text-sm font-bold text-text-primary">{{ boardGame.title }}</h3>
+								{% if boardGame.category %}
+									<p class="text-xs text-text-secondary mt-0.5">{{ boardGame.category }}</p>
+								{% endif %}
+								<div class="flex flex-wrap gap-2 mt-1.5 text-[10px] text-text-secondary">
+									{% if boardGame.maxPlayers %}<span>{{ boardGame.maxPlayers }} joueurs max</span>{% endif %}
+									{% if boardGame.durationMinutes %}<span>{{ boardGame.durationMinutes }} min</span>{% endif %}
+									{% if boardGame.condition %}<span>{{ boardGame.condition }}</span>{% endif %}
+								</div>
+							</div>
+
+							<div class="pt-2 border-t border-custom/50">
+								{% if boardGame.status == 'available' %}
+									{% if activeBoardGame %}
+										<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-text-secondary/60 px-3 py-1.5 rounded-lg bg-white/5 border border-custom/30">
+											Disponible
+										</span>
+										<p class="text-[10px] text-text-secondary/60 mt-1">Vous avez déjà un emprunt en cours.</p>
+									{% else %}
+										<form method="post" action="{{ path('app_user_ludotheque_request', { id: boardGame.id }) }}">
+											<input type="hidden" name="_token" value="{{ csrf_token('request_loan' ~ boardGame.id) }}">
+											<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded-lg bg-emerald-400/10 border border-emerald-400/30 hover:bg-emerald-400/20 transition-all">
+												Emprunter
+											</button>
+										</form>
+									{% endif %}
+								{% elseif boardGame.status == 'pending' %}
+									{% if isOwn %}
+										<div class="flex flex-wrap items-center gap-2">
+											<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-custom-orange px-3 py-1.5 rounded-lg bg-custom-orange/10 border border-custom-orange/30">
+												Demande en attente
+											</span>
+											<form method="post" action="{{ path('app_user_ludotheque_cancel', { id: boardGame.id }) }}" onsubmit="return confirm('Annuler votre demande d\'emprunt pour « {{ boardGame.title }} » ?');">
+												<input type="hidden" name="_token" value="{{ csrf_token('cancel_loan' ~ boardGame.id) }}">
+												<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg bg-red-400/10 border border-red-400/30 hover:bg-red-400/20 transition-all">
+													Annuler
+												</button>
+											</form>
+										</div>
+									{% else %}
+										<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-text-secondary/60 px-3 py-1.5 rounded-lg bg-white/5 border border-custom/30">
+											Indisponible
+										</span>
+									{% endif %}
+								{% elseif boardGame.status == 'loaned' %}
+									{% if isOwn %}
+										{% if boardGame.returnDueAt and boardGame.returnDueAt < date() %}
+											<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-white px-3 py-1.5 rounded-lg bg-red-500 border border-red-500">
+												En retard depuis le {{ boardGame.returnDueAt|date('d/m/Y') }}
+											</span>
+										{% else %}
+											<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-violet-400 px-3 py-1.5 rounded-lg bg-violet-400/10 border border-violet-400/30">
+												Emprunté{% if boardGame.returnDueAt %} jusqu'au {{ boardGame.returnDueAt|date('d/m/Y') }}{% endif %}
+											</span>
+										{% endif %}
+									{% else %}
+										<span class="inline-block text-[10px] font-bold uppercase tracking-wider text-text-secondary/60 px-3 py-1.5 rounded-lg bg-white/5 border border-custom/30">
+											Indisponible
+										</span>
+									{% endif %}
+								{% endif %}
+							</div>
+
+							<div class="pt-2 border-t border-custom/50 flex flex-col gap-1.5">
+								{% if averageRatings[boardGame.id] is not null %}
+									<p class="text-[11px] font-bold text-amber-400">★ {{ averageRatings[boardGame.id]|number_format(1) }}</p>
+								{% endif %}
+								{% if canRate[boardGame.id] %}
+									<form method="post" action="{{ path('app_user_ludotheque_rate', { id: boardGame.id }) }}" class="flex items-center gap-2">
+										<input type="hidden" name="_token" value="{{ csrf_token('rate_game' ~ boardGame.id) }}">
+										<label class="text-[10px] font-bold uppercase tracking-wider text-text-secondary" for="rating-{{ boardGame.id }}">Ma note</label>
+										<select name="rating" id="rating-{{ boardGame.id }}" class="rounded-lg border border-custom bg-custom-tertiary px-2 py-1 text-xs text-text-primary focus:border-custom-orange focus:outline-none">
+											{% for value in 1..5 %}
+												<option value="{{ value }}" {{ myRatings[boardGame.id] == value ? 'selected' : '' }}>{{ value }}</option>
+											{% endfor %}
+										</select>
+										<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors">Noter</button>
+									</form>
+								{% endif %}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="rounded-2xl border border-custom bg-custom-secondary p-8 text-center glass-card">
+					<p class="text-text-secondary text-sm">Aucun jeu dans la ludothèque pour le moment.</p>
+				</div>
+			{% endif %}
+		</div>
+
 		{# ── Zone à risque ── #}
 		<div class="mt-12 pt-8 border-t border-custom/50">
 			<h2 class="text-lg font-bold text-red-400 uppercase tracking-wide mb-6">Zone à risque</h2>

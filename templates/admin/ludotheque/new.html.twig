@@ -1,0 +1,17 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Nouveau jeu - Ludothèque - La Boîte à Chimère{% endblock %}
+
+{% block admin_body %}
+	<div class="min-h-screen mx-auto max-w-[1240px] px-4 sm:px-8 py-8">
+		<a href="{{ path('app_admin_ludotheque_index') }}" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors mb-6">
+			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+			Retour à la ludothèque
+		</a>
+
+		<div class="w-full xl:max-w-2xl rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card">
+			<h1 class="text-xl font-bold text-text-primary uppercase tracking-wide mb-6">Nouveau jeu</h1>
+			{{ include('admin/ludotheque/_form.html.twig', { form: form, button_label: 'Créer le jeu', form_action: path('app_admin_ludotheque_new') }) }}
+		</div>
+	</div>
+{% endblock %}
