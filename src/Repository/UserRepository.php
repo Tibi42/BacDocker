@@ -98,12 +98,40 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Retourne le nombre total d'utilisateurs inscrits (utilisé dans le tableau de bord admin).
+     * Retourne le nombre total d'utilisateurs inscrits (tous statuts).
      */
     public function countAll(): int
     {
         return (int) $this->createQueryBuilder('u')
             ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Retourne le nombre de membres actifs (non suspendus).
+     * Utilisé dans le tableau de bord admin.
+     */
+    public function countActive(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.suspended = :suspended')
+            ->setParameter('suspended', false)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Retourne le nombre de membres suspendus.
+     * Utilisé dans le tableau de bord admin.
+     */
+    public function countInactive(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.suspended = :suspended')
+            ->setParameter('suspended', true)
             ->getQuery()
             ->getSingleScalarResult();
     }

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
  *
  * Agrège les statistiques clés affichées sur la page d'accueil du back-office :
  * total des inscriptions, activités en attente, top proposeurs du mois,
- * statistiques newsletter et derniers utilisateurs inscrits.
+ * statistiques newsletter, membres actifs/inactifs et derniers utilisateurs inscrits.
  *
  * Utilise le pattern __invoke() (single action controller).
  */
@@ -46,7 +46,8 @@ class DashboardController extends AbstractController
         $newsletterPending = $this->newsletterRepository->countByStatus(NewsletterSubscriber::STATUS_PENDING);
 
         $latestUsers = $this->userRepository->findLatest(5);
-        $totalUsers = $this->userRepository->countAll();
+        $totalUsers = $this->userRepository->countActive();
+        $inactiveUsers = $this->userRepository->countInactive();
 
         return $this->render('admin/dashboard.html.twig', [
             'inscriptionsTotal' => $inscriptionsTotal,
@@ -57,6 +58,7 @@ class DashboardController extends AbstractController
             'newsletterConfirmed' => $newsletterConfirmed,
             'newsletterPending' => $newsletterPending,
             'totalUsers' => $totalUsers,
+            'inactiveUsers' => $inactiveUsers,
         ]);
     }
 }

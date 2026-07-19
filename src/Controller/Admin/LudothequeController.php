@@ -417,17 +417,16 @@ class LudothequeController extends AbstractController
     }
 
     /**
-     * Archive un jeu du catalogue (uniquement si disponible).
+     * Supprime définitivement un jeu du catalogue (uniquement si disponible).
      *
-     * Remplace l'ancienne suppression définitive : le jeu et son historique
-     * (notes, journal d'emprunts) sont conservés en base mais n'apparaissent
-     * plus dans les listes admin/membre.
+     * Les notes (Review) et le journal d'emprunts (LoanLog) sont effacés
+     * automatiquement via ON DELETE CASCADE.
      */
-    #[Route('/{id}/archiver', name: 'archive', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function archive(Request $request, BoardGame $boardGame): Response
+    #[Route('/{id}/supprimer', name: 'delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function delete(Request $request, BoardGame $boardGame): Response
     {
         $token = $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('archive' . $boardGame->getId(), $token)) {
+        if (!$this->isCsrfTokenValid('delete' . $boardGame->getId(), $token)) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
             return $this->redirectToRoute('app_admin_ludotheque_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -438,9 +437,10 @@ class LudothequeController extends AbstractController
         }
 
         $title = $boardGame->getTitle();
-        $boardGame->setArchived(true);
+        $this->deleteImageFile($boardGame->getImage());
+        $this->entityManager->remove($boardGame);
         $this->entityManager->flush();
-        $this->addFlash('success', 'Le jeu « ' . $title . ' » a été archivé.');
+        $this->addFlash('success', 'Le jeu « ' . $title . ' » a été supprimé.');
 
         return $this->redirectToRoute('app_admin_ludotheque_index', [], Response::HTTP_SEE_OTHER);
     }

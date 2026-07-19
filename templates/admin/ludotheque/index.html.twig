@@ -119,10 +119,6 @@ Azul;Familial;4;45;Neuf;</code>
 							{% set pageParams = {} %}
 							{% if pagination.currentPageNumber > 1 %}{% set pageParams = pageParams|merge({ page: pagination.currentPageNumber }) %}{% endif %}
 							{% if search %}{% set pageParams = pageParams|merge({ q: search }) %}{% endif %}
-							<div class="flex flex-col gap-0.5">
-								<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary">Note</span>
-								{{ include('components/_star_rating.html.twig', { rating: averageRatings[boardGame.id]|default(null), size: 'text-sm' }, with_context: false) }}
-							</div>
 							{{ include('components/_rate_form.html.twig', {
 								ratePath: path('app_admin_ludotheque_rate', { id: boardGame.id }|merge(pageParams)),
 								csrfId: 'admin_rate_game' ~ boardGame.id,
@@ -147,9 +143,9 @@ Azul;Familial;4;45;Neuf;</code>
 								</form>
 							{% else %}
 								<a href="{{ path('app_admin_ludotheque_edit', { id: boardGame.id }) }}" class="text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors">Modifier</a>
-								<form method="post" action="{{ path('app_admin_ludotheque_archive', { id: boardGame.id }) }}" class="contents" onsubmit="return confirm('Archiver ce jeu ?')">
-									<input type="hidden" name="_token" value="{{ csrf_token('archive' ~ boardGame.id) }}">
-									<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Archiver</button>
+								<form method="post" action="{{ path('app_admin_ludotheque_delete', { id: boardGame.id }) }}" class="contents" onsubmit="return confirm('Supprimer ce jeu ?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ boardGame.id) }}">
+									<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Supprimer</button>
 								</form>
 							{% endif %}
 						</div>
@@ -188,10 +184,6 @@ Azul;Familial;4;45;Neuf;</code>
 										{% if pagination.currentPageNumber > 1 %}{% set pageParams = pageParams|merge({ page: pagination.currentPageNumber }) %}{% endif %}
 										{% if search %}{% set pageParams = pageParams|merge({ q: search }) %}{% endif %}
 										<div class="flex flex-col gap-2">
-											<div class="flex flex-col gap-0.5">
-												<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary">Note</span>
-												{{ include('components/_star_rating.html.twig', { rating: averageRatings[boardGame.id]|default(null), size: 'text-sm' }, with_context: false) }}
-											</div>
 											{{ include('components/_rate_form.html.twig', {
 												ratePath: path('app_admin_ludotheque_rate', { id: boardGame.id }|merge(pageParams)),
 												csrfId: 'admin_rate_game' ~ boardGame.id,
@@ -235,9 +227,9 @@ Azul;Familial;4;45;Neuf;</code>
 											</form>
 										{% else %}
 											<a href="{{ path('app_admin_ludotheque_edit', { id: boardGame.id }) }}" class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors mr-3">Modifier</a>
-											<form method="post" action="{{ path('app_admin_ludotheque_archive', { id: boardGame.id }) }}" class="inline" onsubmit="return confirm('Archiver ce jeu ?')">
-												<input type="hidden" name="_token" value="{{ csrf_token('archive' ~ boardGame.id) }}">
-												<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Archiver</button>
+											<form method="post" action="{{ path('app_admin_ludotheque_delete', { id: boardGame.id }) }}" class="inline" onsubmit="return confirm('Supprimer ce jeu ?')">
+												<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ boardGame.id) }}">
+												<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Supprimer</button>
 											</form>
 										{% endif %}
 									</td>
