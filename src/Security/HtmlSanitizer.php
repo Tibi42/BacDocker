@@ -2,28 +2,69 @@
 
 namespace App\Security;
 
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer as SymfonyHtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+
 /**
  * Sanitizer HTML allowlist pour le contenu WYSIWYG des articles.
- * Supprime scripts, handlers d'événements et URL dangereuses (javascript:, data:, etc.).
+ *
+ * Délègue au composant symfony/html-sanitizer (v8.0.14+) tout en exposant
+ * sanitize() / isSafeUrl() pour le reste de l'application.
  */
 final class HtmlSanitizer
 {
-    private const DANGEROUS_TAGS = [
-        'script', 'style', 'iframe', 'object', 'embed', 'link', 'meta',
-        'form', 'input', 'button', 'textarea', 'select', 'option',
-    ];
+    private readonly SymfonyHtmlSanitizer $sanitizer;
 
-    private const ALLOWED_TAGS = [
-        'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li',
-        'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'img',
-        'span', 'div', 'figure', 'figcaption', 'hr', 'table', 'thead',
-        'tbody', 'tr', 'th', 'td', 'pre', 'code',
-    ];
+    public function __construct()
+    {
+        $attrs = ['class', 'title'];
+        $linkAttrs = [...$attrs, 'href', 'target', 'rel'];
+        $imgAttrs = [...$attrs, 'src', 'alt', 'width', 'height'];
+        $cellAttrs = [...$attrs, 'colspan', 'rowspan'];
 
-    private const ALLOWED_ATTRS = [
-        'href', 'src', 'alt', 'title', 'class', 'width', 'height',
-        'colspan', 'rowspan', 'target', 'rel',
-    ];
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('p', $attrs)
+            ->allowElement('br')
+            ->allowElement('strong', $attrs)
+            ->allowElement('b', $attrs)
+            ->allowElement('em', $attrs)
+            ->allowElement('i', $attrs)
+            ->allowElement('u', $attrs)
+            ->allowElement('s', $attrs)
+            ->allowElement('ul', $attrs)
+            ->allowElement('ol', $attrs)
+            ->allowElement('li', $attrs)
+            ->allowElement('a', $linkAttrs)
+            ->allowElement('h1', $attrs)
+            ->allowElement('h2', $attrs)
+            ->allowElement('h3', $attrs)
+            ->allowElement('h4', $attrs)
+            ->allowElement('h5', $attrs)
+            ->allowElement('h6', $attrs)
+            ->allowElement('blockquote', $attrs)
+            ->allowElement('img', $imgAttrs)
+            ->allowElement('span', $attrs)
+            ->allowElement('div', $attrs)
+            ->allowElement('figure', $attrs)
+            ->allowElement('figcaption', $attrs)
+            ->allowElement('hr')
+            ->allowElement('table', $attrs)
+            ->allowElement('thead', $attrs)
+            ->allowElement('tbody', $attrs)
+            ->allowElement('tr', $attrs)
+            ->allowElement('th', $cellAttrs)
+            ->allowElement('td', $cellAttrs)
+            ->allowElement('pre', $attrs)
+            ->allowElement('code', $attrs)
+            ->forceAttribute('a', 'rel', 'noopener noreferrer')
+            ->allowLinkSchemes(['http', 'https', 'mailto'])
+            ->allowRelativeLinks()
+            ->allowMediaSchemes(['http', 'https'])
+            ->allowRelativeMedias()
+            ->withMaxInputLength(200_000);
+
+        $this->sanitizer = new SymfonyHtmlSanitizer($config);
+    }
 
     public function sanitize(?string $html): ?string
     {
@@ -31,81 +72,7 @@ final class HtmlSanitizer
             return $html;
         }
 
-        $previous = libxml_use_internal_errors(true);
-        $doc = new \DOMDocument('1.0', 'UTF-8');
-        $wrapped = '<?xml encoding="UTF-8"><div id="__sanitize_root">' . $html . '</div>';
-        $doc->loadHTML($wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        libxml_clear_errors();
-        libxml_use_internal_errors($previous);
-
-        $root = $doc->getElementById('__sanitize_root');
-        if (!$root) {
-            return strip_tags($html);
-        }
-
-        $this->cleanNode($root);
-
-        $result = '';
-        foreach ($root->childNodes as $child) {
-            $result .= $doc->saveHTML($child);
-        }
-
-        return $result;
-    }
-
-    private function cleanNode(\DOMNode $node): void
-    {
-        // 1. Recurse into children first (bottom-up) so they are cleaned before we modify the parent
-        $children = [];
-        foreach ($node->childNodes as $child) {
-            $children[] = $child;
-        }
-        foreach ($children as $child) {
-            $this->cleanNode($child);
-        }
-
-        // 2. Clean the node itself
-        if ($node instanceof \DOMElement) {
-            $tag = strtolower($node->tagName);
-
-            if (\in_array($tag, self::DANGEROUS_TAGS, true)) {
-                $node->parentNode?->removeChild($node);
-                return;
-            }
-
-            if (!\in_array($tag, self::ALLOWED_TAGS, true)) {
-                // Remplacer le nœud interdit par ses enfants (déjà nettoyés)
-                while ($node->firstChild) {
-                    $node->parentNode?->insertBefore($node->firstChild, $node);
-                }
-                $node->parentNode?->removeChild($node);
-                return;
-            }
-
-            $attrsToRemove = [];
-            foreach ($node->attributes ?? [] as $attr) {
-                $name = strtolower($attr->name);
-                if (!\in_array($name, self::ALLOWED_ATTRS, true) || str_starts_with($name, 'on')) {
-                    $attrsToRemove[] = $attr->name;
-                    continue;
-                }
-
-                if (\in_array($name, ['href', 'src'], true) && !$this->isSafeUrl($attr->value)) {
-                    $attrsToRemove[] = $attr->name;
-                }
-            }
-
-            foreach ($attrsToRemove as $attrName) {
-                $node->removeAttribute($attrName);
-            }
-
-            if ($tag === 'a') {
-                $node->setAttribute('rel', 'noopener noreferrer');
-                if ($node->hasAttribute('target') && $node->getAttribute('target') !== '_blank') {
-                    $node->removeAttribute('target');
-                }
-            }
-        }
+        return $this->sanitizer->sanitize($html);
     }
 
     public function isSafeUrl(?string $url): bool
@@ -114,14 +81,12 @@ final class HtmlSanitizer
             return false;
         }
 
-        $url = trim($url);
+        $url = trim(html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
-        // Chemins relatifs internes
         if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
             return true;
         }
 
-        // Ancres
         if (str_starts_with($url, '#')) {
             return true;
         }

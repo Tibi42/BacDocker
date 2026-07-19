@@ -196,7 +196,7 @@ class LudothequeController extends AbstractController
         $response = new StreamedResponse(function () use ($boardGames, $statusLabels) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['Titre', 'Catégorie', 'Joueurs max', 'Durée (min)', 'État', 'Notes', 'Statut', 'Emprunteur'], ';');
+            fputcsv($handle, ['Titre', 'Catégorie', 'Joueurs max', 'Durée (min)', 'État', 'Notes', 'Statut', 'Emprunteur'], ';', '"', '\\');
 
             foreach ($boardGames as $boardGame) {
                 fputcsv($handle, [
@@ -208,7 +208,7 @@ class LudothequeController extends AbstractController
                     CsvCellSanitizer::sanitize((string) ($boardGame->getNotes() ?? '')),
                     CsvCellSanitizer::sanitize($statusLabels[$boardGame->getStatus()] ?? $boardGame->getStatus()),
                     CsvCellSanitizer::sanitize((string) ($boardGame->getBorrower()?->getUsername() ?? '')),
-                ], ';');
+                ], ';', '"', '\\');
             }
 
             fclose($handle);

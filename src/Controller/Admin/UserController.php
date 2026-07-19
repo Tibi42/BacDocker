@@ -177,7 +177,7 @@ class UserController extends AbstractController
         $response = new StreamedResponse(function () use ($users) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['Nom d\'utilisateur', 'Email', 'Rôles', 'Suspendu', 'Inscrit le'], ';');
+            fputcsv($handle, ['Nom d\'utilisateur', 'Email', 'Rôles', 'Suspendu', 'Inscrit le'], ';', '"', '\\');
 
             foreach ($users as $user) {
                 $roles = array_filter($user->getRoles(), fn(string $r) => $r !== 'ROLE_USER');
@@ -187,7 +187,7 @@ class UserController extends AbstractController
                     CsvCellSanitizer::sanitize(implode(', ', $roles) ?: 'Utilisateur'),
                     $user->isSuspended() ? 'Oui' : 'Non',
                     $user->getCreatedAt()?->format('d/m/Y H:i') ?? '',
-                ], ';');
+                ], ';', '"', '\\');
             }
 
             fclose($handle);

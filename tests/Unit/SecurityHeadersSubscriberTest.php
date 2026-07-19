@@ -41,6 +41,7 @@ class SecurityHeadersSubscriberTest extends TestCase
         $this->assertStringContainsString("default-src 'self'", $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString("frame-ancestors 'none'", $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString("object-src 'none'", $response->headers->get('Content-Security-Policy'));
+        $this->assertStringNotContainsString('cdn.jsdelivr.net', $response->headers->get('Content-Security-Policy'));
         $this->assertNull($response->headers->get('Strict-Transport-Security'));
     }
 

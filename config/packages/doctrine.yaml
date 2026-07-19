@@ -26,7 +26,9 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
+            # SQLite file DB for isolated functional tests (see .env.test)
+            url: '%env(resolve:DATABASE_URL)%'
+            # "TEST_TOKEN" is typically set by ParaTest (MySQL/Postgres only)
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:

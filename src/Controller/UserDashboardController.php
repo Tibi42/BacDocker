@@ -11,6 +11,7 @@ use App\Repository\InscriptionRepository;
 use App\Repository\LoanLogRepository;
 use App\Repository\ReviewRepository;
 use App\Validator\PasswordPolicy;
+use App\Util\RateLimitKey;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -136,14 +138,29 @@ class UserDashboardController extends AbstractController
      * et la correspondance entre le nouveau mot de passe et sa confirmation.
      */
     #[Route('/mon-espace/changer-mot-de-passe', name: 'app_user_change_password', methods: ['POST'])]
-    public function changePassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator): Response
-    {
+    public function changePassword(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator,
+        RateLimiterFactoryInterface $accountChangePasswordLimiter,
+    ): Response {
         if (!$this->isCsrfTokenValid('change_password', $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
+        $limiter = $accountChangePasswordLimiter->create(RateLimitKey::forIpAndIdentifier(
+            $request->getClientIp() ?? 'unknown',
+            (string) $user->getId(),
+        ));
+        if (!$limiter->consume()->isAccepted()) {
+            $this->addFlash('error', 'Trop de tentatives. Veuillez réessayer dans quelques minutes.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
         $currentPassword = (string) $request->request->get('current_password', '');
         $newPassword = (string) $request->request->get('new_password', '');
         $confirmPassword = (string) $request->request->get('confirm_password', '');
@@ -183,13 +200,24 @@ class UserDashboardController extends AbstractController
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher,
         MailerInterface $mailer,
+        RateLimiterFactoryInterface $accountChangeEmailLimiter,
     ): Response {
         if (!$this->isCsrfTokenValid('change_email', $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
+        $limiter = $accountChangeEmailLimiter->create(RateLimitKey::forIpAndIdentifier(
+            $request->getClientIp() ?? 'unknown',
+            (string) $user->getId(),
+        ));
+        if (!$limiter->consume()->isAccepted()) {
+            $this->addFlash('error', 'Trop de tentatives. Veuillez réessayer dans quelques minutes.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
         $currentPassword = (string) $request->request->get('current_password', '');
         $newEmail = trim((string) $request->request->get('new_email', ''));
 
@@ -249,7 +277,7 @@ class UserDashboardController extends AbstractController
             ]);
         $mailer->send($email);
 
-        $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $newEmail . '. Le lien est valable 15 minutes.');
+        $this->addFlash('success', $genericChangeEmailFlash);
 
         return $this->redirectToRoute('app_user_dashboard');
     }
@@ -522,6 +550,7 @@ class UserDashboardController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher,
+        RateLimiterFactoryInterface $accountDeleteLimiter,
     ): Response {
         if ($this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Les administrateurs ne peuvent pas supprimer leur compte depuis cette page.');
@@ -533,7 +562,17 @@ class UserDashboardController extends AbstractController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
+        $limiter = $accountDeleteLimiter->create(RateLimitKey::forIpAndIdentifier(
+            $request->getClientIp() ?? 'unknown',
+            (string) $user->getId(),
+        ));
+        if (!$limiter->consume()->isAccepted()) {
+            $this->addFlash('error', 'Trop de tentatives. Veuillez réessayer dans quelques minutes.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
         $currentPassword = (string) $request->request->get('current_password', '');
 
         if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {

@@ -22,7 +22,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Flux complet :
  *  1. POST /newsletter/subscribe → validation, rate limiting, envoi du mail de confirmation.
  *  2. GET  /newsletter/confirm/{token} → confirmation de l'abonnement.
- *  3. GET  /newsletter/unsubscribe/{token} → désinscription via le lien dans les emails.
+ *  3. GET  /newsletter/unsubscribe/{token} → page de confirmation
+ *     POST /newsletter/unsubscribe/{token} → désinscription effective (CSRF)
  *
  * Gère également les ré-abonnements (status UNSUBSCRIBED → PENDING) et le
  * renvoi du mail de confirmation (status PENDING).
@@ -143,7 +144,7 @@ final class NewsletterController extends AbstractController
     }
 
     #[Route('/unsubscribe/{token}', name: 'app_newsletter_unsubscribe', methods: ['GET'])]
-    public function unsubscribe(string $token): Response
+    public function unsubscribeForm(string $token): Response
     {
         $subscriber = $this->repository->findByToken($token);
 
@@ -155,8 +156,44 @@ final class NewsletterController extends AbstractController
             ]);
         }
 
-        $subscriber->unsubscribe();
-        $this->entityManager->flush();
+        if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_UNSUBSCRIBED) {
+            return $this->render('newsletter/result.html.twig', [
+                'title' => 'Déjà désinscrit',
+                'message' => 'Cette adresse est déjà désinscrite de la newsletter.',
+                'success' => true,
+            ]);
+        }
+
+        return $this->render('newsletter/unsubscribe_confirm.html.twig', [
+            'token' => $token,
+        ]);
+    }
+
+    #[Route('/unsubscribe/{token}', name: 'app_newsletter_unsubscribe_confirm', methods: ['POST'])]
+    public function unsubscribeConfirm(string $token, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('newsletter_unsubscribe_' . $token, $request->request->get('_token'))) {
+            return $this->render('newsletter/result.html.twig', [
+                'title' => 'Jeton invalide',
+                'message' => 'Jeton de sécurité invalide. Rouvrez le lien depuis votre email.',
+                'success' => false,
+            ]);
+        }
+
+        $subscriber = $this->repository->findByToken($token);
+
+        if (!$subscriber) {
+            return $this->render('newsletter/result.html.twig', [
+                'title' => 'Lien invalide',
+                'message' => 'Ce lien de désinscription est invalide ou a expiré.',
+                'success' => false,
+            ]);
+        }
+
+        if ($subscriber->getStatus() !== NewsletterSubscriber::STATUS_UNSUBSCRIBED) {
+            $subscriber->unsubscribe();
+            $this->entityManager->flush();
+        }
 
         return $this->render('newsletter/result.html.twig', [
             'title' => 'Désinscription confirmée',

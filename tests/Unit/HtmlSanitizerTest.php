@@ -52,5 +52,15 @@ class HtmlSanitizerTest extends TestCase
         $this->assertTrue($this->sanitizer->isSafeUrl('https://example.com'));
         $this->assertFalse($this->sanitizer->isSafeUrl('javascript:alert(1)'));
         $this->assertFalse($this->sanitizer->isSafeUrl('//evil.com'));
+        $this->assertFalse($this->sanitizer->isSafeUrl('data:text/html,alert(1)'));
+    }
+
+    public function testRemovesSvgAndTemplateTags(): void
+    {
+        $result = $this->sanitizer->sanitize('<p>ok</p><svg onload="alert(1)"></svg><template><script>x</script></template>');
+
+        $this->assertStringContainsString('<p>ok</p>', $result);
+        $this->assertStringNotContainsString('<svg', $result);
+        $this->assertStringNotContainsString('<template', $result);
     }
 }

@@ -39,14 +39,14 @@ class NewsletterController extends AbstractController
 
         $response = new StreamedResponse(function () use ($subscribers) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Email', 'Date inscription', 'Date confirmation']);
+            fputcsv($handle, ['Email', 'Date inscription', 'Date confirmation'], ',', '"', '\\');
 
             foreach ($subscribers as $subscriber) {
                 fputcsv($handle, [
                     CsvCellSanitizer::sanitize((string) $subscriber->getEmail()),
                     $subscriber->getCreatedAt()?->format('d/m/Y H:i'),
                     $subscriber->getConfirmedAt()?->format('d/m/Y H:i'),
-                ]);
+                ], ',', '"', '\\');
             }
 
             fclose($handle);

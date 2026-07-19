@@ -121,7 +121,7 @@ class ActivityController extends AbstractController
             $handle = fopen('php://output', 'w');
             // BOM UTF-8 pour Excel
             fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['Date', 'Titre', 'Type', 'Lieu', 'Statut', 'Proposé par', 'Max participants'], ';');
+            fputcsv($handle, ['Date', 'Titre', 'Type', 'Lieu', 'Statut', 'Proposé par', 'Max participants'], ';', '"', '\\');
 
             foreach ($activities as $activity) {
                 fputcsv($handle, [
@@ -132,7 +132,7 @@ class ActivityController extends AbstractController
                     $activity->getStatus() === Activity::STATUS_PUBLISHED ? 'Publiée' : 'En attente',
                     CsvCellSanitizer::sanitize((string) ($activity->getProposedBy()?->getEmail() ?? '')),
                     $activity->getMaxParticipants() ?? '',
-                ], ';');
+                ], ';', '"', '\\');
             }
 
             fclose($handle);

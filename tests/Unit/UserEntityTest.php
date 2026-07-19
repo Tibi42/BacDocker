@@ -61,5 +61,45 @@ class UserEntityTest extends TestCase
 
         $this->assertSame('hashed_pwd', $user->getPassword());
     }
+
+    public function testDefaultIsVerifiedIsTrue(): void
+    {
+        $user = new User();
+
+        $this->assertTrue($user->isVerified());
+    }
+
+    public function testSetIsVerified(): void
+    {
+        $user = new User();
+        $user->setIsVerified(false);
+
+        $this->assertFalse($user->isVerified());
+    }
+
+    public function testNewsletterOptInDefaultAndSetter(): void
+    {
+        $user = new User();
+
+        $this->assertTrue($user->isNewsletterOptIn());
+
+        $user->setNewsletterOptIn(false);
+
+        $this->assertFalse($user->isNewsletterOptIn());
+    }
+
+    public function testPendingEmailAndVerificationToken(): void
+    {
+        $user = new User();
+        $expires = new \DateTimeImmutable('+1 day');
+
+        $user->setPendingEmail('new@example.com');
+        $user->setEmailVerificationToken('token-abc');
+        $user->setEmailVerificationExpiresAt($expires);
+
+        $this->assertSame('new@example.com', $user->getPendingEmail());
+        $this->assertSame('token-abc', $user->getEmailVerificationToken());
+        $this->assertSame($expires, $user->getEmailVerificationExpiresAt());
+    }
 }
 

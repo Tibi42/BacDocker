@@ -4,8 +4,8 @@
 
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+	<link rel="stylesheet" href="/vendor/flatpickr/flatpickr.min.css">
+	<link rel="stylesheet" href="/vendor/flatpickr/themes/dark.css">
 	<style>
 		.flatpickr-input.altInput { width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: #f8fafc; }
 	</style>
@@ -13,8 +13,8 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+	<script src="/vendor/flatpickr/flatpickr.min.js"></script>
+	<script src="/vendor/flatpickr/l10n/fr.js"></script>
 	<script>
 		(function initActivityDatePicker() {
 			function run() {

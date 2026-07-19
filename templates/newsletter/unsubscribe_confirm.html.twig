@@ -1,0 +1,28 @@
+{% extends 'layouts/page.html.twig' %}
+
+{% block title %}Se désinscrire - La Boîte à Chimère{% endblock %}
+
+{% block meta_description %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block page_title %}Newsletter{% endblock %}
+{% block page_subtitle %}<p class="text-lg text-text-secondary max-w-2xl mx-auto">Confirmer la désinscription</p>{% endblock %}
+
+{% block content %}
+	<div class="space-y-8">
+		<section class="rounded-2xl border border-custom glass-card p-8 shadow-xl text-center max-w-lg mx-auto">
+			<h2 class="text-2xl font-bold uppercase tracking-wider text-text-primary mb-4">Se désinscrire</h2>
+			<p class="text-text-secondary leading-relaxed mb-8">
+				Confirmez-vous vouloir ne plus recevoir la newsletter de La Boîte à Chimère ?
+			</p>
+			<form method="post" action="{{ path('app_newsletter_unsubscribe_confirm', { token: token }) }}" class="flex flex-col sm:flex-row gap-3 justify-center">
+				<input type="hidden" name="_token" value="{{ csrf_token('newsletter_unsubscribe_' ~ token) }}">
+				<button type="submit" class="cursor-pointer rounded-lg bg-custom-orange px-6 py-3 text-xs font-extrabold uppercase tracking-widest text-gray-900 hover:bg-orange-600 transition-all">
+					Confirmer la désinscription
+				</button>
+				<a href="{{ path('app_home') }}" class="inline-flex items-center justify-center rounded-lg border border-custom px-6 py-3 text-xs font-extrabold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-all">
+					Annuler
+				</a>
+			</form>
+		</section>
+	</div>
+{% endblock %}

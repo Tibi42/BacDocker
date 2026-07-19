@@ -3,7 +3,7 @@
 {% block title %}Nouvel article - La Boîte à Chimère{% endblock %}
 
 {% block admin_body %}
-	<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+	<link href="/vendor/quill/quill.snow.css" rel="stylesheet">
 	<style>
 		.ql-toolbar {
 			background-color: rgba(255, 255, 255, 0.05);
@@ -108,8 +108,46 @@
 		</div>
 	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+	<script src="/vendor/quill/quill.js"></script>
 	<script>
+		function sanitizePreviewHtml(html) {
+			var allowed = ['P','BR','STRONG','B','EM','I','U','S','UL','OL','LI','A','H1','H2','H3','H4','H5','H6','BLOCKQUOTE','SPAN','DIV'];
+			var template = document.createElement('template');
+			template.innerHTML = html;
+			var walk = function(node) {
+				var children = Array.prototype.slice.call(node.childNodes);
+				children.forEach(function(child) {
+					if (child.nodeType === 1) {
+						if (allowed.indexOf(child.tagName) === -1) {
+							while (child.firstChild) {
+								child.parentNode.insertBefore(child.firstChild, child);
+							}
+							child.parentNode.removeChild(child);
+							return;
+						}
+						Array.prototype.slice.call(child.attributes).forEach(function(attr) {
+							var name = attr.name.toLowerCase();
+							if (name.indexOf('on') === 0 || (name !== 'href' && name !== 'class' && name !== 'title' && name !== 'rel' && name !== 'target')) {
+								child.removeAttribute(attr.name);
+							}
+							if (name === 'href') {
+								var href = (attr.value || '').trim().toLowerCase();
+								if (href.indexOf('javascript:') === 0 || href.indexOf('data:') === 0 || href.indexOf('vbscript:') === 0) {
+									child.removeAttribute('href');
+								}
+							}
+						});
+						if (child.tagName === 'A') {
+							child.setAttribute('rel', 'noopener noreferrer');
+						}
+						walk(child);
+					}
+				});
+			};
+			walk(template.content);
+			return template.innerHTML;
+		}
+
 		function initQuill() {
 			var container = document.getElementById('editor-container');
 			if (!container || container.classList.contains('ql-container')) {
@@ -155,6 +193,8 @@
 					var html = quill.root.innerHTML;
 					if (html === '<p><br></p>' || html === '<p></p>') {
 						html = '<p class="italic text-text-secondary/50">Rédigez votre texte pour voir l\'aperçu...</p>';
+					} else {
+						html = sanitizePreviewHtml(html);
 					}
 					previewContent.innerHTML = html;
 				});

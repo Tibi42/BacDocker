@@ -28,13 +28,13 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
             throw new \RuntimeException('Les fixtures utilisateurs sont interdites en production.');
         }
 
-        // Comptes de développement uniquement — ne jamais y mettre d'identifiants réels.
+        // Comptes de développement uniquement — emails @example.com, pas d'identifiants réels.
         $users = [
             [
-                'email'    => 'guillaume.Pecquet@gmail.com',
+                'email'    => 'superadmin@example.com',
                 'username' => 'superadmin',
                 'roles'    => ['ROLE_SUPER_ADMIN'],
-                'password' => '112358134AaBb&',
+                'password' => 'DevSuperAdmin!12',
             ],
             [
                 'email'    => 'admin@example.com',

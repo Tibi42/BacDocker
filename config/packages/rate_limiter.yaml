@@ -20,3 +20,51 @@ framework:
             policy: 'fixed_window'
             limit: 5
             interval: '1 hour'
+        account_change_password:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '15 minutes'
+        account_change_email:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '15 minutes'
+        account_delete:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '15 minutes'
+
+when@test:
+    framework:
+        rate_limiter:
+            password_reset:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            newsletter_subscribe:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            registration:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            activity_register:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            activity_proposal:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            account_change_password:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            account_change_email:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'
+            account_delete:
+                policy: 'fixed_window'
+                limit: 1000
+                interval: '1 minute'

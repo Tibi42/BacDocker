@@ -21,5 +21,8 @@ when@test:
 
 when@prod:
     framework:
+        # Obligatoire derrière Nginx/Cloudflare : sans trusted_proxies, getClientIp()
+        # (rate limiting) voit l'IP du proxy → contournement ou blocage collatéral.
+        # Ex. .env.local : SYMFONY_TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
         trusted_proxies: '%env(default::SYMFONY_TRUSTED_PROXIES)%'
         trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port']

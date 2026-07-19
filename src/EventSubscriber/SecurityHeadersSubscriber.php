@@ -34,11 +34,12 @@ final class SecurityHeadersSubscriber implements EventSubscriberInterface
         $headers = $event->getResponse()->headers;
 
         $headers->set('X-Content-Type-Options', 'nosniff');
-        // data: requis par AssetMapper (imports CSS → module JS vide en data:)
-        // unsafe-inline requis par les scripts/styles inline admin (Quill, Flatpickr) et AssetMapper.
+        // Quill / Flatpickr / AssetMapper : scripts et styles self-hostés sous /vendor et /assets.
+        // unsafe-inline encore requis pour styles Quill et quelques handlers admin (onclick).
+        // CDN tiers volontairement exclus (supply-chain).
         $headers->set(
             'Content-Security-Policy',
-            "default-src 'self'; script-src 'self' 'unsafe-inline' data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
+            "default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.helloasso.com"
         );
         $headers->set('X-Frame-Options', 'DENY');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');

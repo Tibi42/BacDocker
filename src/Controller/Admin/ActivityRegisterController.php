@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\InscriptionType;
 use App\Repository\ActivityRepository;
 use App\Repository\InscriptionRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,11 +68,6 @@ class ActivityRegisterController extends AbstractController
             && $inscriptionRepository->countForActivity($activity->getId()) >= $maxParticipants;
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($isFull) {
-                $this->addFlash('error', 'Cet événement est complet, les inscriptions sont fermées.');
-                return $this->redirectToRoute('app_home');
-            }
-
             $limiter = $activityRegisterLimiter->create('user_' . $currentUser->getId());
             if (!$limiter->consume()->isAccepted()) {
                 $this->addFlash('error', 'Trop de tentatives d\'inscription. Veuillez réessayer dans quelques minutes.');
@@ -81,19 +77,52 @@ class ActivityRegisterController extends AbstractController
             if ($inscriptionRepository->hasAlreadyRegistered($activity->getId(), $inscription->getParticipantEmail())) {
                 $alreadyRegistered = true;
             } else {
-                $entityManager->persist($inscription);
-                $entityManager->flush();
+                $registered = false;
+                $becameFull = false;
 
-                $template = $isAjax
-                    ? 'admin/activity_register/_register_frame.html.twig'
-                    : 'admin/activity_register/register.html.twig';
+                $entityManager->wrapInTransaction(function () use (
+                    $entityManager,
+                    $inscriptionRepository,
+                    $id,
+                    $inscription,
+                    &$registered,
+                    &$becameFull,
+                ): void {
+                    /** @var Activity|null $locked */
+                    $locked = $entityManager->find(Activity::class, $id, LockMode::PESSIMISTIC_WRITE);
+                    if (!$locked) {
+                        return;
+                    }
 
-                return $this->render($template, [
-                    'activity' => $activity,
-                    'form' => $form,
-                    'alreadyRegistered' => false,
-                    'success' => true,
-                ]);
+                    $max = $locked->getMaxParticipants();
+                    if ($max !== null && $inscriptionRepository->countForActivity($locked->getId()) >= $max) {
+                        $becameFull = true;
+
+                        return;
+                    }
+
+                    $inscription->setActivity($locked);
+                    $entityManager->persist($inscription);
+                    $registered = true;
+                });
+
+                if ($becameFull) {
+                    $this->addFlash('error', 'Cet événement est complet, les inscriptions sont fermées.');
+                    return $this->redirectToRoute('app_home');
+                }
+
+                if ($registered) {
+                    $template = $isAjax
+                        ? 'admin/activity_register/_register_frame.html.twig'
+                        : 'admin/activity_register/register.html.twig';
+
+                    return $this->render($template, [
+                        'activity' => $activity,
+                        'form' => $form,
+                        'alreadyRegistered' => false,
+                        'success' => true,
+                    ]);
+                }
             }
         }
 

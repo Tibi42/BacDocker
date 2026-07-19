@@ -9,34 +9,33 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Vérificateur de compte utilisateur avant authentification.
+ * Vérificateur de compte utilisateur après authentification des identifiants.
  *
- * Appelé par le firewall Symfony lors du processus de connexion.
- * Empêche la connexion si le compte est suspendu (User::$suspended = true)
- * et retourne un message explicite à l'utilisateur.
+ * Les contrôles statut (suspendu / non vérifié) sont volontairement en
+ * checkPostAuth : un attaquant sans mot de passe valide ne peut pas
+ * énumérer l'existence ou l'état d'un compte.
  */
 class UserChecker implements UserCheckerInterface
 {
+    private const GENERIC_INVALID = 'Identifiants invalides.';
+
     public function checkPreAuth(UserInterface $user): void
+    {
+        // Intentionnellement vide : ne pas révéler le statut avant le mot de passe.
+    }
+
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
         if (!$user instanceof User) {
             return;
         }
 
         if ($user->isSuspended()) {
-            throw new CustomUserMessageAccountStatusException(
-                'Votre compte a été suspendu. Contactez un administrateur.'
-            );
+            throw new CustomUserMessageAccountStatusException(self::GENERIC_INVALID);
         }
 
         if (!$user->isVerified()) {
-            throw new CustomUserMessageAccountStatusException(
-                'Veuillez confirmer votre adresse email avant de vous connecter. Vérifiez votre boîte de réception.'
-            );
+            throw new CustomUserMessageAccountStatusException(self::GENERIC_INVALID);
         }
-    }
-
-    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
-    {
     }
 }
