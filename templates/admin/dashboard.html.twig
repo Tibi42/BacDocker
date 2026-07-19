@@ -28,25 +28,25 @@
             </div>
         </a>
 
-        {# Total membres inscrits (actifs uniquement) #}
-        <div class="flex flex-col gap-3 p-5 rounded-2xl border border-custom bg-custom-secondary shadow-lg glass-card hover:border-custom-orange transition-colors">
-            <button type="button" id="members-stats-open" class="flex items-center gap-3 text-left w-full cursor-pointer">
+        {# Total membres inscrits (actifs / suspendus) #}
+        <a href="{{ path('app_admin_user_index') }}"
+           class="flex flex-col gap-3 p-5 rounded-2xl border border-custom bg-custom-secondary shadow-lg glass-card hover:border-custom-orange transition-colors text-decoration-none">
+            <div class="flex items-center gap-3">
                 <span class="text-3xl">👥</span>
                 <div>
                     <div class="font-bold text-text-primary">Membres inscrits</div>
                     <div class="text-xs text-text-secondary">Actifs / suspendus</div>
                 </div>
-            </button>
+            </div>
             <div class="flex justify-between items-end mt-auto">
-                <button type="button" id="members-stats-open-count" class="flex items-baseline gap-2 cursor-pointer text-left">
+                <div class="flex items-baseline gap-2">
                     <span class="text-4xl font-extrabold text-emerald-400" style="line-height:1.1">{{ totalUsers|default(0) }}</span>
                     <span class="text-2xl font-extrabold text-text-secondary" style="line-height:1.1">/</span>
                     <span class="text-4xl font-extrabold text-red-400" style="line-height:1.1">{{ inactiveUsers|default(0) }}</span>
-                </button>
-                <a href="{{ path('app_admin_user_index') }}"
-                   class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-custom-orange text-gray-900 hover:bg-orange-600 transition-colors">Gérer →</a>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-custom-orange text-gray-900">Gérer →</span>
             </div>
-        </div>
+        </a>
 
         {# Dernières inscriptions #}
         <div class="flex flex-col gap-3 p-5 rounded-2xl border border-custom bg-custom-secondary shadow-lg glass-card">
@@ -214,92 +214,4 @@
 
     </div>
 </div>
-
-{# Modale membres inscrits — répartition actifs / suspendus #}
-{% set usersPageUrl = path('app_admin_user_index') %}
-<div id="members-stats-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="members-stats-title">
-    <div id="members-stats-overlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-    <div id="members-stats-panel" role="link" tabindex="0" data-href="{{ usersPageUrl }}"
-         class="relative z-10 w-full max-w-md mx-4 rounded-2xl border border-custom bg-custom-secondary shadow-2xl overflow-hidden hover:border-custom-orange transition-colors cursor-pointer">
-        <div class="bg-custom-tertiary px-6 py-4 border-b border-custom flex items-center justify-between">
-            <div>
-                <span class="text-[9px] font-bold uppercase tracking-widest text-custom-orange">Comptes</span>
-                <h2 id="members-stats-title" class="text-lg font-bold text-text-primary uppercase tracking-wide">Membres inscrits</h2>
-            </div>
-            <button id="members-stats-close" type="button" class="text-text-secondary hover:text-text-primary transition-colors p-1" aria-label="Fermer">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div class="px-6 py-5 flex flex-col gap-4">
-            <p class="text-xs text-text-secondary">Répartition des comptes</p>
-            <div class="flex items-center justify-between gap-3 rounded-xl border border-custom bg-custom-tertiary/50 px-4 py-3">
-                <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Membres actifs</div>
-                    <div class="text-xs text-text-secondary mt-0.5">Comptes non suspendus</div>
-                </div>
-                <span class="text-2xl font-extrabold text-emerald-400">{{ totalUsers|default(0) }}</span>
-            </div>
-            <div class="flex items-center justify-between gap-3 rounded-xl border border-custom bg-custom-tertiary/50 px-4 py-3">
-                <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Membres suspendus</div>
-                    <div class="text-xs text-text-secondary mt-0.5">Comptes suspendus</div>
-                </div>
-                <span class="text-2xl font-extrabold text-red-400">{{ inactiveUsers|default(0) }}</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-(function () {
-    const modal = document.getElementById('members-stats-modal');
-    const openBtn = document.getElementById('members-stats-open');
-    const openCount = document.getElementById('members-stats-open-count');
-    const closeBtn = document.getElementById('members-stats-close');
-    const overlay = document.getElementById('members-stats-overlay');
-    const panel = document.getElementById('members-stats-panel');
-    if (!modal || !openBtn) return;
-
-    function openModal() {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-    function closeModal() {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-    function goToUsers() {
-        const href = panel && panel.getAttribute('data-href');
-        if (href) window.location.href = href;
-    }
-
-    openBtn.addEventListener('click', openModal);
-    if (openCount) openCount.addEventListener('click', openModal);
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeModal();
-        });
-    }
-    if (overlay) overlay.addEventListener('click', closeModal);
-    if (panel) {
-        panel.addEventListener('click', function (e) {
-            if (e.target.closest('#members-stats-close')) return;
-            goToUsers();
-        });
-        panel.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                goToUsers();
-            }
-        });
-    }
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
-})();
-</script>
 {% endblock %}
