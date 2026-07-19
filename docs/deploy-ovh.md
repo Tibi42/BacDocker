@@ -147,6 +147,20 @@ sudo cp deploy/nginx/guillaumepecquet.ovh.conf /etc/nginx/sites-available/guilla
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+⚠️ **Ce `cp` écrase aussi le bloc SSL (443) que Certbot a ajouté au fichier live** — le fichier du repo n'est que la base HTTP (pré-Certbot). Après le `cp` + reload ci-dessus, TOUJOURS relancer Certbot pour réinstaller le bloc SSL et la redirection HTTPS (idempotent, ne redemande pas de certificat s'il est déjà valide) :
+
+```bash
+sudo certbot --nginx -d guillaumepecquet.ovh -d www.guillaumepecquet.ovh --redirect
+```
+
+Certbot ne réactive **pas** HTTP/2 automatiquement. Après le `certbot --nginx` ci-dessus, ajouter `http2 on;` juste après les deux lignes `listen 443 ssl ... # managed by Certbot` dans `/etc/nginx/sites-available/guillaumepecquet.ovh`, puis `sudo nginx -t && sudo systemctl reload nginx`. Vérifier avec :
+
+```bash
+curl -s --http2 -o /dev/null -w "status=%{http_code} http_version=%{http_version}\n" https://guillaumepecquet.ovh/
+```
+
+`http_version` doit afficher `2`. Vérifier aussi `curl -I https://guillaumepecquet.ovh/` avant de considérer le déploiement terminé.
+
 ## 8. Checklist go-live
 
 - [ ] Site joignable en HTTPS
