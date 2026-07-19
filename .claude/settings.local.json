@@ -153,7 +153,14 @@
       "Bash(rm -f lh-prod3 lh-prod4)",
       "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod3.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
       "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
-      "Bash(tasklist //FI \"IMAGENAME eq git.exe\")"
+      "Bash(tasklist //FI \"IMAGENAME eq git.exe\")",
+      "Bash(gzip -c var/tailwind/app.built.css)",
+      "Bash(nginx -v)",
+      "Bash(C:/laragon/bin/nginx/nginx-1.28.2/nginx.exe -v)",
+      "Bash(mkdir -p /tmp/nginxtest/logs /tmp/nginxtest/conf)",
+      "Bash(cat)",
+      "Bash(C:/laragon/bin/nginx/nginx-1.28.2/nginx.exe -t -c C:/laragon/bin/nginx/../../../tmp/nginxtest/conf/test.conf -p C:/laragon/bin/nginx/nginx-1.28.2)",
+      "Bash(C:/laragon/bin/nginx/nginx-1.28.2/nginx.exe -t -c C:/Users/guill/AppData/Local/Temp/claude/C--laragon-www-DevBoiteChimere/385ac3bf-68fc-4745-abcc-91974611c35d/scratchpad/nginxtest/test.conf)"
     ]
   }
 }

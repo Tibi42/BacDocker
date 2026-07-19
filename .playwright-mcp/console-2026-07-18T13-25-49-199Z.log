@@ -1,7 +1,0 @@
-[     475ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
-[     476ms] [LOG] This log comes from assets/app.js - welcome to AssetMapper! 🎉 @ http://devboitechimere.test/assets/app-EKQ_RPv.js:17
-[     476ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
-[     477ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6
-[     477ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://devboitechimere.test/admin:0
-[     477ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://devboitechimere.test/admin:0
-[     479ms] [LOG] details: {application: X} @ http://devboitechimere.test/assets/vendor/@hotwired/stimulus/stimulus.index-S4zNcea.js:6

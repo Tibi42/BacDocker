@@ -1,4 +1,0 @@
-[   16658ms] [ERROR] Error: Form responses must redirect to another location
-    at ie.requestSucceededWithResponse (http://localhost:8080/assets/vendor/@hotwired/turbo/turbo.index-dF2AMYF.js:11:15107)
-    at _.receive (http://localhost:8080/assets/vendor/@hotwired/turbo/turbo.index-dF2AMYF.js:11:9461)
-    at _.perform (http://localhost:8080/assets/vendor/@hotwired/turbo/turbo.index-dF2AMYF.js:11:9082) @ http://localhost:8080/assets/vendor/@hotwired/turbo/turbo.index-dF2AMYF.js:24

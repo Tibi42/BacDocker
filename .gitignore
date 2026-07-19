@@ -24,3 +24,7 @@
 .env.docker.local.dist
 docker/volumes/
 ###< docker ###
+
+###> playwright-mcp ###
+/.playwright-mcp/
+###< playwright-mcp ###

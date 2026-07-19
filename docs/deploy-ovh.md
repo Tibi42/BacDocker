@@ -140,6 +140,13 @@ chmod +x bin/deploy.sh
 ./bin/deploy.sh
 ```
 
+**Important** : `bin/deploy.sh` ne touche jamais à la config Nginx (`deploy/nginx/guillaumepecquet.ovh.conf`). Si ce fichier change (ex. ajout de `gzip`), il faut le recopier et recharger Nginx manuellement :
+
+```bash
+sudo cp deploy/nginx/guillaumepecquet.ovh.conf /etc/nginx/sites-available/guillaumepecquet.ovh
+sudo nginx -t && sudo systemctl reload nginx
+```
+
 ## 8. Checklist go-live
 
 - [ ] Site joignable en HTTPS

@@ -30,16 +30,20 @@ function initReveal() {
         });
     }
 
-    // Marquer les éléments déjà dans le viewport comme immédiatement visibles
+    // Marquer les éléments déjà dans le viewport comme immédiatement visibles.
+    // Les lectures (getBoundingClientRect) et écritures (classList) sont
+    // séparées en deux passes pour éviter un reflow forcé par élément.
     function markVisibleReveals() {
+        const toActivate = [];
         revealEls.forEach((el) => {
             if (el.classList.contains('active')) return;
             const rect = el.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0 &&
                 rect.top < window.innerHeight + 50 && rect.bottom > -50) {
-                activateInstantly(el);
+                toActivate.push(el);
             }
         });
+        toActivate.forEach(activateInstantly);
     }
 
     // Exécuter immédiatement + après 2 frames (le layout peut ne pas être prêt après Turbo)
@@ -72,14 +76,16 @@ function initReveal() {
     let scrollFallbackActive = true;
     function onScrollFallback() {
         let allActive = true;
+        const toActivate = [];
         revealEls.forEach((el) => {
             if (el.classList.contains('active')) return;
             allActive = false;
             const rect = el.getBoundingClientRect();
             if (rect.top < window.innerHeight + 50 && rect.bottom > -50) {
-                activateElement(el);
+                toActivate.push(el);
             }
         });
+        toActivate.forEach(activateElement);
         if (allActive) {
             window.removeEventListener('scroll', onScrollFallback);
             scrollFallbackActive = false;
