@@ -1,0 +1,55 @@
+{% extends 'layouts/page.html.twig' %}
+
+{% block title %}Page introuvable — La Boîte à Chimère{% endblock %}
+
+{% block description %}La page que vous recherchez n'existe pas ou a été déplacée. Retrouvez le chemin vers l'accueil de La Boîte à Chimère.{% endblock %}
+
+{% block page_title %}404{% endblock %}
+{% block page_subtitle %}
+	<p class="text-lg text-text-secondary max-w-2xl mx-auto">
+		Cette page a disparu dans les limbes…
+	</p>
+{% endblock %}
+
+{% block content %}
+	<div class="mx-auto max-w-2xl text-center">
+		<section class="rounded-2xl border border-custom glass-card p-8 lg:p-12 shadow-xl relative overflow-hidden">
+			<div class="absolute -right-20 -top-20 w-64 h-64 bg-custom-orange/10 rounded-full blur-3xl pointer-events-none"></div>
+			<div class="absolute -left-16 -bottom-16 w-48 h-48 bg-accent-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+
+			<div class="relative z-10 space-y-6">
+				<span class="inline-block text-[10px] font-bold uppercase tracking-[0.25em] text-custom-orange">
+					Quête introuvable
+				</span>
+
+				<p class="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto">
+					Le chemin que vous suivez ne mène nulle part — URL erronée, lien périmé ou page déplacée.
+					Revenez à la taverne pour reprendre votre aventure.
+				</p>
+
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+					<a href="{{ path('app_home') }}"
+					   class="inline-flex items-center justify-center gap-2 rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-gray-900 hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20">
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/>
+						</svg>
+						Retour à l'accueil
+					</a>
+					<a href="{{ path('app_evenements') }}"
+					   class="inline-flex items-center justify-center gap-2 rounded-lg border border-custom px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-text-primary hover:border-custom-orange hover:text-custom-orange transition-all">
+						Voir les événements
+					</a>
+				</div>
+
+				<nav class="pt-4 border-t border-custom" aria-label="Liens utiles">
+					<ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-text-secondary">
+						<li><a href="{{ path('app_jds') }}" class="hover:text-custom-orange transition-colors">Jeux de société</a></li>
+						<li><a href="{{ path('app_jdr') }}" class="hover:text-custom-orange transition-colors">Jeux de rôle</a></li>
+						<li><a href="{{ path('app_gn') }}" class="hover:text-custom-orange transition-colors">GN</a></li>
+						<li><a href="{{ path('app_contact') }}" class="hover:text-custom-orange transition-colors">Contact</a></li>
+					</ul>
+				</nav>
+			</div>
+		</section>
+	</div>
+{% endblock %}
