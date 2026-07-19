@@ -8,6 +8,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     articles_images_directory: '%kernel.project_dir%/public/images/articles'
+    app_mailer_from_name: 'La Boîte à Chimère'
 
 services:
     # default configuration for services in *this* file

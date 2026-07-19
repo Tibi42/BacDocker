@@ -57,10 +57,36 @@ Secrets :
 
 ```bash
 cp .env.prod.dist .env.local
-nano .env.local   # APP_SECRET, DATABASE_URL, MAILER_DSN, DEFAULT_URI
+nano .env.local   # APP_SECRET, DATABASE_URL, MAILER_DSN, MAILER_FROM, DEFAULT_URI
 ```
 
-Le compte mail de prod est `superuser@guillaumepecquet.ovh` (récupérer le mot de passe depuis le manager OVH / espace mail) — à renseigner dans `MAILER_DSN`.
+### Mail (obligatoire pour reset password / inscriptions)
+
+1. Créer la boîte `boiteachimere@guillaumepecquet.ovh` dans l’espace mail OVH.
+2. Dans `.env.local` :
+
+```bash
+MAILER_FROM=boiteachimere@guillaumepecquet.ovh
+MAILER_FROM_NAME=La Boîte à Chimère
+DEFAULT_URI=https://guillaumepecquet.ovh
+```
+
+3. Générer le `MAILER_DSN` (encode le mot de passe) :
+
+```bash
+php -r "echo 'smtp://'.rawurlencode('boiteachimere@guillaumepecquet.ovh').':'.rawurlencode('VOTRE_MDP').'@ssl0.ovh.net:465', PHP_EOL;"
+```
+
+Coller le résultat dans `MAILER_DSN=...` — **sans** `?verify_peer=0` en production.
+
+4. Tester l’envoi :
+
+```bash
+php bin/console mailer:test votre@email.com
+tail -n 50 var/log/prod.log
+```
+
+Si échec SSL/auth : vérifier mot de passe mail OVH, ports 465 sortants, et que `MAILER_FROM` = le compte SMTP.
 
 Générer un secret :
 
@@ -117,8 +143,9 @@ chmod +x bin/deploy.sh
 ## 8. Checklist go-live
 
 - [ ] Site joignable en HTTPS
+- [ ] `php bin/console mailer:test …` OK
+- [ ] Reset password : email reçu, lien en `https://guillaumepecquet.ovh/...`
 - [ ] Login admin fonctionne
-- [ ] Envoi d’email (reset password / inscription) OK, expéditeur `superuser@guillaumepecquet.ovh`
 - [ ] Upload images articles OK (`public/images` writable)
 - [ ] `APP_DEBUG=0`, profiler absent
 - [ ] Pas de fixtures chargées

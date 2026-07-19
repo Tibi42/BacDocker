@@ -9,9 +9,11 @@ use App\Util\RateLimitKey;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -32,6 +34,7 @@ class ResetPasswordController extends AbstractController
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager,
         private RateLimiterFactory $passwordResetLimiter,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -174,7 +177,18 @@ class ResetPasswordController extends AbstractController
             ])
         ;
 
-        $mailer->send($email);
+        try {
+            $mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            $this->resetPasswordHelper->removeResetRequest($resetToken->getToken());
+            $this->logger->error('Échec envoi email reset password.', [
+                'exception' => $e->getMessage(),
+                'user_id' => $user->getId(),
+            ]);
+            $this->addFlash('reset_password_error', 'Impossible d\'envoyer l\'email pour le moment. Réessayez dans quelques minutes.');
+
+            return $this->redirectToRoute('app_forgot_password_request');
+        }
 
         // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);
