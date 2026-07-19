@@ -1,0 +1,163 @@
+{% extends 'layouts/page.html.twig' %}
+
+{% block title %}Ludothèque - La Boîte à Chimère{% endblock %}
+
+{% block meta_description %}<meta name="description" content="Découvrez le catalogue de jeux de société de la ludothèque de La Boîte à Chimère. Empruntez un jeu en vous connectant à votre espace membre.">{% endblock %}
+{% block og_description %}Découvrez le catalogue de jeux de société de la ludothèque de La Boîte à Chimère.{% endblock %}
+
+{% block page_title %}Ludothèque{% endblock %}
+{% block page_subtitle %}<p class="text-lg text-text-secondary max-w-2xl mx-auto">Le catalogue de jeux de société de l'association</p>{% endblock %}
+
+{% block content %}
+	<form method="get" action="{{ path('app_ludotheque') }}" class="flex flex-wrap items-end gap-2 mb-6">
+		<div class="relative flex-1 min-w-[160px]"
+			 data-controller="search-autocomplete"
+			 data-search-autocomplete-url-value="{{ path('app_ludotheque_suggest') }}">
+			<label for="catalogue-search" class="sr-only">Rechercher un jeu</label>
+			<input type="text"
+				   id="catalogue-search"
+				   name="q"
+				   value="{{ search|default('') }}"
+				   placeholder="Rechercher un jeu..."
+				   autocomplete="off"
+				   role="combobox"
+				   aria-autocomplete="list"
+				   aria-controls="catalogue-suggestions"
+				   data-search-autocomplete-target="input"
+				   data-action="input->search-autocomplete#onInput keydown->search-autocomplete#onKeydown"
+				   class="w-full rounded-lg border border-custom bg-custom-secondary px-3 py-2 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
+			<ul id="catalogue-suggestions"
+				data-search-autocomplete-target="list"
+				data-action="click->search-autocomplete#select"
+				role="listbox"
+				hidden
+				class="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-custom bg-custom-secondary shadow-lg py-1"></ul>
+		</div>
+		<button type="submit" class="rounded-lg bg-custom-orange px-4 py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 hover:bg-orange-600 transition-all">Rechercher</button>
+		{% if search|default('') %}
+			<a href="{{ path('app_ludotheque') }}" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors py-2">Réinitialiser</a>
+		{% endif %}
+	</form>
+
+	{% if pagination|length > 0 %}
+		<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+			<p class="text-sm text-text-secondary">
+				{{ pagination.totalItemCount }} jeu{{ pagination.totalItemCount > 1 ? 'x' : '' }}
+				{% if search|default('') %}
+					pour « {{ search }} »
+				{% else %}
+					au catalogue
+				{% endif %}
+			</p>
+			{% if app.user %}
+				<a href="{{ path('app_user_dashboard') }}#ludotheque" class="text-xs font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors">
+					Mes emprunts →
+				</a>
+			{% else %}
+				<p class="text-xs text-text-secondary">
+					<a href="{{ path('app_login') }}" class="font-bold text-custom-orange hover:text-orange-400 transition-colors">Connectez-vous</a>
+					pour emprunter un jeu.
+				</p>
+			{% endif %}
+		</div>
+
+		<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+			{% for boardGame in pagination %}
+				{% set isOwn = boardGame.borrower and app.user and boardGame.borrower.id == app.user.id %}
+				<article class="rounded-lg border border-custom bg-custom-secondary p-2.5 shadow-md glass-card flex flex-col gap-1.5">
+					{% if boardGame.image %}
+						<img src="{{ asset('images/board-games/' ~ boardGame.image) }}" alt="{{ boardGame.title }}" loading="lazy" width="200" height="140" class="w-full h-[5.5rem] object-cover rounded-md border border-custom">
+					{% else %}
+						<div class="w-full h-[5.5rem] rounded-md border border-custom bg-custom-tertiary flex items-center justify-center">
+							<svg class="h-6 w-6 text-text-secondary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+						</div>
+					{% endif %}
+					<div class="min-w-0 flex-1">
+						<h2 class="text-xs font-bold text-text-primary leading-snug truncate" title="{{ boardGame.title }}">{{ boardGame.title }}</h2>
+						{% if boardGame.category %}
+							<p class="text-[10px] text-text-secondary truncate mt-0.5">{{ boardGame.category }}</p>
+						{% endif %}
+						<div class="flex flex-wrap gap-x-1.5 gap-y-0.5 mt-1 text-[9px] text-text-secondary/80">
+							{% if boardGame.maxPlayers %}<span>{{ boardGame.maxPlayers }}j</span>{% endif %}
+							{% if boardGame.durationMinutes %}<span>{{ boardGame.durationMinutes }}′</span>{% endif %}
+						</div>
+					</div>
+					<div class="pt-1.5 border-t border-custom/40 flex flex-col gap-1.5">
+						<div class="flex items-center justify-between gap-1">
+							{% if boardGame.status == 'available' %}
+								<span class="text-[9px] font-bold uppercase tracking-wider text-emerald-400">Dispo</span>
+							{% elseif boardGame.status == 'pending' and isOwn %}
+								<span class="text-[9px] font-bold uppercase tracking-wider text-custom-orange">En attente</span>
+							{% elseif boardGame.status == 'loaned' and isOwn %}
+								<span class="text-[9px] font-bold uppercase tracking-wider text-violet-400">Emprunté</span>
+							{% else %}
+								<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary/60">Indispo</span>
+							{% endif %}
+							{{ include('components/_star_rating.html.twig', { rating: averageRatings[boardGame.id]|default(null), size: 'text-xs' }, with_context: false) }}
+						</div>
+						{% if app.user %}
+							{% if boardGame.status == 'available' %}
+								{% if activeBoardGame %}
+									<p class="text-[9px] text-text-secondary/60">Emprunt déjà en cours.</p>
+								{% else %}
+									<form method="post" action="{{ path('app_user_ludotheque_request', { id: boardGame.id }) }}">
+										<input type="hidden" name="_token" value="{{ csrf_token('request_loan' ~ boardGame.id) }}">
+										<button type="submit" class="text-[9px] font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded-md bg-emerald-400/10 border border-emerald-400/30 hover:bg-emerald-400/20 transition-all">
+											Emprunter
+										</button>
+									</form>
+								{% endif %}
+							{% elseif boardGame.status == 'pending' and isOwn %}
+								<form method="post" action="{{ path('app_user_ludotheque_cancel', { id: boardGame.id }) }}" onsubmit="return confirm('Annuler votre demande d\'emprunt pour « {{ boardGame.title }} » ?');">
+									<input type="hidden" name="_token" value="{{ csrf_token('cancel_loan' ~ boardGame.id) }}">
+									<button type="submit" class="text-[9px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 px-2 py-1 rounded-md bg-red-400/10 border border-red-400/30 hover:bg-red-400/20 transition-all">
+										Annuler
+									</button>
+								</form>
+							{% endif %}
+						{% endif %}
+					</div>
+				</article>
+			{% endfor %}
+		</div>
+
+		{% if pagination.pageCount > 1 %}
+			<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
+				<p class="text-xs text-text-secondary">
+					Page {{ pagination.currentPageNumber }} / {{ pagination.pageCount }}
+				</p>
+				<nav class="flex items-center gap-1" aria-label="Pagination de la ludothèque">
+					{% if pagination.currentPageNumber > 1 %}
+						<a href="{{ path('app_ludotheque', app.request.query.all|merge({page: pagination.currentPageNumber - 1})) }}"
+						   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">&larr; Préc.</a>
+					{% endif %}
+
+					{% for page in 1..pagination.pageCount %}
+						{% if page == pagination.currentPageNumber %}
+							<span class="px-3 py-2 rounded-lg text-xs font-bold bg-custom-orange text-text-primary">{{ page }}</span>
+						{% elseif page == 1 or page == pagination.pageCount or (page >= pagination.currentPageNumber - 2 and page <= pagination.currentPageNumber + 2) %}
+							<a href="{{ path('app_ludotheque', app.request.query.all|merge({page: page})) }}"
+							   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">{{ page }}</a>
+						{% elseif page == 2 or page == pagination.pageCount - 1 %}
+							<span class="px-1 text-text-secondary">…</span>
+						{% endif %}
+					{% endfor %}
+
+					{% if pagination.currentPageNumber < pagination.pageCount %}
+						<a href="{{ path('app_ludotheque', app.request.query.all|merge({page: pagination.currentPageNumber + 1})) }}"
+						   class="px-3 py-2 rounded-lg text-xs font-bold text-text-secondary hover:text-text-primary border border-custom hover:border-custom-orange transition-colors">Suiv. &rarr;</a>
+					{% endif %}
+				</nav>
+			</div>
+		{% endif %}
+	{% else %}
+		<div class="rounded-2xl border border-custom bg-custom-secondary p-8 text-center glass-card">
+			{% if search|default('') %}
+				<p class="text-text-secondary text-sm mb-3">Aucun jeu ne correspond à « {{ search }} ».</p>
+				<a href="{{ path('app_ludotheque') }}" class="text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors">Réinitialiser la recherche</a>
+			{% else %}
+				<p class="text-text-secondary text-sm">Aucun jeu dans la ludothèque pour le moment.</p>
+			{% endif %}
+		</div>
+	{% endif %}
+{% endblock %}

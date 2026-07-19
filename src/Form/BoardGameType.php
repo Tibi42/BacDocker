@@ -5,11 +5,13 @@ namespace App\Form;
 use App\Entity\BoardGame;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -69,6 +71,24 @@ class BoardGameType extends AbstractType
                 'label_attr' => $labelAttr,
                 'required' => false,
                 'attr' => array_merge($inputAttr, ['placeholder' => 'Notes complémentaires...', 'rows' => 4]),
+            ])
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image (PNG ou JPEG, max. 250 Ko — redimensionnée à 600 px)',
+                'label_attr' => $labelAttr,
+                'required' => false,
+                'mapped' => false,
+                'constraints' => [
+                    new File(
+                        maxSize: '250k',
+                        maxSizeMessage: 'L\'image ne doit pas dépasser 250 Ko.',
+                        mimeTypes: [
+                            'image/jpeg',
+                            'image/png',
+                        ],
+                        mimeTypesMessage: 'Veuillez uploader une image valide (PNG ou JPEG).',
+                    ),
+                ],
+                'attr' => array_merge($inputAttr, ['accept' => 'image/png,image/jpeg']),
             ]);
     }
 

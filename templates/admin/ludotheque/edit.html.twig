@@ -9,8 +9,41 @@
 			Retour à la ludothèque
 		</a>
 
+		{% for type, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium
+					{{ type == 'success' ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : '' }}
+					{{ type == 'error' ? 'bg-red-500/10 border border-red-500/30 text-red-400' : '' }}
+					{{ type == 'warning' ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400' : '' }}">
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
+
 		<div class="w-full xl:max-w-2xl rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card">
 			<h1 class="text-xl font-bold text-text-primary uppercase tracking-wide mb-6">Modifier le jeu</h1>
+
+			{# Note admin (formulaire séparé pour éviter les formulaires imbriqués) #}
+			<div class="mb-6 rounded-xl border border-custom bg-custom-tertiary p-4">
+				<p class="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-3">Note</p>
+				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div class="flex flex-col gap-1">
+						<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary">Moyenne</span>
+						{{ include('components/_star_rating.html.twig', { rating: averageRating|default(null), size: 'text-lg' }, with_context: false) }}
+					</div>
+					<div>
+						{{ include('components/_rate_form.html.twig', {
+							ratePath: path('app_admin_ludotheque_rate', { id: boardGame.id, return: 'edit' }),
+							csrfId: 'admin_rate_game' ~ boardGame.id,
+							myScore: myRating|default(0),
+							label: myRating ? 'Ma note (admin)' : 'Noter ce jeu',
+							returnTo: 'edit',
+						}) }}
+					</div>
+				</div>
+				<p class="text-[10px] text-text-secondary mt-3">Cliquez sur une étoile pour enregistrer votre note. Elle compte dans la moyenne affichée aux membres.</p>
+			</div>
+
 			{{ include('admin/ludotheque/_form.html.twig', { form: form, button_label: 'Enregistrer', form_action: path('app_admin_ludotheque_edit', { id: boardGame.id }) }) }}
 		</div>
 	</div>

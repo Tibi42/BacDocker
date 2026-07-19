@@ -111,4 +111,23 @@ class BoardGameTest extends TestCase
 
         $this->assertTrue($boardGame->isArchived());
     }
+
+    public function testImageDefaultsNull(): void
+    {
+        $boardGame = new BoardGame();
+
+        $this->assertNull($boardGame->getImage());
+    }
+
+    public function testSetImageRoundTrip(): void
+    {
+        $boardGame = new BoardGame();
+        $boardGame->setImage('game-abc123.jpg');
+
+        $this->assertSame('game-abc123.jpg', $boardGame->getImage());
+
+        $boardGame->setImage(null);
+
+        $this->assertNull($boardGame->getImage());
+    }
 }

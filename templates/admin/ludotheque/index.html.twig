@@ -11,11 +11,73 @@
 
 		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
 			<h1 class="text-2xl font-bold text-text-primary uppercase tracking-wide">Gestion de la ludothèque</h1>
-			<a href="{{ path('app_admin_ludotheque_new') }}" class="inline-flex items-center gap-2 rounded-lg bg-custom-orange py-3 px-5 text-sm font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all shadow-lg shadow-custom-orange/20">
-				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-				Nouveau jeu
-			</a>
+			<div class="flex flex-wrap items-center gap-3">
+				<a href="{{ path('app_admin_ludotheque_export_csv', search ? { q: search } : {}) }}" class="inline-flex items-center gap-2 rounded-lg border border-custom bg-custom-secondary py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-custom-orange hover:border-custom-orange transition-all">
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+					Export CSV
+				</a>
+				<form method="post" action="{{ path('app_admin_ludotheque_import_csv') }}" enctype="multipart/form-data" class="inline">
+					<input type="hidden" name="_token" value="{{ csrf_token('ludotheque_import_csv') }}">
+					<input type="file" id="ludo-csv-import" name="csv_file" accept=".csv,text/csv" required class="sr-only" onchange="this.form.requestSubmit()">
+					<label for="ludo-csv-import" title="Colonnes : Titre;Catégorie;Joueurs max;Durée (min);État;Notes" class="inline-flex items-center gap-2 rounded-lg border border-custom bg-custom-secondary py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary hover:text-custom-orange hover:border-custom-orange transition-all cursor-pointer">
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+						Import CSV
+					</label>
+				</form>
+				<a href="{{ path('app_admin_ludotheque_new') }}" class="inline-flex items-center gap-2 rounded-lg bg-custom-orange py-3 px-5 text-sm font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all shadow-lg shadow-custom-orange/20">
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+					Nouveau jeu
+				</a>
+			</div>
 		</div>
+
+		<div class="mb-6 rounded-xl border border-custom-orange/30 bg-custom-orange/5 p-4 glass-card">
+			<p class="text-[10px] font-bold uppercase tracking-wider text-custom-orange mb-2">Format du fichier CSV d'importation</p>
+			<ul class="text-xs text-text-secondary space-y-1.5 list-disc list-inside">
+				<li>Fichier <span class="text-text-primary font-medium">.csv</span> en UTF-8, séparateur <span class="text-text-primary font-medium">;</span> ou <span class="text-text-primary font-medium">,</span></li>
+				<li>Première ligne = en-têtes obligatoires (le titre est requis) :
+					<code class="block mt-1.5 rounded-lg border border-custom bg-custom-tertiary px-3 py-2 text-[11px] text-text-primary font-mono overflow-x-auto">Titre;Catégorie;Joueurs max;Durée (min);État;Notes</code>
+				</li>
+				<li><span class="text-text-primary font-medium">État</span> (optionnel) : Neuf, Bon état, Usé ou Abîmé</li>
+				<li><span class="text-text-primary font-medium">Joueurs max</span> et <span class="text-text-primary font-medium">Durée (min)</span> : entiers positifs (ou vides)</li>
+				<li>Statut, emprunteur et image ne sont pas importés — les jeux sont créés comme <span class="text-text-primary font-medium">disponibles</span></li>
+				<li>Maximum 500 lignes par import — exemple :
+					<code class="block mt-1.5 rounded-lg border border-custom bg-custom-tertiary px-3 py-2 text-[11px] text-text-primary font-mono overflow-x-auto whitespace-pre">Titre;Catégorie;Joueurs max;Durée (min);État;Notes
+Catan;Stratégie;4;90;Bon état;Extension cities &amp; knights incluse
+Azul;Familial;4;45;Neuf;</code>
+				</li>
+			</ul>
+		</div>
+
+		<form method="get" action="{{ path('app_admin_ludotheque_index') }}" class="flex flex-wrap items-end gap-3 mb-6 rounded-xl border border-custom bg-custom-secondary p-4 glass-card">
+			<div class="relative flex-1 min-w-[200px]"
+				 data-controller="search-autocomplete"
+				 data-search-autocomplete-url-value="{{ path('app_ludotheque_suggest') }}">
+				<label for="ludo-search" class="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">Rechercher</label>
+				<input type="text"
+					   id="ludo-search"
+					   name="q"
+					   value="{{ search }}"
+					   placeholder="Titre, catégorie, notes..."
+					   autocomplete="off"
+					   role="combobox"
+					   aria-autocomplete="list"
+					   aria-controls="ludo-suggestions"
+					   data-search-autocomplete-target="input"
+					   data-action="input->search-autocomplete#onInput keydown->search-autocomplete#onKeydown"
+					   class="w-full rounded-lg border border-custom bg-custom-tertiary px-3 py-2 text-sm text-text-primary placeholder-text-secondary/60 focus:border-custom-orange focus:outline-none focus:ring-1 focus:ring-custom-orange">
+				<ul id="ludo-suggestions"
+					data-search-autocomplete-target="list"
+					data-action="click->search-autocomplete#select"
+					role="listbox"
+					hidden
+					class="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-custom bg-custom-tertiary shadow-lg py-1"></ul>
+			</div>
+			<button type="submit" class="rounded-lg bg-custom-orange px-4 py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all">Rechercher</button>
+			{% if search %}
+				<a href="{{ path('app_admin_ludotheque_index') }}" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors py-2">Réinitialiser</a>
+			{% endif %}
+		</form>
 
 		{% if pagination.totalItemCount > 0 %}
 			{# Vue mobile : cartes empilées #}
@@ -23,7 +85,14 @@
 				{% for boardGame in pagination %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ boardGame.status == 'pending' ? 'border-custom-orange/30 bg-custom-orange/5' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
-							<h3 class="font-medium text-text-primary text-sm">{{ boardGame.title }}{% if averageRatings[boardGame.id] is not null %} <span class="text-amber-400 font-bold">★ {{ averageRatings[boardGame.id]|number_format(1) }}</span>{% endif %}</h3>
+							<div class="flex items-start gap-3 min-w-0">
+								{% if boardGame.image %}
+									<img src="{{ asset('images/board-games/' ~ boardGame.image) }}" alt="{{ boardGame.title }}" class="h-12 w-12 object-cover rounded-md border border-custom shrink-0">
+								{% endif %}
+								<h3 class="font-medium text-text-primary text-sm flex items-center gap-2 flex-wrap">
+									<span>{{ boardGame.title }}</span>
+								</h3>
+							</div>
 							{% if boardGame.status == 'pending' %}
 								<span class="bg-custom-orange text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0">En attente</span>
 							{% elseif boardGame.status == 'loaned' and boardGame.returnDueAt and boardGame.returnDueAt < date() %}
@@ -45,6 +114,20 @@
 							{% if boardGame.status == 'loaned' and boardGame.returnDueAt %}
 								<span>Retour prévu le {{ boardGame.returnDueAt|date('d/m/Y') }}</span>
 							{% endif %}
+						</div>
+						<div class="mb-3 flex flex-col gap-2">
+							{% set pageParams = {} %}
+							{% if pagination.currentPageNumber > 1 %}{% set pageParams = pageParams|merge({ page: pagination.currentPageNumber }) %}{% endif %}
+							{% if search %}{% set pageParams = pageParams|merge({ q: search }) %}{% endif %}
+							<div class="flex flex-col gap-0.5">
+								<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary">Note</span>
+								{{ include('components/_star_rating.html.twig', { rating: averageRatings[boardGame.id]|default(null), size: 'text-sm' }, with_context: false) }}
+							</div>
+							{{ include('components/_rate_form.html.twig', {
+								ratePath: path('app_admin_ludotheque_rate', { id: boardGame.id }|merge(pageParams)),
+								csrfId: 'admin_rate_game' ~ boardGame.id,
+								myScore: myRatings[boardGame.id]|default(0),
+							}, with_context: false) }}
 						</div>
 						<div class="flex flex-wrap items-center gap-3 pt-2 border-t border-custom/50">
 							{% if boardGame.status == 'pending' %}
@@ -82,6 +165,7 @@
 							<tr>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Titre</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Catégorie</th>
+								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Note</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Statut</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Emprunteur</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary text-right">Actions</th>
@@ -90,8 +174,31 @@
 						<tbody>
 							{% for boardGame in pagination %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ boardGame.status == 'pending' ? 'bg-custom-orange/5' : '' }}">
-									<td class="px-4 py-3 font-medium text-text-primary">{{ boardGame.title }}{% if averageRatings[boardGame.id] is not null %} <span class="text-amber-400 font-bold text-xs">★ {{ averageRatings[boardGame.id]|number_format(1) }}</span>{% endif %}</td>
+									<td class="px-4 py-3 font-medium text-text-primary">
+										<div class="flex items-center gap-3">
+											{% if boardGame.image %}
+												<img src="{{ asset('images/board-games/' ~ boardGame.image) }}" alt="{{ boardGame.title }}" class="h-10 w-10 object-cover rounded-md border border-custom shrink-0">
+											{% endif %}
+											<span>{{ boardGame.title }}</span>
+										</div>
+									</td>
 									<td class="px-4 py-3 text-sm text-text-secondary">{{ boardGame.category|default('—') }}</td>
+									<td class="px-4 py-3">
+										{% set pageParams = {} %}
+										{% if pagination.currentPageNumber > 1 %}{% set pageParams = pageParams|merge({ page: pagination.currentPageNumber }) %}{% endif %}
+										{% if search %}{% set pageParams = pageParams|merge({ q: search }) %}{% endif %}
+										<div class="flex flex-col gap-2">
+											<div class="flex flex-col gap-0.5">
+												<span class="text-[9px] font-bold uppercase tracking-wider text-text-secondary">Note</span>
+												{{ include('components/_star_rating.html.twig', { rating: averageRatings[boardGame.id]|default(null), size: 'text-sm' }, with_context: false) }}
+											</div>
+											{{ include('components/_rate_form.html.twig', {
+												ratePath: path('app_admin_ludotheque_rate', { id: boardGame.id }|merge(pageParams)),
+												csrfId: 'admin_rate_game' ~ boardGame.id,
+												myScore: myRatings[boardGame.id]|default(0),
+											}, with_context: false) }}
+										</div>
+									</td>
 									<td class="px-4 py-3">
 										{% if boardGame.status == 'pending' %}
 											<span class="bg-custom-orange text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">En attente</span>
@@ -175,11 +282,18 @@
 
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">
-				<p class="text-text-secondary mb-4">Aucun jeu dans la ludothèque pour le moment.</p>
-				<a href="{{ path('app_admin_ludotheque_new') }}" class="inline-flex items-center gap-2 rounded-lg bg-custom-orange py-2.5 px-4 text-xs font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all">
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-					Ajouter un jeu
-				</a>
+				{% if search %}
+					<p class="text-text-secondary mb-4">Aucun jeu ne correspond à « {{ search }} ».</p>
+					<a href="{{ path('app_admin_ludotheque_index') }}" class="inline-flex items-center gap-2 rounded-lg border border-custom bg-custom-tertiary py-2.5 px-4 text-xs font-extrabold uppercase tracking-widest text-text-secondary hover:text-custom-orange hover:border-custom-orange transition-all">
+						Réinitialiser la recherche
+					</a>
+				{% else %}
+					<p class="text-text-secondary mb-4">Aucun jeu dans la ludothèque pour le moment.</p>
+					<a href="{{ path('app_admin_ludotheque_new') }}" class="inline-flex items-center gap-2 rounded-lg bg-custom-orange py-2.5 px-4 text-xs font-extrabold uppercase tracking-widest text-text-primary hover:bg-orange-600 transition-all">
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+						Ajouter un jeu
+					</a>
+				{% endif %}
 			</div>
 		{% endif %}
 	</div>

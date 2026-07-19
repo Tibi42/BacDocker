@@ -7,11 +7,12 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Note (1 à 5) attribuée par un membre à un jeu de la ludothèque.
+ * Note (1 à 5) attribuée à un jeu de la ludothèque.
  *
- * Une seule note par (jeu, membre) — upsertable : un membre peut modifier
- * sa propre note. La création/mise à jour est conditionnée à un emprunt
- * passé (voir LoanLogRepository::hasBorrowed()).
+ * Une seule note par (jeu, utilisateur) — upsertable.
+ * Les membres ne peuvent noter qu'après un emprunt validé
+ * (LoanLogRepository::hasBorrowed) ; les administrateurs peuvent noter
+ * depuis le back-office sans condition d'emprunt.
  */
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 #[ORM\UniqueConstraint(name: 'uniq_review_board_game_user', columns: ['board_game_id', 'user_id'])]

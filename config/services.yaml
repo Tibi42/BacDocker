@@ -8,6 +8,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     articles_images_directory: '%kernel.project_dir%/public/images/articles'
+    board_games_images_directory: '%kernel.project_dir%/public/images/board-games'
     app_mailer_from_name: 'La Boîte à Chimère'
 
 services:

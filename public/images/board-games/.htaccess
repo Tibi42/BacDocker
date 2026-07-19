@@ -1,0 +1,4 @@
+# Empêche l'exécution de scripts PHP dans le dossier d'upload des jeux.
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>

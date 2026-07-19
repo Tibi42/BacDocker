@@ -56,11 +56,16 @@ class BoardGame
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $durationMinutes = null;
 
-    #[ORM\Column(length: 32, nullable: true)]
+    /** État physique du jeu (Neuf, Bon état, Usé, Abîmé). Colonne SQL : item_condition (condition est réservé en MySQL). */
+    #[ORM\Column(name: 'item_condition', length: 32, nullable: true)]
     private ?string $condition = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
+
+    /** Nom du fichier image (PNG/JPEG) stocké dans public/images/board-games/. */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
 
     #[ORM\Column(length: 16, options: ['default' => 'available'])]
     private string $status = self::STATUS_AVAILABLE;
@@ -174,6 +179,17 @@ class BoardGame
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
         return $this;
     }
 

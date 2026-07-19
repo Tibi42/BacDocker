@@ -19,7 +19,7 @@ class ReviewRepository extends ServiceEntityRepository
     }
 
     /**
-     * Moyenne des notes pour ce jeu, ou null s'il n'a aucune note.
+     * Moyenne des notes (membres et admins) pour ce jeu, ou null s'il n'a aucune note.
      */
     public function averageFor(BoardGame $boardGame): ?float
     {

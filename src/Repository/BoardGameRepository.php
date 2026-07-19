@@ -25,23 +25,103 @@ class BoardGameRepository extends ServiceEntityRepository
 
     /**
      * Retourne un QueryBuilder pour les jeux triés par titre (asc).
-     * Utilisé par KnpPaginator pour paginer les résultats de l'admin.
+     * Utilisé par KnpPaginator. Recherche optionnelle sur titre, catégorie, notes et état.
      */
-    public function findAllOrderByTitleQb(): QueryBuilder
+    public function findAllOrderByTitleQb(?string $search = null): QueryBuilder
     {
-        return $this->createQueryBuilder('b')
+        $qb = $this->createQueryBuilder('b')
             ->leftJoin('b.borrower', 'u')
             ->addSelect('u')
             ->andWhere('b.archived = false')
             ->orderBy('b.title', 'ASC');
+
+        $term = $search !== null ? trim($search) : '';
+        if ($term !== '') {
+            $qb->andWhere(
+                'LOWER(b.title) LIKE :search
+                OR LOWER(COALESCE(b.category, \'\')) LIKE :search
+                OR LOWER(COALESCE(b.notes, \'\')) LIKE :search
+                OR LOWER(COALESCE(b.condition, \'\')) LIKE :search'
+            )->setParameter('search', '%' . mb_strtolower($term) . '%');
+        }
+
+        return $qb;
     }
 
     /**
      * @return BoardGame[]
      */
-    public function findAllOrderByTitle(): array
+    public function findAllOrderByTitle(?string $search = null): array
     {
-        return $this->findAllOrderByTitleQb()->getQuery()->getResult();
+        return $this->findAllOrderByTitleQb($search)->getQuery()->getResult();
+    }
+
+    /**
+     * Suggestions d'autocomplétion (titre / catégorie), jeux non archivés.
+     *
+     * @return list<array{id: int, title: string, category: ?string}>
+     */
+    public function findSuggestions(string $term, int $limit = 8): array
+    {
+        $term = trim($term);
+        if ($term === '' || mb_strlen($term) < 2) {
+            return [];
+        }
+
+        $limit = max(1, min($limit, 20));
+
+        $rows = $this->createQueryBuilder('b')
+            ->select('b.id', 'b.title', 'b.category')
+            ->andWhere('b.archived = false')
+            ->andWhere(
+                'LOWER(b.title) LIKE :search
+                OR LOWER(COALESCE(b.category, \'\')) LIKE :search'
+            )
+            ->setParameter('search', '%' . mb_strtolower($term) . '%')
+            ->orderBy('b.title', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static fn (array $row): array => [
+            'id' => (int) $row['id'],
+            'title' => (string) $row['title'],
+            'category' => $row['category'] !== null ? (string) $row['category'] : null,
+        ], $rows);
+    }
+
+    /**
+     * Jeux déjà empruntés par le membre (LoanLog), plus sa demande / son emprunt en cours.
+     * Utilisé dans /mon-espace pour n'afficher que l'historique personnel.
+     */
+    public function findBorrowedByUserQb(User $user, ?string $search = null): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.borrower', 'u')
+            ->addSelect('u')
+            ->andWhere('b.archived = false')
+            ->andWhere(
+                'EXISTS (
+                    SELECT 1 FROM App\Entity\LoanLog l
+                    WHERE l.boardGame = b AND l.user = :user
+                )
+                OR (b.borrower = :user AND b.status IN (:activeStatuses))'
+            )
+            ->setParameter('user', $user)
+            ->setParameter('activeStatuses', [BoardGame::STATUS_PENDING, BoardGame::STATUS_LOANED])
+            ->orderBy('b.title', 'ASC');
+
+        $term = $search !== null ? trim($search) : '';
+        if ($term !== '') {
+            $qb->andWhere(
+                'LOWER(b.title) LIKE :search
+                OR LOWER(COALESCE(b.category, \'\')) LIKE :search
+                OR LOWER(COALESCE(b.notes, \'\')) LIKE :search
+                OR LOWER(COALESCE(b.condition, \'\')) LIKE :search'
+            )->setParameter('search', '%' . mb_strtolower($term) . '%');
+        }
+
+        return $qb;
     }
 
     /**

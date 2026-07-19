@@ -12,6 +12,7 @@ use App\Repository\LoanLogRepository;
 use App\Repository\ReviewRepository;
 use App\Validator\PasswordPolicy;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +36,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_USER')]
 class UserDashboardController extends AbstractController
 {
+    private const LUDO_PER_PAGE = 15;
+
     /**
      * Page principale de l'espace utilisateur.
      *
@@ -43,8 +46,15 @@ class UserDashboardController extends AbstractController
      * activités à venir et activités passées.
      */
     #[Route('/mon-espace', name: 'app_user_dashboard')]
-    public function index(InscriptionRepository $inscriptionRepository, ActivityRepository $activityRepository, BoardGameRepository $boardGameRepository, ReviewRepository $reviewRepository, LoanLogRepository $loanLogRepository): Response
-    {
+    public function index(
+        Request $request,
+        InscriptionRepository $inscriptionRepository,
+        ActivityRepository $activityRepository,
+        BoardGameRepository $boardGameRepository,
+        ReviewRepository $reviewRepository,
+        LoanLogRepository $loanLogRepository,
+        PaginatorInterface $paginator,
+    ): Response {
         $user = $this->getUser();
         $email = $user->getEmail();
 
@@ -71,13 +81,18 @@ class UserDashboardController extends AbstractController
             }
         }
 
-        $boardGames = $boardGameRepository->findAllOrderByTitle();
+        $search = trim((string) $request->query->get('q', ''));
+        $boardGamesPagination = $paginator->paginate(
+            $boardGameRepository->findBorrowedByUserQb($user, $search !== '' ? $search : null),
+            $request->query->getInt('page', 1),
+            self::LUDO_PER_PAGE,
+        );
         $activeBoardGame = $boardGameRepository->findActiveForUser($user);
 
         $averageRatings = [];
         $canRate = [];
         $myRatings = [];
-        foreach ($boardGames as $bg) {
+        foreach ($boardGamesPagination as $bg) {
             $averageRatings[$bg->getId()] = $reviewRepository->averageFor($bg);
             $canRate[$bg->getId()] = $loanLogRepository->hasBorrowed($bg, $user);
             $myReview = $reviewRepository->findOneForUserAndGame($bg, $user);
@@ -87,12 +102,31 @@ class UserDashboardController extends AbstractController
         return $this->render('user_dashboard/index.html.twig', [
             'upcoming' => $upcoming,
             'past' => $past,
-            'boardGames' => $boardGames,
+            'boardGamesPagination' => $boardGamesPagination,
             'activeBoardGame' => $activeBoardGame,
             'averageRatings' => $averageRatings,
             'canRate' => $canRate,
             'myRatings' => $myRatings,
+            'search' => $search,
         ]);
+    }
+
+    /**
+     * @return array{page?: int, q?: string}
+     */
+    private function ludothequeRedirectParams(Request $request): array
+    {
+        $params = [];
+        $page = $request->query->getInt('page', 1);
+        if ($page > 1) {
+            $params['page'] = $page;
+        }
+        $search = trim((string) $request->query->get('q', ''));
+        if ($search !== '') {
+            $params['q'] = $search;
+        }
+
+        return $params;
     }
 
     /**
@@ -359,26 +393,28 @@ class UserDashboardController extends AbstractController
     #[Route('/mon-espace/ludotheque/{id}/emprunter', name: 'app_user_ludotheque_request', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function requestLoan(Request $request, BoardGame $boardGame, EntityManagerInterface $em, BoardGameRepository $boardGameRepository): Response
     {
+        $redirectParams = $this->ludothequeRedirectParams($request);
+
         if (!$this->isCsrfTokenValid('request_loan' . $boardGame->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $user = $this->getUser();
 
         if ($boardGameRepository->findActiveForUser($user) !== null) {
             $this->addFlash('error', 'Vous avez déjà un jeu en cours d\'emprunt ou en attente de validation.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         if ($boardGame->getStatus() !== BoardGame::STATUS_AVAILABLE) {
             $this->addFlash('error', 'Ce jeu n\'est plus disponible.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         if ($boardGame->isArchived()) {
             $this->addFlash('error', 'Ce jeu n\'est plus disponible.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $boardGame->setStatus(BoardGame::STATUS_PENDING);
@@ -388,7 +424,7 @@ class UserDashboardController extends AbstractController
 
         $this->addFlash('success', 'Votre demande d\'emprunt pour « ' . $boardGame->getTitle() . ' » a été envoyée.');
 
-        return $this->redirectToRoute('app_user_dashboard');
+        return $this->redirectToRoute('app_user_dashboard', $redirectParams);
     }
 
     /**
@@ -400,14 +436,16 @@ class UserDashboardController extends AbstractController
     #[Route('/mon-espace/ludotheque/{id}/annuler', name: 'app_user_ludotheque_cancel', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function cancelLoanRequest(BoardGame $boardGame, Request $request, EntityManagerInterface $em): Response
     {
+        $redirectParams = $this->ludothequeRedirectParams($request);
+
         if (!$this->isCsrfTokenValid('cancel_loan' . $boardGame->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         if ($boardGame->getStatus() !== BoardGame::STATUS_PENDING || $boardGame->getBorrower()?->getId() !== $this->getUser()->getId()) {
             $this->addFlash('error', 'Cette demande ne peut plus être annulée.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $boardGame->setStatus(BoardGame::STATUS_AVAILABLE);
@@ -417,7 +455,7 @@ class UserDashboardController extends AbstractController
 
         $this->addFlash('success', 'Votre demande d\'emprunt pour « ' . $boardGame->getTitle() . ' » a été annulée.');
 
-        return $this->redirectToRoute('app_user_dashboard');
+        return $this->redirectToRoute('app_user_dashboard', $redirectParams);
     }
 
     /**
@@ -431,22 +469,24 @@ class UserDashboardController extends AbstractController
     #[Route('/mon-espace/ludotheque/{id}/noter', name: 'app_user_ludotheque_rate', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function rateGame(BoardGame $boardGame, Request $request, EntityManagerInterface $em, LoanLogRepository $loanLogRepository, ReviewRepository $reviewRepository): Response
     {
+        $redirectParams = $this->ludothequeRedirectParams($request);
+
         if (!$this->isCsrfTokenValid('rate_game' . $boardGame->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $user = $this->getUser();
 
         if (!$loanLogRepository->hasBorrowed($boardGame, $user)) {
             $this->addFlash('error', 'Vous devez avoir emprunté ce jeu pour le noter.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $rating = $request->request->getInt('rating');
         if ($rating < 1 || $rating > 5) {
             $this->addFlash('error', 'La note doit être comprise entre 1 et 5.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $review = $reviewRepository->findOneForUserAndGame($boardGame, $user);
@@ -462,12 +502,12 @@ class UserDashboardController extends AbstractController
             $em->flush();
         } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
             $this->addFlash('error', 'Votre note a déjà été enregistrée, veuillez réessayer.');
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard', $redirectParams);
         }
 
         $this->addFlash('success', 'Votre note pour « ' . $boardGame->getTitle() . ' » a été enregistrée.');
 
-        return $this->redirectToRoute('app_user_dashboard');
+        return $this->redirectToRoute('app_user_dashboard', $redirectParams);
     }
 
     /**
