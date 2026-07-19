@@ -42,193 +42,136 @@ class BoardGameFixtures extends Fixture implements DependentFixtureInterface
 
         $now = new \DateTimeImmutable('now');
 
-        $games = [
-            [
-                'title' => 'Catan',
-                'category' => 'Stratégie',
-                'maxPlayers' => 4,
-                'durationMinutes' => 90,
-                'condition' => 'Bon état',
-                'notes' => 'Extension Seafarers disponible au local.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [210, 140, 50],
-            ],
-            [
-                'title' => 'Ticket to Ride',
-                'category' => 'Familial',
-                'maxPlayers' => 5,
-                'durationMinutes' => 60,
-                'condition' => 'Neuf',
-                'notes' => 'Version Europe.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [40, 110, 180],
-            ],
-            [
-                'title' => '7 Wonders',
-                'category' => 'Stratégie',
-                'maxPlayers' => 7,
-                'durationMinutes' => 45,
-                'condition' => 'Bon état',
-                'notes' => null,
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [180, 140, 40],
-            ],
-            [
-                'title' => 'Azul',
-                'category' => 'Familial',
-                'maxPlayers' => 4,
-                'durationMinutes' => 45,
-                'condition' => 'Neuf',
-                'notes' => 'Très demandé en soirée découverte.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [60, 140, 200],
-            ],
-            [
-                'title' => 'Wingspan',
-                'category' => 'Stratégie',
-                'maxPlayers' => 5,
-                'durationMinutes' => 75,
-                'condition' => 'Bon état',
-                'notes' => 'Extension Européenne incluse.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [70, 130, 90],
-            ],
-            [
-                'title' => 'Dixit',
-                'category' => 'Ambiance',
-                'maxPlayers' => 8,
-                'durationMinutes' => 30,
-                'condition' => 'Usé',
-                'notes' => 'Quelques cartes cornées.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [160, 90, 160],
-            ],
-            [
-                'title' => 'Carcassonne',
-                'category' => 'Familial',
-                'maxPlayers' => 5,
-                'durationMinutes' => 45,
-                'condition' => 'Bon état',
-                'notes' => null,
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [90, 150, 70],
-            ],
-            [
-                'title' => 'Pandemic',
-                'category' => 'Coopératif',
-                'maxPlayers' => 4,
-                'durationMinutes' => 60,
-                'condition' => 'Bon état',
-                'notes' => 'Idéal pour initier au coopératif.',
+        // title, category, maxPlayers, durationMinutes, condition, notes
+        $catalog = [
+            ['Catan', 'Stratégie', 4, 90, 'Bon état', 'Extension Seafarers disponible au local.'],
+            ['Ticket to Ride', 'Familial', 5, 60, 'Neuf', 'Version Europe.'],
+            ['7 Wonders', 'Stratégie', 7, 45, 'Bon état', null],
+            ['Azul', 'Familial', 4, 45, 'Neuf', 'Très demandé en soirée découverte.'],
+            ['Wingspan', 'Stratégie', 5, 75, 'Bon état', 'Extension Européenne incluse.'],
+            ['Dixit', 'Ambiance', 8, 30, 'Usé', 'Quelques cartes cornées.'],
+            ['Carcassonne', 'Familial', 5, 45, 'Bon état', null],
+            ['Pandemic', 'Coopératif', 4, 60, 'Bon état', 'Idéal pour initier au coopératif.'],
+            ['Codenames', 'Ambiance', 8, 30, 'Neuf', null],
+            ['Terraforming Mars', 'Expert', 5, 150, 'Bon état', 'Durée longue — prévoir une soirée entière.'],
+            ['Splendor', 'Familial', 4, 30, 'Bon état', null],
+            ['The Crew', 'Coopératif', 5, 20, 'Neuf', 'Jeu de cartes coopératif à missions.'],
+            ['King of Tokyo', 'Ambiance', 6, 45, 'Usé', 'Dés un peu usés.'],
+            ['Gloomhaven: Jaws of the Lion', 'Expert', 4, 120, 'Bon état', 'Campagne en cours au local.'],
+            ['Love Letter', 'Ambiance', 4, 20, 'Abîmé', 'Boîte abîmée, cartes OK.'],
+            ['Evergreen', 'Stratégie', 4, 45, 'Neuf', null],
+            ['Quacks of Quedlinburg', 'Familial', 4, 45, 'Bon état', null],
+            ['Cascadia', 'Familial', 4, 40, 'Neuf', 'Jeu calme, très apprécié.'],
+            ['Root', 'Expert', 4, 90, 'Bon état', 'Asymétrique — lire les règles avant.'],
+            ['Everdell', 'Stratégie', 4, 80, 'Bon état', null],
+            ['Just One', 'Ambiance', 7, 20, 'Neuf', 'Parfait en grand groupe.'],
+            ['Sky Team', 'Coopératif', 2, 20, 'Neuf', 'Duo uniquement.'],
+            ['Forest Shuffle', 'Stratégie', 4, 45, 'Bon état', null],
+            ['Ark Nova', 'Expert', 4, 150, 'Bon état', 'Très demandé — réservation conseillée.'],
+            ['Heat: Pedal to the Metal', 'Familial', 6, 60, 'Neuf', null],
+            ['Brass: Birmingham', 'Expert', 4, 120, 'Bon état', null],
+            ['The Mind', 'Coopératif', 4, 20, 'Usé', null],
+            ['Exploding Kittens', 'Ambiance', 5, 15, 'Usé', 'Cartes un peu cornées.'],
+            ['Unlock! Escape Adventures', 'Coopératif', 6, 60, 'Bon état', 'Scénarios à usage unique — noter lesquels sont faits.'],
+            ['Dobble', 'Ambiance', 8, 15, 'Bon état', 'Idéal enfants / apéro.'],
+            ['Patchwork', 'Familial', 2, 30, 'Neuf', 'Duo uniquement.'],
+            ['Concordia', 'Stratégie', 5, 100, 'Bon état', null],
+            ['Spirit Island', 'Coopératif', 4, 120, 'Bon état', 'Complexité élevée.'],
+            ['Blood Rage', 'Expert', 4, 90, 'Bon état', 'Figurines à manipuler avec soin.'],
+            ['Inis', 'Stratégie', 4, 75, 'Bon état', null],
+            ['Jaipur', 'Familial', 2, 30, 'Neuf', 'Duo uniquement.'],
+            ['Hanabi', 'Coopératif', 5, 30, 'Usé', null],
+            ['Time Stories', 'Coopératif', 4, 90, 'Bon état', 'Scénarios réutilisables avec soin.'],
+            ['Scythe', 'Expert', 5, 115, 'Bon état', null],
+            ['Twilight Struggle', 'Expert', 2, 150, 'Bon état', 'Duo — partie longue.'],
+            ['Concept', 'Ambiance', 12, 40, 'Bon état', null],
+            ['Welcome To', 'Familial', 100, 25, 'Neuf', 'Roll & write — illimité en joueurs.'],
+            ['Cartographers', 'Familial', 100, 45, 'Bon état', 'Roll & write.'],
+            ['Dune: Imperium', 'Expert', 4, 120, 'Neuf', null],
+            ['Nemesis', 'Expert', 5, 180, 'Bon état', 'Semi-coop — soirée entière.'],
+            ['Lost Ruins of Arnak', 'Stratégie', 4, 90, 'Bon état', null],
+            ['Marvel Champions', 'Coopératif', 4, 60, 'Neuf', 'LCG — extensions au local.'],
+            ['Race for the Galaxy', 'Stratégie', 4, 45, 'Usé', null],
+            ['Dominion', 'Stratégie', 4, 30, 'Bon état', 'Deck-building classique.'],
+            ['Kingdomino', 'Familial', 4, 20, 'Neuf', 'Idéal pour débuter.'],
+        ];
+
+        $palette = [
+            [210, 140, 50], [40, 110, 180], [180, 140, 40], [60, 140, 200], [70, 130, 90],
+            [160, 90, 160], [90, 150, 70], [180, 50, 50], [40, 40, 50], [200, 100, 40],
+            [120, 60, 160], [30, 50, 100], [220, 80, 40], [50, 70, 60], [180, 60, 100],
+            [50, 140, 110], [190, 120, 60], [80, 160, 120], [140, 90, 50], [100, 140, 80],
+            [200, 160, 40], [70, 100, 160], [60, 120, 70], [160, 100, 50], [200, 60, 60],
+            [90, 80, 70], [100, 60, 120], [220, 100, 80], [50, 80, 120], [220, 180, 40],
+            [140, 80, 140], [180, 130, 70], [40, 100, 80], [160, 40, 50], [70, 110, 150],
+            [200, 140, 60], [120, 70, 40], [80, 60, 100], [160, 120, 50], [50, 50, 80],
+            [180, 100, 140], [60, 140, 160], [100, 150, 90], [140, 100, 60], [80, 40, 50],
+            [170, 110, 50], [60, 60, 120], [150, 90, 40], [100, 80, 140], [90, 130, 100],
+        ];
+
+        // Index => overrides de statut / emprunt pour varier les données de test
+        $statusOverrides = [
+            7 => [ // Pandemic
                 'status' => BoardGame::STATUS_PENDING,
                 'borrower' => $member,
                 'requestedAt' => $now->modify('-1 day'),
-                'color' => [180, 50, 50],
             ],
-            [
-                'title' => 'Codenames',
-                'category' => 'Ambiance',
-                'maxPlayers' => 8,
-                'durationMinutes' => 30,
-                'condition' => 'Neuf',
-                'notes' => null,
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [40, 40, 50],
-            ],
-            [
-                'title' => 'Terraforming Mars',
-                'category' => 'Expert',
-                'maxPlayers' => 5,
-                'durationMinutes' => 150,
-                'condition' => 'Bon état',
-                'notes' => 'Durée longue — prévoir une soirée entière.',
+            9 => [ // Terraforming Mars
                 'status' => BoardGame::STATUS_LOANED,
                 'borrower' => $member,
                 'requestedAt' => $now->modify('-10 days'),
                 'loanedAt' => $now->modify('-7 days'),
                 'returnDueAt' => $now->modify('+7 days'),
-                'color' => [200, 100, 40],
             ],
-            [
-                'title' => 'Splendor',
-                'category' => 'Familial',
-                'maxPlayers' => 4,
-                'durationMinutes' => 30,
-                'condition' => 'Bon état',
-                'notes' => null,
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [120, 60, 160],
-            ],
-            [
-                'title' => 'The Crew',
-                'category' => 'Coopératif',
-                'maxPlayers' => 5,
-                'durationMinutes' => 20,
-                'condition' => 'Neuf',
-                'notes' => 'Jeu de cartes coopératif à missions.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [30, 50, 100],
-            ],
-            [
-                'title' => 'King of Tokyo',
-                'category' => 'Ambiance',
-                'maxPlayers' => 6,
-                'durationMinutes' => 45,
-                'condition' => 'Usé',
-                'notes' => 'Dés un peu usés.',
+            12 => [ // King of Tokyo
                 'status' => BoardGame::STATUS_LOANED,
                 'borrower' => $memberB,
                 'requestedAt' => $now->modify('-5 days'),
                 'loanedAt' => $now->modify('-3 days'),
                 'returnDueAt' => $now->modify('+11 days'),
-                'color' => [220, 80, 40],
             ],
-            [
-                'title' => 'Gloomhaven: Jaws of the Lion',
-                'category' => 'Expert',
-                'maxPlayers' => 4,
-                'durationMinutes' => 120,
-                'condition' => 'Bon état',
-                'notes' => 'Campagne en cours au local — ne pas mélanger les composants.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [50, 70, 60],
+            23 => [ // Ark Nova
+                'status' => BoardGame::STATUS_PENDING,
+                'borrower' => $memberB,
+                'requestedAt' => $now->modify('-2 days'),
             ],
-            [
-                'title' => 'Love Letter',
-                'category' => 'Ambiance',
-                'maxPlayers' => 4,
-                'durationMinutes' => 20,
-                'condition' => 'Abîmé',
-                'notes' => 'Boîte abîmée, cartes OK.',
-                'status' => BoardGame::STATUS_AVAILABLE,
-                'color' => [180, 60, 100],
+            44 => [ // Nemesis
+                'status' => BoardGame::STATUS_LOANED,
+                'borrower' => $member,
+                'requestedAt' => $now->modify('-14 days'),
+                'loanedAt' => $now->modify('-12 days'),
+                'returnDueAt' => $now->modify('+2 days'),
             ],
         ];
 
-        foreach ($games as $data) {
-            $filename = $this->createCoverPng($data['title'], $data['color']);
+        foreach ($catalog as $index => [$title, $category, $maxPlayers, $duration, $condition, $notes]) {
+            $filename = $this->createCoverPng($title, $palette[$index % count($palette)]);
 
             $game = new BoardGame();
-            $game->setTitle($data['title']);
-            $game->setCategory($data['category']);
-            $game->setMaxPlayers($data['maxPlayers']);
-            $game->setDurationMinutes($data['durationMinutes']);
-            $game->setCondition($data['condition']);
-            $game->setNotes($data['notes']);
+            $game->setTitle($title);
+            $game->setCategory($category);
+            $game->setMaxPlayers($maxPlayers);
+            $game->setDurationMinutes($duration);
+            $game->setCondition($condition);
+            $game->setNotes($notes);
             $game->setImage($filename);
-            $game->setStatus($data['status']);
+            $game->setStatus(BoardGame::STATUS_AVAILABLE);
 
-            if (isset($data['borrower']) && $data['borrower'] instanceof User) {
-                $game->setBorrower($data['borrower']);
-            }
-            if (isset($data['requestedAt'])) {
-                $game->setRequestedAt($data['requestedAt']);
-            }
-            if (isset($data['loanedAt'])) {
-                $game->setLoanedAt($data['loanedAt']);
-            }
-            if (isset($data['returnDueAt'])) {
-                $game->setReturnDueAt($data['returnDueAt']);
+            if (isset($statusOverrides[$index])) {
+                $override = $statusOverrides[$index];
+                $game->setStatus($override['status']);
+                if (isset($override['borrower']) && $override['borrower'] instanceof User) {
+                    $game->setBorrower($override['borrower']);
+                }
+                if (isset($override['requestedAt'])) {
+                    $game->setRequestedAt($override['requestedAt']);
+                }
+                if (isset($override['loanedAt'])) {
+                    $game->setLoanedAt($override['loanedAt']);
+                }
+                if (isset($override['returnDueAt'])) {
+                    $game->setReturnDueAt($override['returnDueAt']);
+                }
             }
 
             $manager->persist($game);
@@ -254,15 +197,12 @@ class BoardGameFixtures extends Fixture implements DependentFixtureInterface
             throw new \RuntimeException('Impossible de créer une image GD pour ' . $title);
         }
 
-        // Fond principal
         $bg = imagecolorallocate($img, $rgb[0], $rgb[1], $rgb[2]);
         imagefilledrectangle($img, 0, 0, $size - 1, $size - 1, $bg);
 
-        // Bandeau sombre en bas
         $band = imagecolorallocate($img, 20, 20, 28);
         imagefilledrectangle($img, 0, 300, $size - 1, $size - 1, $band);
 
-        // Motif géométrique simple (losanges)
         $accent = imagecolorallocate(
             $img,
             min(255, $rgb[0] + 40),
@@ -283,16 +223,13 @@ class BoardGameFixtures extends Fixture implements DependentFixtureInterface
             }
         }
 
-        // Initiales centrées
         $white = imagecolorallocate($img, 255, 255, 255);
         $initials = $this->initials($title);
         $font = 5;
         $charW = imagefontwidth($font);
-        $charH = imagefontheight($font);
         $textW = $charW * strlen($initials);
         imagestring($img, $font, (int) (($size - $textW) / 2), 150, $initials, $white);
 
-        // Titre dans le bandeau (tronqué si trop long)
         $label = mb_strlen($title) > 28 ? mb_substr($title, 0, 25) . '...' : $title;
         $labelW = $charW * strlen($label);
         imagestring($img, $font, (int) (($size - $labelW) / 2), 340, $label, $white);
