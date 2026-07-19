@@ -152,7 +152,8 @@
       "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4 '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
       "Bash(rm -f lh-prod3 lh-prod4)",
       "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod3.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
-      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)"
+      "Bash(npx --yes lighthouse http://devboitechimere.test/ --output=json --output-path=lh-prod4.report.json '--chrome-flags=--headless=new --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --quiet)",
+      "Bash(tasklist //FI \"IMAGENAME eq git.exe\")"
     ]
   }
 }

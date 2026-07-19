@@ -498,7 +498,9 @@
 								{% else %}
 									<div class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium" style="min-height: 220px;">
 								{% endif %}
-									<img src="{{ asset('images/articles/' ~ (article.image|prefer_webp)) }}" alt="Illustration de l'article : {{ article.title }}" loading="lazy" decoding="async" width="640" height="440" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
+									{% set articleImage = article.image|prefer_webp %}
+									{% set articleImageSmall = articleImage|responsive_small('articles') %}
+									<img src="{{ asset('images/articles/' ~ articleImage) }}" {% if articleImageSmall %}srcset="{{ asset('images/articles/' ~ articleImageSmall) }} 480w, {{ asset('images/articles/' ~ articleImage) }} 680w" sizes="(min-width: 1024px) 300px, (min-width: 768px) 45vw, 90vw" {% endif %}alt="Illustration de l'article : {{ article.title }}" loading="lazy" decoding="async" width="640" height="440" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700">
 									<div class="absolute inset-0 image-overlay"></div>
 									<span class="absolute right-3 top-3 bg-custom-orange px-2 py-1 rounded text-[9px] font-bold text-gray-900 uppercase tracking-widest shadow-lg">{{ article.tag }}</span>
 									<div class="absolute bottom-4 left-4 right-4 z-10">
