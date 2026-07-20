@@ -1,6 +1,6 @@
-<div class="header-container mx-auto max-w-[1240px] lg:max-w-[1360px] px-4 sm:px-7 lg:px-8 xl:px-12 py-3 bg-custom-secondary rounded-xl shadow-2xl border border-custom flex items-center justify-between gap-2 lg:gap-3 xl:gap-4">
-	<a href="{{ path('app_home') }}" data-turbo="false" class="flex items-center gap-2 sm:gap-3 xl:gap-4 shrink-0 transition-all hover:opacity-80 z-[75]">
-		<div class="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
+<div class="header-container mx-auto max-w-[1240px] lg:max-w-[1360px] px-4 sm:px-7 lg:px-8 xl:px-12 py-3 flex items-center justify-between gap-2 lg:gap-3 xl:gap-4">
+	<a href="{{ path('app_home') }}" data-turbo="false" class="nav-brand flex items-center gap-2 sm:gap-3 xl:gap-4 shrink-0 z-[75]">
+		<div class="nav-brand-mark h-9 w-9 sm:h-10 sm:w-10 shrink-0">
 			<svg class="h-full w-full" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 				<path d="M20 2L36 12v16L20 38L4 28V12L20 2z" stroke="url(#logo)" stroke-width="1.5" fill="none"/>
 				<path d="M20 8l10 6v8l-10 6-10-6v-8l10-6z" stroke="url(#logo2)" stroke-width="1" fill="none"/>
@@ -20,18 +20,18 @@
 		</div>
 	</a>
 
-	<nav class="hidden lg:flex flex-1 items-center justify-center gap-2.5 xl:gap-5 2xl:gap-8 min-w-0">
-		<a href="{{ path('app_home') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_home' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">ACCUEIL</a>
-		<a href="{{ path('app_jds') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_jds' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">JDS</a>
-		<a href="{{ path('app_jdr') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_jdr' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">JDR</a>
-		<a href="{{ path('app_gn') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_gn' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">GN</a>
-		<a href="{{ path('app_association') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_association' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">ASSOCIATION</a>
-		<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] text-text-primary hover:text-custom-orange transition-colors">FORUM</a>
+	<nav class="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-1.5 2xl:gap-2 min-w-0" aria-label="Navigation principale">
+		<a href="{{ path('app_home') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'is-active' : '' }}">Accueil</a>
+		<a href="{{ path('app_jds') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_jds' ? 'is-active' : '' }}">JDS</a>
+		<a href="{{ path('app_jdr') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_jdr' ? 'is-active' : '' }}">JDR</a>
+		<a href="{{ path('app_gn') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_gn' ? 'is-active' : '' }}">GN</a>
+		<a href="{{ path('app_association') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_association' ? 'is-active' : '' }}">Association</a>
+		<a href="https://laboiteachimere.com/forum/" target="_blank" rel="noopener noreferrer" data-turbo="false" class="nav-link">Forum</a>
 		{% if app.user %}
-			<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'text-custom-orange' : 'text-text-primary hover:text-custom-orange' }} transition-colors">MON ESPACE</a>
+			<a href="{{ path('app_user_dashboard') }}" data-turbo="false" class="nav-link {{ app.request.attributes.get('_route') == 'app_user_dashboard' ? 'is-active' : '' }}">Mon espace</a>
 		{% endif %}
 		{% if is_granted('ROLE_ADMIN') %}
-			<a href="{{ path('admin') }}" class="shrink-0 text-[11px] xl:text-[13px] font-bold uppercase tracking-[0.06em] xl:tracking-[0.1em] text-custom-orange hover:text-orange-400 transition-colors">DASHBOARD</a>
+			<a href="{{ path('admin') }}" class="nav-link nav-link--accent">Dashboard</a>
 		{% endif %}
 	</nav>
 
@@ -42,7 +42,7 @@
 				<span class="text-custom-orange">{{ app.user.username }}</span>
 			</span>
 		{% endif %}
-		<button type="button" data-theme-toggle class="theme-toggle-btn p-2 sm:p-2.5 rounded-lg bg-custom-tertiary border border-custom text-text-secondary hover:text-text-primary transition-all z-[75]" aria-label="Changer de thème">
+		<button type="button" data-theme-toggle class="theme-toggle-btn nav-icon-btn p-2 sm:p-2.5 rounded-lg text-text-secondary hover:text-text-primary z-[75]" aria-label="Changer de thème">
 			<svg class="h-5 w-5 sun-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
 			</svg>
@@ -53,13 +53,13 @@
 		{% if app.user %}
 			<form method="post" action="{{ path('app_logout') }}" class="hidden lg:block" data-turbo="false">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-				<button type="submit" class="rounded-lg bg-custom-orange px-3.5 py-2.5 xl:px-6 xl:py-3 text-[10px] xl:text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer transition-all hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 shadow-lg shadow-custom-orange/20">
-					DÉCONNEXION
+				<button type="submit" class="nav-cta">
+					Déconnexion
 				</button>
 			</form>
 		{% else %}
-			<button type="button" id="join-btn" class="hidden lg:block rounded-lg bg-custom-orange px-3.5 py-2.5 xl:px-6 xl:py-3 text-[10px] xl:text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer transition-all hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 shadow-lg shadow-custom-orange/20 whitespace-nowrap">
-				NOUS REJOINDRE
+			<button type="button" id="join-btn" class="hidden lg:block nav-cta whitespace-nowrap">
+				Nous rejoindre
 			</button>
 		{% endif %}
 		{# Hamburger Menu Button #}
@@ -74,7 +74,7 @@
 {# ── Panel connexion desktop : glisse sous la barre ── #}
 {% if not app.user %}
 	<div id="join-panel" class="hidden sm:block mx-auto max-w-[1240px] lg:max-w-[1360px] overflow-hidden" style="max-height:0;transition:max-height 0.3s ease">
-		<div class="bg-custom-secondary border border-t-0 border-custom rounded-b-xl px-7 pt-4 pb-5">
+		<div class="join-panel-inner px-7 pt-4 pb-5">
 			{% if login_error is defined and login_error %}<p class="mb-3 text-xs font-semibold text-red-400 text-center">{{ login_error.messageKey|trans(login_error.messageData, 'security') }}</p>{% endif %}
 			<form action="{{ path('app_login') }}" method="post" data-turbo="false" class="flex flex-col gap-2">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -93,8 +93,8 @@
 							</button>
 						</div>
 					</div>
-					<button type="submit" class="shrink-0 rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20 min-w-[130px] text-center">SE CONNECTER</button>
-					<button type="button" data-open-register class="shrink-0 rounded-lg bg-custom-orange px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.05em] text-gray-900 cursor-pointer hover:bg-orange-600 hover:scale-105 hover:shadow-xl hover:shadow-custom-orange/40 transition-all shadow-lg shadow-custom-orange/20 min-w-[130px] text-center">S'INSCRIRE</button>
+					<button type="submit" class="nav-cta min-w-[130px] text-center">Se connecter</button>
+					<button type="button" data-open-register class="nav-cta min-w-[130px] text-center">S'inscrire</button>
 				</div>
 				<a href="{{ path('app_forgot_password_request') }}" class="text-xs text-text-secondary hover:text-custom-orange transition-colors text-center">Mot de passe oublié ?</a>
 			</form>

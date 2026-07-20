@@ -1,4 +1,9 @@
+@import "../vendor/normalize.css/normalize.min.css";
 @import "tailwindcss" source(none);
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme) source(none);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
 @source "../../templates/**/*.html.twig";
 @source "../../templates/**/*.twig";
 @source "../../src/**/*.php";
@@ -133,9 +138,74 @@ input,
     box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
 }
 
-/* Header container style */
+/* ── Navbar premium ─────────────────────────────────────────────── */
 .header-container {
-    transition: background-color, border-color, box-shadow, opacity 0.3s ease;
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+    background:
+        linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--bg-secondary) 92%, transparent) 0%,
+            color-mix(in srgb, var(--bg-tertiary) 78%, transparent) 100%
+        );
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    box-shadow:
+        0 12px 40px -12px var(--shadow-color),
+        0 0 0 1px color-mix(in srgb, #14b8a6 8%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 8%, transparent);
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        border-radius 0.3s ease,
+        opacity 0.3s ease;
+}
+
+/* Panel login ouvert : la barre se soude au panneau du dessous */
+.header-container.is-panel-open {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-width: 0;
+}
+
+.header-container::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, #14b8a6 55%, transparent) 22%,
+        color-mix(in srgb, #f8742c 70%, transparent) 50%,
+        color-mix(in srgb, #14b8a6 55%, transparent) 78%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+.header-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        ellipse 60% 80% at 50% -10%,
+        color-mix(in srgb, #f8742c 14%, transparent) 0%,
+        transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+.header-container > * {
+    position: relative;
+    z-index: 1;
 }
 
 @media (min-width: 1024px) {
@@ -145,6 +215,204 @@ input,
         align-items: center;
         justify-content: space-between;
         gap: 1.5rem;
+    }
+}
+
+/* Marque */
+.nav-brand {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.nav-brand:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.nav-brand-mark {
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s ease, transform 0.35s ease;
+}
+
+.nav-brand:hover .nav-brand-mark {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, #14b8a6 55%, transparent));
+    transform: rotate(-6deg) scale(1.05);
+}
+
+/* Liens */
+.nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.7rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-radius: 0.55rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+@media (min-width: 1280px) {
+    .nav-link {
+        padding: 0.5rem 0.85rem;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+    }
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.2rem;
+    width: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #14b8a6, #f8742c);
+    transform: translateX(-50%);
+    transition: width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background-color: color-mix(in srgb, var(--bg-tertiary) 70%, transparent);
+}
+
+.nav-link:hover::after,
+.nav-link.is-active::after {
+    width: 55%;
+}
+
+.nav-link.is-active {
+    color: var(--orange-accent);
+    background-color: color-mix(in srgb, #f8742c 12%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #f8742c 22%, transparent);
+}
+
+.nav-link--accent {
+    color: var(--orange-accent);
+}
+
+.nav-link--accent:hover {
+    color: #fb923c;
+}
+
+/* Bouton icône (thème) */
+.nav-icon-btn {
+    border: 1px solid var(--border-color);
+    background:
+        linear-gradient(
+            160deg,
+            color-mix(in srgb, var(--bg-tertiary) 90%, transparent),
+            color-mix(in srgb, var(--bg-secondary) 80%, transparent)
+        );
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 6%, transparent);
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.nav-icon-btn:hover {
+    border-color: color-mix(in srgb, #f8742c 35%, var(--border-color));
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, #f8742c 15%, transparent),
+        0 6px 16px -8px color-mix(in srgb, #f8742c 40%, transparent);
+    transform: translateY(-1px);
+}
+
+/* CTA */
+.nav-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.65rem;
+    background:
+        linear-gradient(135deg, #ff8a3d 0%, #f8742c 45%, #e85d14 100%);
+    padding: 0.65rem 0.9rem;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #111827 !important;
+    cursor: pointer;
+    border: none;
+    box-shadow:
+        0 8px 20px -8px rgba(248, 116, 44, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+@media (min-width: 1280px) {
+    .nav-cta {
+        padding: 0.75rem 1.4rem;
+        font-size: 11px;
+    }
+}
+
+.nav-cta:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: brightness(1.06);
+    box-shadow:
+        0 14px 28px -10px rgba(248, 116, 44, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-cta:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Panel login collé sous la barre */
+.join-panel-inner {
+    border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+    border-top: 0;
+    border-radius: 0 0 1rem 1rem;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--bg-secondary) 94%, transparent),
+            color-mix(in srgb, var(--bg-tertiary) 88%, transparent)
+        );
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    box-shadow: 0 16px 36px -18px var(--shadow-color);
+}
+
+html.light-mode .header-container {
+    box-shadow:
+        0 12px 32px -14px rgba(15, 23, 42, 0.14),
+        0 0 0 1px color-mix(in srgb, #14b8a6 10%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+html.light-mode .nav-link.is-active {
+    background-color: color-mix(in srgb, #f8742c 10%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav-brand,
+    .nav-brand-mark,
+    .nav-link,
+    .nav-link::after,
+    .nav-icon-btn,
+    .nav-cta {
+        transition: none !important;
+    }
+
+    .nav-brand:hover .nav-brand-mark,
+    .nav-cta:hover {
+        transform: none;
     }
 }
 

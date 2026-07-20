@@ -53,7 +53,7 @@ function installEscapeHandlerOnce() {
             joinBtn.classList.remove('ring-2', 'ring-white/30');
             const headerBar = joinBtn.closest('header')?.querySelector('.header-container');
             if (headerBar) {
-                headerBar.classList.remove('rounded-b-none', 'border-b-0');
+                headerBar.classList.remove('is-panel-open');
             }
         }
 
@@ -89,7 +89,7 @@ function initJoinPanel() {
             panel.style.maxHeight = panel.scrollHeight + 'px';
             btn.classList.add('ring-2', 'ring-white/30');
             if (headerBar) {
-                headerBar.classList.add('rounded-b-none', 'border-b-0');
+                headerBar.classList.add('is-panel-open');
             }
             setTimeout(() => panel.querySelector('input')?.focus(), 300);
         }
@@ -99,7 +99,7 @@ function initJoinPanel() {
             panel.style.maxHeight = '0';
             btn.classList.remove('ring-2', 'ring-white/30');
             if (headerBar) {
-                headerBar.classList.remove('rounded-b-none', 'border-b-0');
+                headerBar.classList.remove('is-panel-open');
             }
         }
 
@@ -285,7 +285,7 @@ function bootJoinPanel() {
             btn.classList.add('ring-2', 'ring-white/30');
             const headerBar = btn.closest('header')?.querySelector('.header-container');
             if (headerBar) {
-                headerBar.classList.add('rounded-b-none', 'border-b-0');
+                headerBar.classList.add('is-panel-open');
             }
         }
 
