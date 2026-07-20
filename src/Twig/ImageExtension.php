@@ -26,15 +26,24 @@ final class ImageExtension extends AbstractExtension
     }
 
     /**
-     * Remplace .jpg/.jpeg/.png par .webp pour servir la version optimisée.
+     * Remplace .jpg/.jpeg/.png par .webp uniquement si le fichier WebP existe
+     * réellement sous public/images/{$subdir}/. Sinon conserve l'original
+     * (cas des uploads admin ré-encodés en JPEG/PNG sans variante WebP).
      */
-    public function preferWebp(?string $filename): string
+    public function preferWebp(?string $filename, string $subdir = 'articles'): string
     {
         if ($filename === null || $filename === '') {
             return '';
         }
 
-        return (string) preg_replace('/\.(jpe?g|png)$/i', '.webp', $filename);
+        if (preg_match('/\.(jpe?g|png)$/i', $filename) !== 1) {
+            return $filename;
+        }
+
+        $webp = (string) preg_replace('/\.(jpe?g|png)$/i', '.webp', $filename);
+        $path = $this->projectDir . '/public/images/' . $subdir . '/' . $webp;
+
+        return is_file($path) ? $webp : $filename;
     }
 
     /**
