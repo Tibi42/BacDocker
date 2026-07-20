@@ -125,6 +125,34 @@ class BoardGameRepositoryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testFindForBulkDeleteReturnsEmptyForEmptyIds(): void
+    {
+        $registry = $this->createMock(ManagerRegistry::class);
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->never())->method('andWhere');
+
+        $repo = $this->makeRepoWithQueryBuilder($registry, $qb);
+
+        $this->assertSame([], $repo->findForBulkDelete([]));
+    }
+
+    public function testFindForBulkDeleteFiltersAvailableNonArchived(): void
+    {
+        $registry = $this->createMock(ManagerRegistry::class);
+
+        $query = $this->createMock(Query::class);
+        $query->expects($this->once())->method('getResult')->willReturn([]);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->exactly(3))->method('andWhere')->willReturnSelf();
+        $qb->expects($this->exactly(2))->method('setParameter')->willReturnSelf();
+        $qb->expects($this->once())->method('getQuery')->willReturn($query);
+
+        $repo = $this->makeRepoWithQueryBuilder($registry, $qb);
+
+        $this->assertSame([], $repo->findForBulkDelete([1, 2, 3]));
+    }
+
     public function testFindActiveForUserBuildsQueryAndReturnsResult(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);

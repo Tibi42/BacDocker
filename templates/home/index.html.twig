@@ -41,15 +41,16 @@
 {% block importmap %}{{ importmap(['app', 'carousel.js'], { nonce: csp_nonce() }) }}{% endblock %}
 
 {% block body %}
-<h1 class="sr-only">La Boîte à Chimère — Association Ludique Parisienne</h1>
 	<!-- Hero Section avec Carousel, Header et NOS MONDES -->
-	<section id="home" class="relative w-full min-h-[600px] lg:min-h-[700px] overflow-hidden mb-12 lg:mb-0">
-		<img src="{{ asset('images/hero/hero.webp') }}" srcset="{{ asset('images/hero/hero-720.webp') }} 720w, {{ asset('images/hero/hero.webp') }} 1024w" sizes="100vw" alt="Salle de jeu de La Boîte à Chimère" width="1024" height="1024" fetchpriority="high" decoding="sync" class="absolute inset-0 h-full w-full object-cover">
-		<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+	<section id="home" class="hero relative w-full min-h-[100svh] lg:min-h-[92vh] overflow-hidden mb-12 lg:mb-0">
+		<div class="hero-media absolute inset-0" aria-hidden="true">
+			<img src="{{ asset('images/hero/hero.webp') }}" srcset="{{ asset('images/hero/hero-720.webp') }} 720w, {{ asset('images/hero/hero.webp') }} 1024w" sizes="100vw" alt="" width="1024" height="1024" fetchpriority="high" decoding="sync" class="hero-media__img absolute inset-0 h-full w-full object-cover">
+			<div class="hero-media__overlay absolute inset-0"></div>
+			<div class="hero-media__glow absolute inset-0"></div>
+			<div class="hero-media__grain absolute inset-0"></div>
+		</div>
 
 		{% set slides = carousel_slides() %}
-		{% from 'components/_activity_badge.html.twig' import badge as activity_badge %}
-	{% from 'components/_calendar_day.html.twig' import day_classes, day_text_classes %}
 
 		<!-- Données Mondes -->
 		{% set worlds = [
@@ -59,11 +60,10 @@
         ] %}
 
 		<!-- Contenu par-dessus l'image hero -->
-		<div
-			class="relative z-10">
+		<div class="relative z-10 flex min-h-[100svh] lg:min-h-[92vh] flex-col">
 			<!-- Carousel Prochain(s) événement(s) -->
-			<section class="mx-auto max-w-[1240px] px-4 sm:px-8 lg:px-10 pt-6 lg:pt-10 mb-8 lg:mb-12" id="carousel-container" aria-label="Événements à la une">
-				<div class="relative rounded-2xl border border-custom glass-card shadow-xl overflow-hidden">
+			<section class="mx-auto w-full max-w-[1240px] px-4 sm:px-8 lg:px-10 pt-5 lg:pt-8 mb-4 lg:mb-6" id="carousel-container" aria-label="Événements à la une">
+				<div class="hero-carousel relative overflow-hidden rounded-2xl">
 					<div class="overflow-hidden rounded-2xl">
 						<div id="carousel" class="flex h-auto" style="transform: translateX(0%); touch-action: pan-y;">
 							{% for slide in slides %}
@@ -97,160 +97,49 @@
 						</div>
 					</div>
 				</div>
-				<div id="carousel-events-dots" class="flex justify-center items-center gap-3 py-4 mt-2">
+				<div id="carousel-events-dots" class="flex justify-center items-center gap-3 py-3 mt-1">
 					{% for slide in slides %}
-						<button type="button" class="carousel-events-dot h-3 w-3 rounded-full transition-all bg-white/50 hover:bg-white/80" data-index="{{ loop.index0 }}" data-slide="{{ loop.index0 }}" aria-label="Aller au slide {{ loop.index }}"></button>
+						<button type="button" class="carousel-events-dot h-2.5 w-2.5 rounded-full transition-all bg-white/40 hover:bg-white/80" data-index="{{ loop.index0 }}" data-slide="{{ loop.index0 }}" aria-label="Aller au slide {{ loop.index }}"></button>
 					{% endfor %}
 				</div>
 			</section>
 
 			<!-- Header -->
-			<header class="mx-auto max-w-[1240px] lg:max-w-[1360px] px-8 lg:px-10 mb-12 lg:mb-16">
+			<header class="mx-auto w-full max-w-[1240px] lg:max-w-[1360px] px-8 lg:px-10 mb-6 lg:mb-8">
 				{{ include('partials/_navbar.html.twig') }}
 			</header>
+
+			<!-- Brand stage -->
+			<div class="hero-brand mx-auto flex w-full max-w-[1240px] flex-1 flex-col items-center justify-center px-6 pb-16 pt-4 text-center sm:px-8 lg:px-10 lg:pb-28">
+				<p class="hero-brand__eyebrow">Association ludique · Paris</p>
+				<h1 class="hero-brand__title">
+					<span class="hero-brand__title-line">La Boîte</span>
+					<span class="hero-brand__title-line hero-brand__title-line--accent">à Chimère</span>
+				</h1>
+				<p class="hero-brand__tagline">Autour de la table : jeux de rôle, société, GN&nbsp;&amp;&nbsp;figurines.</p>
+				<div class="hero-brand__actions">
+					{% if app.user %}
+						<a href="{{ path('app_user_dashboard') }}" class="hero-cta hero-cta--primary">Mon espace</a>
+					{% else %}
+						<button type="button" class="hero-cta hero-cta--primary" data-hero-join>Nous rejoindre</button>
+					{% endif %}
+					<a href="#mondes" class="hero-cta hero-cta--ghost">Nos soirées</a>
+				</div>
+			</div>
+
+			<div id="mondes" class="scroll-mt-8" aria-hidden="true"></div>
 
 <!-- ÉVÉNEMENTS À VENIR (Mobile only - inside hero for layout flow). Turbo-frame : mise à jour partielle pour ne pas fermer le menu / modales. -->
 			<turbo-frame id="calendar-frame" class="calendar-turbo-frame">
 				<div id="calendar" class="lg:hidden mx-auto max-w-[1240px] px-8 mb-8">
 					<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6">ÉVÉNEMENTS À VENIR</h2>
-					<article class="bg-custom-primary p-5 rounded-xl border border-custom relative shadow-2xl glass-card">
-						{# Navigation mois #}
-						<div class="flex items-center justify-between mb-4">
-							<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
-								{{ calendarMonthName }} {{ calendarYear }}
-							</a>
-							<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
-						</div>
-						{# Filtres par type #}
-						<div class="grid grid-cols-3 gap-2 mb-4">
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}" data-turbo-action="advance"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType is null ? 'bg-custom-orange text-gray-900' : 'bg-custom-tertiary text-text-secondary hover:text-gray-900' }}">Tous</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDS"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDS' ? 'bg-emerald-500 text-gray-900' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40' }}">JDS</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDR"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDR' ? 'bg-violet-500 text-white' : 'bg-violet-500/20 text-violet-400 hover:bg-violet-500/40' }}">JDR</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}" data-turbo-action="advance" aria-label="Filtrer par GN"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'GN' ? 'bg-red-500 text-white' : 'bg-red-500/20 text-red-400 hover:bg-red-500/40' }}">GN</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDF"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDF' ? 'bg-sky-500 text-gray-900' : 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/40' }}">JDF</a>
-							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}" data-turbo-action="advance" aria-label="Filtrer par AG"
-							   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'AG' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/40' }}">AG</a>
-						</div>
-						<div class="flex gap-4 mb-6">
-							<div class="flex-1">
-								<div class="calendar-grid grid grid-cols-7 gap-1 text-center text-sm font-bold uppercase tracking-tighter text-text-primary mb-4">
-									<span class="calendar-weekday text-text-secondary">Lu</span>
-									<span class="calendar-weekday text-text-secondary">Ma</span>
-									<span class="calendar-weekday text-text-secondary">Me</span>
-									<span class="calendar-weekday text-text-secondary">Je</span>
-									<span class="calendar-weekday text-text-secondary">Ve</span>
-									<span class="calendar-weekday text-text-secondary">Sa</span>
-									<span class="calendar-weekday text-text-secondary">Di</span>
-									{% for day in calendarDays %}
-										{% if day is not null %}
-											{% set isFuture = (calendarYear > nowYear)
-												or (calendarYear == nowYear and calendarMonth > nowMonth)
-												or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
-											{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
-											{% set isPast = not isFuture and not isToday %}
-											{% if day in daysWithActivities %}
-												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-event block py-2 rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
-													<span>{{ day }}</span>
-													{% if (activitiesCountByDay[day] ?? 1) > 1 %}
-														<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
-													{% endif %}
-												</a>
-											{% elseif isToday %}
-												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2 {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
-											{% else %}
-												<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-empty block w-full py-2 hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer {{ isPast ? 'text-text-secondary' : 'text-text-primary' }} {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
-											{% endif %}
-										{% else %}
-											<span class="py-2"></span>
-										{% endif %}
-									{% endfor %}
-								</div>
-							</div>
-						</div>
-						{% if selectedDay %}
-							<p class="text-[10px] font-bold uppercase tracking-wider text-custom-orange mb-3">
-								Événements du {{ selectedDay }} {{ calendarMonthName }}
-								{% if activitiesForSelectedDay|length > 1 %}
-									<span class="text-text-secondary font-normal">({{ activitiesForSelectedDay|length }} événements)</span>
-								{% endif %}
-							</p>
-							{% for activity in activitiesForSelectedDay %}
-							<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
-								<div class="flex justify-between items-start mb-1">
-									{% set actType = activity.type|default('Play Test') %}
-													{{ activity_badge(actType) }}
-									<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-								</div>
-								<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-								{% if activity.description %}
-									<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-								{% else %}
-									<div class="mb-2"></div>
-								{% endif %}
-								{% if activity.startAt > date() %}
-									<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
-								{% else %}
-									<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
-								{% endif %}
-							</div>
-							{% else %}
-							<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center mb-4">
-								<p class="text-xs text-text-secondary">Aucun événement ce jour-là.</p>
-							</div>
-							{% endfor %}
-							{% set selectedDayIsFuture = (calendarYear > nowYear)
-								or (calendarYear == nowYear and calendarMonth > nowMonth)
-								or (calendarYear == nowYear and calendarMonth == nowMonth and selectedDay >= nowDay) %}
-							{% if is_granted('ROLE_USER') and selectedDayIsFuture %}
-								<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(selectedDay)}) }}"
-								   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
-									+ Ajouter une activité
-								</button>
-							{% elseif not is_granted('ROLE_USER') and selectedDayIsFuture %}
-								<p class="text-[10px] text-text-secondary text-center mt-3">
-									<a href="{{ path('app_home', { open: 'login' }) }}" data-turbo="false" class="text-custom-orange font-bold uppercase tracking-wider hover:underline">Connectez-vous</a>
-									pour proposer une activité.
-								</p>
-							{% endif %}
-						{% else %}
-							{% for activity in activities %}
-							<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom mb-4 last:mb-0">
-								<div class="flex justify-between items-start mb-1">
-									{% set actType = activity.type|default('Play Test') %}
-													{{ activity_badge(actType) }}
-									<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-								</div>
-								<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-								{% if activity.description %}
-									<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-								{% else %}
-									<div class="mb-2"></div>
-								{% endif %}
-								{% if activity.startAt > date() %}
-									<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer">S'INSCRIRE</button>
-								{% else %}
-									<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed">TERMINÉ</span>
-								{% endif %}
-							</div>
-							{% else %}
-							<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center">
-								<p class="text-xs text-text-secondary">Aucun événement ce mois-ci. Cliquez sur un jour du calendrier pour voir les événements.</p>
-							</div>
-							{% endfor %}
-						{% endif %}
-					</article>
+					{{ include('components/_calendar_panel.html.twig', { layout: 'mobile' }) }}
 				</div>
 			</turbo-frame>
 			<!-- NOS MONDES (Mobile only variant) -->
 			<div class="lg:hidden bg-custom-primary border-t border-custom">
 				<section class="mx-auto max-w-[1240px] px-8 py-12">
-					<h2 class="text-3xl font-bold uppercase tracking-[0.2em] text-text-primary mb-8 text-center">ASSOCIATION LUDIQUE PARISIENNE</h2>
+					<h2 class="text-3xl font-bold uppercase tracking-[0.2em] text-text-primary mb-8 text-center">Nos soirées</h2>
 					<div class="grid gap-6">
 						{% for world in worlds %}
 							<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}-mobile" class="group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg">
@@ -273,8 +162,8 @@
 	</section>
 
 	<!-- NOS MONDES (Desktop only) -->
-	<section class="hidden lg:block relative z-30 mx-auto max-w-[1240px] px-8 lg:px-10 lg:-mt-44 mb-20">
-		<h2 class="text-3xl lg:text-4xl font-bold uppercase tracking-[0.2em] text-text-primary mb-16 text-center">ASSOCIATION LUDIQUE PARISIENNE</h2>
+	<section class="hidden lg:block relative z-30 mx-auto max-w-[1240px] px-8 lg:px-10 lg:-mt-28 mb-20">
+		<h2 class="text-3xl lg:text-4xl font-bold uppercase tracking-[0.2em] text-text-primary mb-16 text-center">Nos soirées</h2>
 		<div class="grid gap-6 lg:grid-cols-3">
 			{% for world in worlds %}
 				<a href="{{ path(world.route) }}" data-turbo="false" id="{{ world.id }}" class="reveal delay-{{ loop.index }}00 card-premium group relative aspect-[1.8/1] overflow-hidden rounded-xl bg-custom-tertiary shadow-lg border border-custom">
@@ -308,155 +197,7 @@
 					<turbo-frame id="calendar-desktop-frame" class="calendar-turbo-frame">
 						<div class="hidden lg:block">
 							<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8">ÉVÉNEMENTS À VENIR</h2>
-							<article class="bg-custom-primary p-5 lg:p-6 rounded-xl border border-custom relative shadow-2xl glass-card">
-								{# Navigation mois #}
-								<div class="flex items-center justify-between mb-4">
-									<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">&larr; {{ prevMonthName }}</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-primary hover:text-custom-orange transition-colors" title="Afficher toutes les activités du mois">
-										{{ calendarMonthName }} {{ calendarYear }}
-									</a>
-									<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}" data-turbo-action="advance" class="text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors">{{ nextMonthName }} &rarr;</a>
-								</div>
-								{# Filtres par type #}
-								<div class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}" data-turbo-action="advance"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType is null ? 'bg-custom-orange text-gray-900' : 'bg-custom-tertiary text-text-secondary hover:text-gray-900' }}">Tous</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDS"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDS' ? 'bg-emerald-500 text-gray-900' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40' }}">JDS</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDR"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDR' ? 'bg-violet-500 text-white' : 'bg-violet-500/20 text-violet-400 hover:bg-violet-500/40' }}">JDR</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}" data-turbo-action="advance" aria-label="Filtrer par GN"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'GN' ? 'bg-red-500 text-white' : 'bg-red-500/20 text-red-400 hover:bg-red-500/40' }}">GN</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}" data-turbo-action="advance" aria-label="Filtrer par JDF"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'JDF' ? 'bg-sky-500 text-gray-900' : 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/40' }}">JDF</a>
-									<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}" data-turbo-action="advance" aria-label="Filtrer par AG"
-									   class="px-3 py-2.5 rounded text-[10px] font-bold uppercase tracking-wider text-center transition-all {{ filterType == 'AG' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/40' }}">AG</a>
-								</div>
-								<div class="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-									<!-- Left Column: Calendar Grid -->
-									<div class="lg:col-span-7">
-										<div class="flex gap-4">
-											<div class="flex-1">
-												<div class="calendar-grid grid grid-cols-7 gap-1 lg:gap-2 text-center text-sm lg:text-base font-bold uppercase tracking-tighter text-text-primary mb-4">
-													<span class="calendar-weekday text-text-secondary">Lu</span>
-													<span class="calendar-weekday text-text-secondary">Ma</span>
-													<span class="calendar-weekday text-text-secondary">Me</span>
-													<span class="calendar-weekday text-text-secondary">Je</span>
-													<span class="calendar-weekday text-text-secondary">Ve</span>
-													<span class="calendar-weekday text-text-secondary">Sa</span>
-													<span class="calendar-weekday text-text-secondary">Di</span>
-													{% for day in calendarDays %}
-														{% if day is not null %}
-															{% set isFuture = (calendarYear > nowYear)
-																or (calendarYear == nowYear and calendarMonth > nowMonth)
-																or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
-															{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
-															{% set isPast = not isFuture and not isToday %}
-															{% if day in daysWithActivities %}
-																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-event block py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center rounded {{ day_classes(activitiesTypesByDay[day]|default(''), isPast) }} {{ day_text_classes(activitiesTypesByDay[day]|default(''), isPast) }} shadow-lg hover:ring-2 hover:ring-custom-orange/60 transition-all  {{ selectedDay == day ? 'ring-2 ring-custom-orange' : ''  }}" title="{{ activitiesCountByDay[day] ?? 1 }} événement(s)">
-																	<span>{{ day }}</span>
-																	{% if (activitiesCountByDay[day] ?? 1) > 1 %}
-																		<span class="block text-[8px] opacity-90">{{ activitiesCountByDay[day] }}</span>
-																	{% endif %}
-																</a>
-															{% elseif isToday %}
-																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer text-custom-orange font-bold underline underline-offset-2 {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
-															{% else %}
-																<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}" data-turbo-action="advance" class="calendar-day-empty block w-full py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center hover:text-custom-orange hover:bg-custom-orange/10 rounded transition-colors cursor-pointer {{ isPast ? 'text-text-secondary' : 'text-text-primary' }} {{ selectedDay == day ? 'ring-2 ring-custom-orange' : '' }}" title="Voir ce jour">{{ day }}</a>
-															{% endif %}
-														{% else %}
-															<span class="py-2 lg:h-16 lg:flex lg:flex-col lg:justify-center lg:items-center"></span>
-														{% endif %}
-													{% endfor %}
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<!-- Right Column: Events List -->
-									<div class="lg:col-span-5 mt-6 lg:mt-0">
-										{% if selectedDay %}
-											<p class="text-[10px] font-bold uppercase tracking-wider text-custom-orange mb-3">
-												Événements du {{ selectedDay }} {{ calendarMonthName }}
-												{% if activitiesForSelectedDay|length > 1 %}
-													<span class="text-text-secondary font-normal">({{ activitiesForSelectedDay|length }} événements)</span>
-												{% endif %}
-											</p>
-											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
-												{% for activity in activitiesForSelectedDay %}
-												<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom flex flex-col justify-between">
-													<div>
-														<div class="flex justify-between items-start mb-1">
-															{% set actType = activity.type|default('Play Test') %}
-																	{{ activity_badge(actType) }}
-															<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-														</div>
-														<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-														{% if activity.description %}
-															<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-														{% else %}
-															<div class="mb-2"></div>
-														{% endif %}
-													</div>
-													{% if activity.startAt > date() %}
-														<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer mt-3">S'INSCRIRE</button>
-													{% else %}
-														<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed mt-3">TERMINÉ</span>
-													{% endif %}
-												</div>
-												{% else %}
-												<div class="col-span-full rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center">
-													<p class="text-xs text-text-secondary">Aucun événement ce jour-là.</p>
-												</div>
-												{% endfor %}
-											</div>
-											{% set selectedDayIsFuture = (calendarYear > nowYear)
-												or (calendarYear == nowYear and calendarMonth > nowMonth)
-												or (calendarYear == nowYear and calendarMonth == nowMonth and selectedDay >= nowDay) %}
-											{% if is_granted('ROLE_USER') and selectedDayIsFuture %}
-												<button type="button" data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(selectedDay)}) }}"
-												   class="inline-flex w-full justify-center rounded-lg border-2 border-dashed border-custom-orange/50 py-3 mt-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:bg-custom-orange/10 transition-all cursor-pointer">
-													+ Ajouter une activité
-												</button>
-											{% elseif not is_granted('ROLE_USER') and selectedDayIsFuture %}
-												<p class="text-[10px] text-text-secondary text-center mt-3">
-													<a href="{{ path('app_home', { open: 'login' }) }}" data-turbo="false" class="text-custom-orange font-bold uppercase tracking-wider hover:underline">Connectez-vous</a>
-													pour proposer une activité.
-												</p>
-											{% endif %}
-										{% else %}
-											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
-												{% for activity in activities %}
-												<div class="rounded-xl bg-custom-secondary/40 p-4 border border-custom flex flex-col justify-between">
-													<div>
-														<div class="flex justify-between items-start mb-1">
-															{% set actType = activity.type|default('Play Test') %}
-																	{{ activity_badge(actType) }}
-															<span class="font-bold text-text-primary text-base">{{ activity.startAt|date('j M')|upper }}</span>
-														</div>
-														<h3 class="font-bold text-text-primary text-xs mb-1 leading-snug">{{ activity.title }}</h3>
-														{% if activity.description %}
-															<p class="text-xs text-text-secondary mb-3 leading-relaxed line-clamp-3">{{ activity.description }}</p>
-														{% else %}
-															<div class="mb-2"></div>
-														{% endif %}
-													</div>
-													{% if activity.startAt > date() %}
-														<button type="button" data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}" class="inline-flex w-full justify-center rounded bg-custom-orange py-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-900 transition-all hover:bg-orange-600 cursor-pointer mt-3">S'INSCRIRE</button>
-													{% else %}
-														<span class="inline-flex w-full justify-center rounded bg-custom-tertiary py-2 text-[10px] font-extrabold uppercase tracking-widest text-text-secondary cursor-not-allowed mt-3">TERMINÉ</span>
-													{% endif %}
-												</div>
-												{% else %}
-												<div class="col-span-full rounded-xl bg-custom-secondary/40 p-4 border border-custom text-center">
-													<p class="text-xs text-text-secondary">Aucun événement ce mois-ci. Cliquez sur un jour pour voir les événements.</p>
-												</div>
-												{% endfor %}
-											</div>
-										{% endif %}
-									</div>
-								</div>
-							</article>
+							{{ include('components/_calendar_panel.html.twig', { layout: 'desktop' }) }}
 						</div>
 					</turbo-frame>
 

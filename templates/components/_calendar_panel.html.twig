@@ -1,0 +1,227 @@
+{#
+  Panneau calendrier (mobile + desktop).
+  Variables attendues : celles de HomeController + layout ('mobile'|'desktop')
+#}
+{% from 'components/_activity_badge.html.twig' import badge as activity_badge %}
+{% from 'components/_calendar_day.html.twig' import day_classes %}
+
+{% set isDesktop = layout == 'desktop' %}
+
+<article class="calendar-panel relative overflow-hidden rounded-2xl border border-custom glass-card shadow-2xl">
+	{# Halo décoratif #}
+	<div class="calendar-panel__glow pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full opacity-40" aria-hidden="true"></div>
+	<div class="calendar-panel__glow calendar-panel__glow--soft pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full opacity-25" aria-hidden="true"></div>
+
+	<div class="relative {{ isDesktop ? 'p-6 lg:p-8' : 'p-5' }}">
+		{# Navigation mois #}
+		<nav class="calendar-nav mb-5 flex items-center justify-between gap-3" aria-label="Navigation du mois">
+			<a href="{{ path('app_home', { month: prevMonth, year: prevYear, type: filterType }) }}"
+			   data-turbo-action="advance"
+			   class="calendar-nav__btn"
+			   aria-label="Mois précédent : {{ prevMonthName }}">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+				</svg>
+				<span class="hidden sm:inline">{{ prevMonthName }}</span>
+			</a>
+
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: 0, type: filterType }) }}"
+			   data-turbo-action="advance"
+			   class="calendar-nav__title group text-center"
+			   title="Afficher toutes les activités du mois">
+				<span class="block text-[10px] font-bold uppercase tracking-[0.25em] text-custom-orange/80 group-hover:text-custom-orange transition-colors">Agenda</span>
+				<span class="mt-0.5 block text-lg font-extrabold uppercase tracking-[0.12em] text-text-primary group-hover:text-custom-orange transition-colors sm:text-xl">
+					{{ calendarMonthName }}
+					<span class="font-semibold text-text-secondary">{{ calendarYear }}</span>
+				</span>
+			</a>
+
+			<a href="{{ path('app_home', { month: nextMonth, year: nextYear, type: filterType }) }}"
+			   data-turbo-action="advance"
+			   class="calendar-nav__btn calendar-nav__btn--next"
+			   aria-label="Mois suivant : {{ nextMonthName }}">
+				<span class="hidden sm:inline">{{ nextMonthName }}</span>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+				</svg>
+			</a>
+		</nav>
+
+		{# Filtres par type #}
+		<div class="calendar-filters mb-6 grid grid-cols-3 {{ isDesktop ? 'md:grid-cols-6' : '' }} gap-2" role="group" aria-label="Filtrer par type d'activité">
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear }) }}"
+			   data-turbo-action="advance"
+			   class="calendar-filter {{ filterType is null ? 'is-active calendar-filter--all' : '' }}">Tous</a>
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDS' }) }}"
+			   data-turbo-action="advance"
+			   aria-label="Filtrer par JDS"
+			   class="calendar-filter calendar-filter--jds {{ filterType == 'JDS' ? 'is-active' : '' }}">JDS</a>
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDR' }) }}"
+			   data-turbo-action="advance"
+			   aria-label="Filtrer par JDR"
+			   class="calendar-filter calendar-filter--jdr {{ filterType == 'JDR' ? 'is-active' : '' }}">JDR</a>
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'GN' }) }}"
+			   data-turbo-action="advance"
+			   aria-label="Filtrer par GN"
+			   class="calendar-filter calendar-filter--gn {{ filterType == 'GN' ? 'is-active' : '' }}">GN</a>
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'JDF' }) }}"
+			   data-turbo-action="advance"
+			   aria-label="Filtrer par JDF"
+			   class="calendar-filter calendar-filter--jdf {{ filterType == 'JDF' ? 'is-active' : '' }}">JDF</a>
+			<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, type: 'AG' }) }}"
+			   data-turbo-action="advance"
+			   aria-label="Filtrer par AG"
+			   class="calendar-filter calendar-filter--ag {{ filterType == 'AG' ? 'is-active' : '' }}">AG</a>
+		</div>
+
+		{% set calendarGrid %}
+			<div class="calendar-grid grid grid-cols-7 gap-1.5 {{ isDesktop ? 'lg:gap-2' : '' }} text-center">
+				<span class="calendar-weekday">Lu</span>
+				<span class="calendar-weekday">Ma</span>
+				<span class="calendar-weekday">Me</span>
+				<span class="calendar-weekday">Je</span>
+				<span class="calendar-weekday">Ve</span>
+				<span class="calendar-weekday">Sa</span>
+				<span class="calendar-weekday">Di</span>
+				{% for day in calendarDays %}
+					{% if day is not null %}
+						{% set isFuture = (calendarYear > nowYear)
+							or (calendarYear == nowYear and calendarMonth > nowMonth)
+							or (calendarYear == nowYear and calendarMonth == nowMonth and day > nowDay) %}
+						{% set isToday = (calendarYear == nowYear and calendarMonth == nowMonth and day == nowDay) %}
+						{% set isPast = not isFuture and not isToday %}
+						{% set isSelected = selectedDay == day %}
+						{% set dayCount = activitiesCountByDay[day] ?? 1 %}
+						{% set actType = activitiesTypesByDay[day]|default('') %}
+
+						{% if day in daysWithActivities %}
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}"
+							   data-turbo-action="advance"
+							   class="calendar-day calendar-day-event {{ day_classes(actType, isPast) }} {{ isToday ? 'is-today' : '' }} {{ isSelected ? 'is-selected' : '' }} {{ isDesktop ? 'lg:h-16' : '' }}"
+							   title="{{ dayCount }} événement(s)">
+								<span class="calendar-day__num">{{ day }}</span>
+								{% if dayCount > 1 %}
+									<span class="calendar-day__count">{{ dayCount }}</span>
+								{% else %}
+									<span class="calendar-day__dot" aria-hidden="true"></span>
+								{% endif %}
+							</a>
+						{% else %}
+							<a href="{{ path('app_home', { month: calendarMonth, year: calendarYear, day: day, type: filterType }) }}"
+							   data-turbo-action="advance"
+							   class="calendar-day calendar-day-empty {{ isToday ? 'is-today' : '' }} {{ isPast ? 'is-past' : '' }} {{ isSelected ? 'is-selected' : '' }} {{ isDesktop ? 'lg:h-16' : '' }}"
+							   title="Voir ce jour">
+								<span class="calendar-day__num">{{ day }}</span>
+							</a>
+						{% endif %}
+					{% else %}
+						<span class="calendar-day calendar-day--spacer {{ isDesktop ? 'lg:h-16' : '' }}" aria-hidden="true"></span>
+					{% endif %}
+				{% endfor %}
+			</div>
+		{% endset %}
+
+		{% set eventsList %}
+			{% if selectedDay %}
+				<p class="calendar-events__label mb-3">
+					<span class="text-custom-orange">{{ selectedDay }} {{ calendarMonthName }}</span>
+					{% if activitiesForSelectedDay|length > 1 %}
+						<span class="text-text-secondary font-normal normal-case tracking-normal"> · {{ activitiesForSelectedDay|length }} événements</span>
+					{% endif %}
+				</p>
+				<div class="{{ isDesktop ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3' : 'space-y-3' }}">
+					{% for activity in activitiesForSelectedDay %}
+						{% set actType = activity.type|default('Play Test') %}
+						<div class="calendar-event-card calendar-event-card--{{ actType|lower|replace({' ': '-'}) }}">
+							<div class="flex justify-between items-start gap-2 mb-2">
+								{{ activity_badge(actType) }}
+								<time class="calendar-event-card__date" datetime="{{ activity.startAt|date('Y-m-d') }}">{{ activity.startAt|date('j M')|upper }}</time>
+							</div>
+							<h3 class="calendar-event-card__title">{{ activity.title }}</h3>
+							{% if activity.description %}
+								<p class="calendar-event-card__desc">{{ activity.description }}</p>
+							{% endif %}
+							{% if activity.startAt > date() %}
+								<button type="button"
+										data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}"
+										class="calendar-event-card__cta">S'inscrire</button>
+							{% else %}
+								<span class="calendar-event-card__cta calendar-event-card__cta--done">Terminé</span>
+							{% endif %}
+						</div>
+					{% else %}
+						<div class="calendar-event-card calendar-event-card--empty {{ isDesktop ? 'col-span-full' : '' }}">
+							<p class="text-sm text-text-secondary text-center">Aucun événement ce jour-là.</p>
+						</div>
+					{% endfor %}
+				</div>
+				{% set selectedDayIsFuture = (calendarYear > nowYear)
+					or (calendarYear == nowYear and calendarMonth > nowMonth)
+					or (calendarYear == nowYear and calendarMonth == nowMonth and selectedDay >= nowDay) %}
+				{% if is_granted('ROLE_USER') and selectedDayIsFuture %}
+					<button type="button"
+							data-modal-url="{{ path('app_activity_new_public', {date: calendarYear ~ '-' ~ '%02d'|format(calendarMonth) ~ '-' ~ '%02d'|format(selectedDay)}) }}"
+							class="calendar-add-btn">
+						+ Ajouter une activité
+					</button>
+				{% elseif not is_granted('ROLE_USER') and selectedDayIsFuture %}
+					<p class="mt-4 text-center text-[11px] text-text-secondary">
+						<a href="{{ path('app_home', { open: 'login' }) }}" data-turbo="false" class="font-bold uppercase tracking-wider text-custom-orange hover:underline">Connectez-vous</a>
+						pour proposer une activité.
+					</p>
+				{% endif %}
+			{% else %}
+				<p class="calendar-events__label mb-3">
+					<span class="text-custom-orange">Ce mois</span>
+					{% if activities|length > 0 %}
+						<span class="text-text-secondary font-normal normal-case tracking-normal"> · {{ activities|length }} à venir</span>
+					{% endif %}
+				</p>
+				<div class="{{ isDesktop ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3' : 'space-y-3' }}">
+					{% for activity in activities %}
+						{% set actType = activity.type|default('Play Test') %}
+						<div class="calendar-event-card calendar-event-card--{{ actType|lower|replace({' ': '-'}) }}">
+							<div class="flex justify-between items-start gap-2 mb-2">
+								{{ activity_badge(actType) }}
+								<time class="calendar-event-card__date" datetime="{{ activity.startAt|date('Y-m-d') }}">{{ activity.startAt|date('j M')|upper }}</time>
+							</div>
+							<h3 class="calendar-event-card__title">{{ activity.title }}</h3>
+							{% if activity.description %}
+								<p class="calendar-event-card__desc">{{ activity.description }}</p>
+							{% endif %}
+							{% if activity.startAt > date() %}
+								<button type="button"
+										data-modal-url="{{ path('app_activity_register', { id: activity.id }) }}"
+										class="calendar-event-card__cta">S'inscrire</button>
+							{% else %}
+								<span class="calendar-event-card__cta calendar-event-card__cta--done">Terminé</span>
+							{% endif %}
+						</div>
+					{% else %}
+						<div class="calendar-event-card calendar-event-card--empty {{ isDesktop ? 'col-span-full' : '' }}">
+							<p class="text-sm text-text-secondary text-center">Aucun événement ce mois-ci. Cliquez sur un jour pour explorer.</p>
+						</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endset %}
+
+		{% if isDesktop %}
+			<div class="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+				<div class="lg:col-span-7">
+					{{ calendarGrid }}
+				</div>
+				<div class="calendar-events lg:col-span-5 mt-6 lg:mt-0">
+					{{ eventsList }}
+				</div>
+			</div>
+		{% else %}
+			<div class="mb-6">
+				{{ calendarGrid }}
+			</div>
+			<div class="calendar-events">
+				{{ eventsList }}
+			</div>
+		{% endif %}
+	</div>
+</article>

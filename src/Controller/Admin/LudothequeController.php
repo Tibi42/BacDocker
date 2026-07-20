@@ -283,6 +283,63 @@ class LudothequeController extends AbstractController
         return $this->redirectToRoute('app_admin_ludotheque_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Supprime définitivement plusieurs jeux disponibles en une seule action.
+     */
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $redirectParams = $this->redirectParams($request);
+
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $rawIds = $request->request->all('ids');
+        if (!\is_array($rawIds)) {
+            $rawIds = [];
+        }
+
+        $ids = [];
+        foreach ($rawIds as $rawId) {
+            $id = filter_var($rawId, \FILTER_VALIDATE_INT);
+            if ($id !== false && $id > 0) {
+                $ids[] = $id;
+            }
+        }
+        $ids = array_values(array_unique($ids));
+
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun jeu sélectionné.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $games = $this->boardGameRepository->findForBulkDelete($ids);
+        foreach ($games as $boardGame) {
+            $this->deleteImageFile($boardGame->getImage());
+            $this->entityManager->remove($boardGame);
+        }
+
+        if ($games !== []) {
+            $this->entityManager->flush();
+        }
+
+        $deletedCount = \count($games);
+        if ($deletedCount > 0) {
+            $this->addFlash(
+                'success',
+                sprintf('%d jeu%s supprimé%s.', $deletedCount, $deletedCount > 1 ? 'x' : '', $deletedCount > 1 ? 's' : '')
+            );
+        } else {
+            $this->addFlash('error', 'Aucun jeu disponible à supprimer dans la sélection.');
+        }
+
+        return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{id}/modifier', name: 'edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, BoardGame $boardGame, ReviewRepository $reviewRepository): Response
     {

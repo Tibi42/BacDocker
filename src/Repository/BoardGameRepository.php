@@ -125,6 +125,31 @@ class BoardGameRepository extends ServiceEntityRepository
     }
 
     /**
+     * Jeux éligibles à une suppression en masse (disponibles, non archivés).
+     *
+     * @param list<int> $ids
+     * @return list<BoardGame>
+     */
+    public function findForBulkDelete(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        /** @var list<BoardGame> $games */
+        $games = $this->createQueryBuilder('b')
+            ->andWhere('b.id IN (:ids)')
+            ->andWhere('b.archived = false')
+            ->andWhere('b.status = :status')
+            ->setParameter('ids', $ids)
+            ->setParameter('status', BoardGame::STATUS_AVAILABLE)
+            ->getQuery()
+            ->getResult();
+
+        return $games;
+    }
+
+    /**
      * Retourne le jeu actuellement pending/loaned pour cet utilisateur, s'il en a un.
      * Utilisé pour interdire à un membre d'avoir plus d'un jeu actif en même temps.
      */
@@ -135,6 +160,9 @@ class BoardGameRepository extends ServiceEntityRepository
             ->andWhere('b.borrower = :user')
             ->setParameter('statuses', [BoardGame::STATUS_PENDING, BoardGame::STATUS_LOANED])
             ->setParameter('user', $user)
+            ->orderBy('b.returnDueAt', 'ASC')
+            ->addOrderBy('b.id', 'ASC')
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }

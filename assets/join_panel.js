@@ -4,6 +4,8 @@
  * (sinon un clic peut ouvrir puis refermer dans le même tick).
  */
 
+import { openMobileMenu } from './mobile_menu.js';
+
 export function isShortMobileViewport() {
     return window.innerWidth < 1024 && window.innerHeight < 900;
 }
@@ -295,20 +297,40 @@ function bootJoinPanel() {
         if (isShortMobileViewport()) {
             openLoginModal();
         } else {
-            const drawer = document.getElementById('mobile-menu-drawer');
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileForm = document.getElementById('mobile-join-form');
             const mobileBtn = document.getElementById('mobile-join-btn');
-            if (drawer && mobileMenuBtn && mobileForm && mobileBtn) {
-                drawer.classList.remove('pointer-events-none');
-                drawer.classList.add('menu-open');
-                mobileMenuBtn.classList.add('hidden');
-                document.body.style.overflow = 'hidden';
+            if (mobileForm && mobileBtn) {
+                openMobileMenu();
                 mobileForm.style.maxHeight = mobileForm.scrollHeight + 'px';
                 mobileBtn.classList.add('ring-2', 'ring-white/30');
             }
         }
     }
+
+    // CTA hero « Nous rejoindre »
+    document.querySelectorAll('[data-hero-join]').forEach((heroBtn) => {
+        if (heroBtn.dataset.heroJoinInit === '1') {
+            return;
+        }
+        heroBtn.dataset.heroJoinInit = '1';
+        heroBtn.addEventListener('click', () => {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('join-btn')?.click();
+                return;
+            }
+            if (isShortMobileViewport()) {
+                openLoginModal();
+                return;
+            }
+            const mobileJoinBtn = document.getElementById('mobile-join-btn');
+            if (mobileJoinBtn) {
+                openMobileMenu();
+                mobileJoinBtn.click();
+                return;
+            }
+            openLoginModal();
+        });
+    });
 }
 
 if (document.readyState === 'loading') {

@@ -1,58 +1,84 @@
 /**
- * Initialise le menu de navigation mobile (drawer / tiroir latéral).
+ * Menu de navigation mobile (drawer / tiroir latéral).
  *
- * - Réinitialise toujours l'état fermé au chargement (Turbo peut restaurer
- *   un état ouvert depuis son cache).
- * - Garde anti-double-init via dataset.menuInit pour éviter l'empilement
- *   de listeners sur DOMContentLoaded + turbo:load.
+ * Délégation d'événements au document : résiste au cache Turbo
+ * (sinon dataset.menuInit bloquait le re-bind et le burger ne faisait plus rien).
+ *
+ * - Réinitialise l'état fermé sur turbo:load / turbo:before-cache.
  * - Bloque le scroll du body quand le menu est ouvert.
- * - Ferme le menu au clic sur l'overlay ou sur un lien de navigation.
- *
- * Layout : colonne flex avec nav scrollable + pied de page fixe
- * (déconnexion / copyright) — plus besoin de déplacer le DOM.
+ * - Ferme au clic overlay, lien de nav, ou Escape.
  */
-function initMobileMenu() {
+
+let isOpen = false;
+let listenersBound = false;
+
+export function openMobileMenu() {
     const btn = document.getElementById('mobile-menu-btn');
     const drawer = document.getElementById('mobile-menu-drawer');
-
     if (!btn || !drawer) return;
 
-    // Toujours réinitialiser l'état au chargement (Turbo peut restaurer un état ouvert depuis le cache)
-    btn.classList.remove('hidden');
+    isOpen = true;
+    drawer.classList.remove('pointer-events-none');
+    drawer.classList.add('menu-open');
+    btn.classList.add('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+export function closeMobileMenu() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const drawer = document.getElementById('mobile-menu-drawer');
+    if (!drawer) return;
+
+    isOpen = false;
     drawer.classList.remove('menu-open');
     drawer.classList.add('pointer-events-none');
+    btn?.classList.remove('hidden');
     document.body.style.overflow = '';
+}
 
-    if (btn.dataset.menuInit) return;
-    btn.dataset.menuInit = '1';
+function resetMobileMenu() {
+    closeMobileMenu();
+}
 
-    let isOpen = false;
-
-    function open() {
-        isOpen = true;
-        drawer.classList.remove('pointer-events-none');
-        drawer.classList.add('menu-open');
-        btn.classList.add('hidden');
-        document.body.style.overflow = 'hidden';
+function onDocumentClick(e) {
+    if (e.target.closest('#mobile-menu-btn')) {
+        e.stopPropagation();
+        if (isOpen) {
+            closeMobileMenu();
+        } else {
+            openMobileMenu();
+        }
+        return;
     }
 
-    function close() {
-        isOpen = false;
-        drawer.classList.remove('menu-open');
-        drawer.classList.add('pointer-events-none');
-        btn.classList.remove('hidden');
-        document.body.style.overflow = '';
+    if (e.target.closest('#mobile-menu-overlay')) {
+        closeMobileMenu();
+        return;
     }
 
-    btn.addEventListener('click', (e) => { e.stopPropagation(); isOpen ? close() : open(); });
-    document.getElementById('mobile-menu-overlay')?.addEventListener('click', close);
-    document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.addEventListener('click', close);
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isOpen) close();
-    });
+    if (e.target.closest('.mobile-nav-link')) {
+        closeMobileMenu();
+    }
+}
+
+function onDocumentKeydown(e) {
+    if (e.key === 'Escape' && isOpen) {
+        closeMobileMenu();
+    }
+}
+
+function bindListenersOnce() {
+    if (listenersBound) return;
+    listenersBound = true;
+    document.addEventListener('click', onDocumentClick);
+    document.addEventListener('keydown', onDocumentKeydown);
+}
+
+function initMobileMenu() {
+    bindListenersOnce();
+    resetMobileMenu();
 }
 
 document.addEventListener('DOMContentLoaded', initMobileMenu);
 document.addEventListener('turbo:load', initMobileMenu);
+document.addEventListener('turbo:before-cache', resetMobileMenu);
