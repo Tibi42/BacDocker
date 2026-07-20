@@ -1,4 +1,4 @@
-{{ form_start(form, { action: form_action, attr: { class: 'space-y-4', 'data-turbo': 'false' } }) }}
+{{ form_start(form, { action: form_action, attr: { class: 'space-y-4', 'data-turbo': 'false', 'data-article-form-target': 'form' } }) }}
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 		<div>
 			{{ form_label(form.position) }}
@@ -7,23 +7,23 @@
 		</div>
 		<div>
 			{{ form_label(form.tag) }}
-			{{ form_widget(form.tag) }}
+			{{ form_widget(form.tag, { attr: { 'data-article-form-target': 'tagInput', 'data-action': 'input->article-form#updateTag' } }) }}
 			<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.tag) }}</div>
 		</div>
 	</div>
 	<div>
 		{{ form_label(form.title) }}
-		{{ form_widget(form.title) }}
+		{{ form_widget(form.title, { attr: { 'data-article-form-target': 'titleInput', 'data-action': 'input->article-form#updateTitle' } }) }}
 		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.title) }}</div>
 	</div>
 	<div>
 		{{ form_label(form.imageFile) }}
-		{{ form_widget(form.imageFile) }}
+		{{ form_widget(form.imageFile, { attr: { 'data-article-form-target': 'imageInput', 'data-action': 'change->article-form#updateImagePreview' } }) }}
 		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.imageFile) }}</div>
 	</div>
 	<div>
 		{{ form_label(form.galleryFiles) }}
-		{{ form_widget(form.galleryFiles) }}
+		{{ form_widget(form.galleryFiles, { attr: { 'data-article-form-target': 'galleryInput', 'data-action': 'change->article-form#updateGalleryFromInput' } }) }}
 		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.galleryFiles) }}</div>
 	</div>
 
@@ -36,7 +36,7 @@
 					<div class="relative group rounded-lg border border-custom bg-custom-secondary p-2 flex flex-col items-center">
 						<img src="{{ asset('images/articles/' ~ img) }}" alt="Galerie image" class="h-20 w-20 object-cover rounded-md mb-2 border border-custom">
 						<label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold uppercase text-text-secondary hover:text-text-primary">
-							<input type="checkbox" name="delete_gallery_images[]" value="{{ img }}" class="rounded border-custom bg-custom-secondary text-custom-orange focus:ring-custom-orange focus:ring-1">
+							<input type="checkbox" name="delete_gallery_images[]" value="{{ img }}" data-action="change->article-form#toggleExistingGalleryImage" class="rounded border-custom bg-custom-secondary text-custom-orange focus:ring-custom-orange focus:ring-1">
 							Supprimer
 						</label>
 					</div>
@@ -55,10 +55,10 @@
 	</div>
 	<div>
 		{{ form_label(form.content) }}
-		<div id="editor-container" class="rounded-lg border border-custom bg-custom-secondary text-text-primary min-h-[400px] mb-2">
+		<div data-article-form-target="editor" class="rounded-lg border border-custom bg-custom-secondary text-text-primary min-h-[400px] mb-2">
 			{{ form.content.vars.value|sanitize_html }}
 		</div>
-		{{ form_widget(form.content) }}
+		{{ form_widget(form.content, { attr: { class: 'hidden-content-editor hidden', style: 'display:none', 'data-article-form-target': 'contentInput' } }) }}
 		<div class="text-amber-400 text-xs mt-1">{{ form_errors(form.content) }}</div>
 		{% if form.content.vars.help is defined and form.content.vars.help %}
 			{{ form_help(form.content) }}

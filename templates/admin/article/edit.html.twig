@@ -38,14 +38,13 @@
 		}
 	</style>
 
-	<div class="min-h-screen mx-auto max-w-[1240px] px-4 sm:px-8 py-8">
+	<div class="min-h-screen mx-auto max-w-[1240px] px-4 sm:px-8 py-8" data-controller="article-form">
 		<a href="{{ path('app_admin_article_index') }}" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary hover:text-custom-orange transition-colors mb-6">
 			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
 			Retour aux articles
 		</a>
 
 		<div class="flex flex-col xl:flex-row gap-8 items-start">
-			<!-- Formulaire de modification -->
 			<div class="w-full xl:w-7/12 rounded-2xl border border-custom bg-custom-secondary p-6 lg:p-8 shadow-2xl glass-card">
 				<h1 class="text-xl font-bold text-text-primary uppercase tracking-wide mb-6">Modifier l'article</h1>
 				<div class="mb-6 p-4 rounded-xl bg-custom-tertiary/50 border border-custom">
@@ -58,49 +57,46 @@
 				{{ include('admin/article/_form.html.twig', { form: form, button_label: 'Enregistrer', form_action: path('app_admin_article_edit', { id: article.id }) }) }}
 			</div>
 
-			<!-- Panneau d'aperçu en direct -->
 			<div class="w-full xl:w-5/12 xl:sticky xl:top-8 rounded-2xl border border-custom bg-custom-secondary p-6 shadow-2xl glass-card">
 				<div class="flex items-center justify-between mb-6 border-b border-custom pb-4">
 					<h2 class="text-xs font-bold text-text-primary uppercase tracking-wider">Aperçu en direct</h2>
 					<div class="flex bg-custom-tertiary rounded-lg p-0.5 border border-custom">
-						<button type="button" id="btn-preview-card" class="px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-custom-orange text-gray-900 shadow transition-all">Format Carte</button>
-						<button type="button" id="btn-preview-detail" class="px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-all">Page de l'article</button>
+						<button type="button" data-article-form-target="previewCardBtn" data-action="click->article-form#showCardPreview" class="px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-custom-orange text-gray-900 shadow transition-all">Format Carte</button>
+						<button type="button" data-article-form-target="previewDetailBtn" data-action="click->article-form#showDetailPreview" class="px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-all">Page de l'article</button>
 					</div>
 				</div>
 
-				<!-- Aperçu Carte -->
-				<div id="preview-card-section" class="space-y-4">
+				<div data-article-form-target="cardSection" class="space-y-4">
 					<p class="text-[9px] text-text-secondary uppercase tracking-widest text-center mb-2">Rendu sur la page d'accueil</p>
 					<div class="max-w-[360px] mx-auto">
 						<div class="group relative overflow-hidden rounded-xl bg-custom-tertiary shadow-lg block card-premium aspect-[1.8/1] min-h-[220px] border border-custom">
-							<img id="preview-card-img" src="{% if article.image %}{{ asset('images/articles/' ~ article.image) }}{% endif %}" alt="Illustration de l'article" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 {% if not article.image %}hidden{% endif %}">
-							<div id="preview-card-img-placeholder" class="absolute inset-0 flex items-center justify-center bg-custom-secondary border-dashed border-2 border-custom text-text-secondary text-xs {% if article.image %}hidden{% endif %}">
+							<img data-article-form-target="cardImg" src="{% if article.image %}{{ asset('images/articles/' ~ article.image) }}{% endif %}" alt="Illustration de l'article" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 {% if not article.image %}hidden{% endif %}">
+							<div data-article-form-target="cardImgPlaceholder" class="absolute inset-0 flex items-center justify-center bg-custom-secondary border-dashed border-2 border-custom text-text-secondary text-xs {% if article.image %}hidden{% endif %}">
 								Aucune image
 							</div>
 							<div class="absolute inset-0 image-overlay"></div>
-							<span id="preview-card-tag" class="absolute right-3 top-3 bg-custom-orange px-2 py-1 rounded text-[9px] font-bold text-gray-900 uppercase tracking-widest shadow-lg">{{ article.tag }}</span>
+							<span data-article-form-target="cardTag" class="absolute right-3 top-3 bg-custom-orange px-2 py-1 rounded text-[9px] font-bold text-gray-900 uppercase tracking-widest shadow-lg">{{ article.tag }}</span>
 							<div class="absolute bottom-4 left-4 right-4 z-10">
-								<h3 id="preview-card-title" class="text-sm font-bold leading-tight text-text-primary uppercase">{{ article.title }}</h3>
+								<h3 data-article-form-target="cardTitle" class="text-sm font-bold leading-tight text-text-primary uppercase">{{ article.title }}</h3>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<!-- Aperçu Page de l'article -->
-				<div id="preview-detail-section" class="hidden space-y-4">
+				<div data-article-form-target="detailSection" class="hidden space-y-4">
 					<p class="text-[9px] text-text-secondary uppercase tracking-widest text-center mb-2">Rendu sur la page de l'article</p>
 					<div class="w-full rounded-xl border border-custom bg-custom-tertiary p-4 shadow-xl relative overflow-hidden max-h-[500px] overflow-y-auto">
 						<div class="flex items-center gap-3 mb-4">
-							<span id="preview-detail-tag" class="inline-block rounded-md bg-custom-orange/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-custom-orange">{{ article.tag }}</span>
-						</div>
-						
-						<div id="preview-detail-img-container" class="mb-4 overflow-hidden rounded-lg border border-custom max-w-xl mx-auto aspect-video relative shadow-lg {% if not article.image %}hidden{% endif %}">
-							<img id="preview-detail-img" src="{% if article.image %}{{ asset('images/articles/' ~ article.image) }}{% endif %}" alt="Illustration de l'article" class="h-full w-full object-cover">
+							<span data-article-form-target="detailTag" class="inline-block rounded-md bg-custom-orange/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-custom-orange">{{ article.tag }}</span>
 						</div>
 
-						<h3 id="preview-detail-title" class="text-base font-bold text-text-primary mb-3 uppercase">{{ article.title }}</h3>
+						<div data-article-form-target="detailImgContainer" class="mb-4 overflow-hidden rounded-lg border border-custom max-w-xl mx-auto aspect-video relative shadow-lg {% if not article.image %}hidden{% endif %}">
+							<img data-article-form-target="detailImg" src="{% if article.image %}{{ asset('images/articles/' ~ article.image) }}{% endif %}" alt="Illustration de l'article" class="h-full w-full object-cover">
+						</div>
 
-						<div id="preview-detail-content" class="prose prose-invert max-w-none text-text-secondary text-xs leading-relaxed space-y-3">
+						<h3 data-article-form-target="detailTitle" class="text-base font-bold text-text-primary mb-3 uppercase">{{ article.title }}</h3>
+
+						<div data-article-form-target="previewContent" class="prose prose-invert max-w-none text-text-secondary text-xs leading-relaxed space-y-3">
 							{% if article.content %}
 								{{ article.content|sanitize_html }}
 							{% else %}
@@ -108,12 +104,12 @@
 							{% endif %}
 						</div>
 
-						<div id="preview-detail-gallery" class="mt-6 pt-4 border-t border-custom {% if article.gallery is empty %}hidden{% endif %}">
+						<div data-article-form-target="galleryContainer" class="mt-6 pt-4 border-t border-custom {% if article.gallery is empty %}hidden{% endif %}">
 							<span class="block text-[10px] font-bold uppercase tracking-wider text-text-primary mb-2">Galerie d'images</span>
-							<div id="preview-detail-gallery-grid" class="grid grid-cols-3 gap-2">
+							<div data-article-form-target="galleryGrid" class="grid grid-cols-3 gap-2">
 								{% if article.gallery is not empty %}
 									{% for img in article.gallery %}
-										<img src="{{ asset('images/articles/' ~ img) }}" class="h-16 w-full object-cover rounded border border-custom" data-existing-img="{{ img }}">
+										<img src="{{ asset('images/articles/' ~ img) }}" alt="" class="h-16 w-full object-cover rounded border border-custom" data-existing-img="{{ img }}">
 									{% endfor %}
 								{% endif %}
 							</div>
@@ -123,259 +119,4 @@
 			</div>
 		</div>
 	</div>
-
-	<script src="/vendor/quill/quill.js"></script>
-	<script nonce="{{ csp_nonce() }}">
-		function sanitizePreviewHtml(html) {
-			var allowed = ['P','BR','STRONG','B','EM','I','U','S','UL','OL','LI','A','H1','H2','H3','H4','H5','H6','BLOCKQUOTE','SPAN','DIV'];
-			var template = document.createElement('template');
-			template.innerHTML = html;
-			var walk = function(node) {
-				var children = Array.prototype.slice.call(node.childNodes);
-				children.forEach(function(child) {
-					if (child.nodeType === 1) {
-						if (allowed.indexOf(child.tagName) === -1) {
-							while (child.firstChild) {
-								child.parentNode.insertBefore(child.firstChild, child);
-							}
-							child.parentNode.removeChild(child);
-							return;
-						}
-						Array.prototype.slice.call(child.attributes).forEach(function(attr) {
-							var name = attr.name.toLowerCase();
-							if (name.indexOf('on') === 0 || (name !== 'href' && name !== 'class' && name !== 'title' && name !== 'rel' && name !== 'target')) {
-								child.removeAttribute(attr.name);
-							}
-							if (name === 'href') {
-								var href = (attr.value || '').trim().toLowerCase();
-								if (href.indexOf('javascript:') === 0 || href.indexOf('data:') === 0 || href.indexOf('vbscript:') === 0) {
-									child.removeAttribute('href');
-								}
-							}
-						});
-						if (child.tagName === 'A') {
-							child.setAttribute('rel', 'noopener noreferrer');
-						}
-						walk(child);
-					}
-				});
-			};
-			walk(template.content);
-			return template.innerHTML;
-		}
-
-		function initQuill() {
-			var container = document.getElementById('editor-container');
-			if (!container || container.classList.contains('ql-container')) {
-				return;
-			}
-
-			if (typeof Quill === 'undefined') {
-				setTimeout(initQuill, 50);
-				return;
-			}
-
-			var toolbarOptions = [
-				[{ 'header': [1, 2, 3, false] }],
-				['bold', 'italic', 'underline', 'strike'],
-				[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-				['link', 'clean']
-			];
-
-			var quill = new Quill('#editor-container', {
-				theme: 'snow',
-				modules: {
-					toolbar: toolbarOptions
-				}
-			});
-
-			var form = document.querySelector('form');
-			var contentInput = document.querySelector('.hidden-content-editor');
-
-			if (form && contentInput) {
-				form.addEventListener('submit', function() {
-					var html = quill.root.innerHTML;
-					if (html === '<p><br></p>' || html === '<p></p>') {
-						html = '';
-					}
-					contentInput.value = html;
-				});
-			}
-
-			// Synchronisation en direct du contenu avec Quill
-			var previewContent = document.getElementById('preview-detail-content');
-			if (previewContent) {
-				quill.on('text-change', function() {
-					var html = quill.root.innerHTML;
-					if (html === '<p><br></p>' || html === '<p></p>') {
-						html = '<p class="italic text-text-secondary/50">Rédigez votre texte pour voir l\'aperçu...</p>';
-					} else {
-						html = sanitizePreviewHtml(html);
-					}
-					previewContent.innerHTML = html;
-				});
-			}
-		}
-
-		function initLivePreview() {
-			var previewCardBtn = document.getElementById('btn-preview-card');
-			var previewDetailBtn = document.getElementById('btn-preview-detail');
-			var cardSection = document.getElementById('preview-card-section');
-			var detailSection = document.getElementById('preview-detail-section');
-
-			if (!previewCardBtn || !previewDetailBtn) {
-				return;
-			}
-
-			// Gestion des onglets
-			previewCardBtn.addEventListener('click', function() {
-				cardSection.classList.remove('hidden');
-				detailSection.classList.add('hidden');
-				
-				previewCardBtn.className = "px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-custom-orange text-gray-900 shadow transition-all";
-				previewDetailBtn.className = "px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-all";
-			});
-
-			previewDetailBtn.addEventListener('click', function() {
-				cardSection.classList.add('hidden');
-				detailSection.classList.remove('hidden');
-				
-				previewCardBtn.className = "px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-all";
-				previewDetailBtn.className = "px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-custom-orange text-gray-900 shadow transition-all";
-			});
-
-			// Synchronisation du titre
-			var titleInput = document.getElementById('article_title');
-			var cardTitle = document.getElementById('preview-card-title');
-			var detailTitle = document.getElementById('preview-detail-title');
-			if (titleInput && cardTitle && detailTitle) {
-				var updateTitle = function() {
-					var val = titleInput.value.trim();
-					cardTitle.textContent = val || "Titre de l'article";
-					detailTitle.textContent = val || "Titre de l'article";
-				};
-				titleInput.addEventListener('input', updateTitle);
-				updateTitle(); // Init
-			}
-
-			// Synchronisation du tag
-			var tagInput = document.getElementById('article_tag');
-			var cardTag = document.getElementById('preview-card-tag');
-			var detailTag = document.getElementById('preview-detail-tag');
-			if (tagInput && cardTag && detailTag) {
-				var updateTag = function() {
-					var val = tagInput.value.trim();
-					cardTag.textContent = val || "TAG";
-					detailTag.textContent = val || "TAG";
-				};
-				tagInput.addEventListener('input', updateTag);
-				updateTag(); // Init
-			}
-
-			// Synchronisation de l'image (Upload)
-			var imageInput = document.getElementById('article_imageFile');
-			var cardImg = document.getElementById('preview-card-img');
-			var detailImg = document.getElementById('preview-detail-img');
-			var cardImgPlaceholder = document.getElementById('preview-card-img-placeholder');
-			var detailImgContainer = document.getElementById('preview-detail-img-container');
-
-			if (imageInput && cardImg && detailImg) {
-				imageInput.addEventListener('change', function() {
-					if (imageInput.files && imageInput.files[0]) {
-						var reader = new FileReader();
-						reader.onload = function(e) {
-							cardImg.src = e.target.result;
-							cardImg.classList.remove('hidden');
-							if (cardImgPlaceholder) {
-								cardImgPlaceholder.classList.add('hidden');
-							}
-
-							detailImg.src = e.target.result;
-							if (detailImgContainer) {
-								detailImgContainer.classList.remove('hidden');
-							}
-						};
-						reader.readAsDataURL(imageInput.files[0]);
-					}
-				});
-			}
-
-			// Synchronisation de la galerie d'images
-			var galleryInput = document.getElementById('article_galleryFiles');
-			var galleryContainer = document.getElementById('preview-detail-gallery');
-			var galleryGrid = document.getElementById('preview-detail-gallery-grid');
-			var newFilesPreviews = [];
-
-			function updateGalleryPreview() {
-				var tempPreviews = galleryGrid.querySelectorAll('.new-preview-img');
-				tempPreviews.forEach(function(el) { el.remove(); });
-
-				newFilesPreviews.forEach(function(src) {
-					var img = document.createElement('img');
-					img.src = src;
-					img.className = "h-16 w-full object-cover rounded border border-custom new-preview-img";
-					galleryGrid.appendChild(img);
-				});
-
-				var visibleExisting = galleryGrid.querySelectorAll('img[data-existing-img]:not(.hidden)');
-				if (visibleExisting.length > 0 || newFilesPreviews.length > 0) {
-					galleryContainer.classList.remove('hidden');
-				} else {
-					galleryContainer.classList.add('hidden');
-				}
-			}
-
-			if (galleryInput && galleryContainer && galleryGrid) {
-				galleryInput.addEventListener('change', function() {
-					newFilesPreviews = [];
-					if (galleryInput.files && galleryInput.files.length > 0) {
-						var filesArray = Array.from(galleryInput.files);
-						var loadedCount = 0;
-
-						filesArray.forEach(function(file) {
-							var reader = new FileReader();
-							reader.onload = function(e) {
-								newFilesPreviews.push(e.target.result);
-								loadedCount++;
-								if (loadedCount === filesArray.length) {
-									updateGalleryPreview();
-								}
-							};
-							reader.readAsDataURL(file);
-						});
-					} else {
-						updateGalleryPreview();
-					}
-				});
-
-				// Listen to delete checkboxes
-				var deleteCheckboxes = document.querySelectorAll('input[name="delete_gallery_images[]"]');
-				deleteCheckboxes.forEach(function(checkbox) {
-					checkbox.addEventListener('change', function() {
-						var filename = checkbox.value;
-						var correspondingImg = galleryGrid.querySelector('img[data-existing-img="' + filename + '"]');
-						if (correspondingImg) {
-							if (checkbox.checked) {
-								correspondingImg.classList.add('hidden');
-							} else {
-								correspondingImg.classList.remove('hidden');
-							}
-						}
-						updateGalleryPreview();
-					});
-				});
-			}
-		}
-
-		initQuill();
-		initLivePreview();
-		document.addEventListener('DOMContentLoaded', function() {
-			initQuill();
-			initLivePreview();
-		});
-		document.addEventListener('turbo:load', function() {
-			initQuill();
-			initLivePreview();
-		});
-	</script>
 {% endblock %}

@@ -87,8 +87,27 @@ class AdminPagesTest extends DatabaseWebTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/admin/articles/' . $article->getId() . '/modifier');
+        $html = $this->client->getResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('[data-controller="article-form"]');
+        $this->assertSelectorExists('[data-action="click->article-form#showDetailPreview"]');
+        $this->assertSelectorExists('[data-article-form-target="editor"]');
+        $this->assertStringNotContainsString('function initQuill', $html);
+        $this->assertStringNotContainsString('function initLivePreview', $html);
+    }
+
+    public function testAdminArticleNewUsesStimulusFormController(): void
+    {
+        $this->client->request('GET', '/admin/articles/nouveau');
+        $html = $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('[data-controller="article-form"]');
+        $this->assertSelectorExists('[data-action="click->article-form#showDetailPreview"]');
+        $this->assertSelectorExists('[data-article-form-target="editor"]');
+        $this->assertStringNotContainsString('function initQuill', $html);
+        $this->assertStringNotContainsString('function initLivePreview', $html);
     }
 
     public function testAdminCanOpenLudothequeEdit(): void
