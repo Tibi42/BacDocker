@@ -7,10 +7,22 @@
  * - Réinitialise l'état fermé sur turbo:load / turbo:before-cache.
  * - Bloque le scroll du body quand le menu est ouvert.
  * - Ferme au clic overlay, lien de nav, ou Escape.
+ * - Burger → X via classe .is-open (pas de hide du bouton).
  */
 
 let isOpen = false;
 let listenersBound = false;
+
+function syncBurgerState(open) {
+    const btn = document.getElementById('mobile-menu-btn');
+    const drawer = document.getElementById('mobile-menu-drawer');
+    if (!btn || !drawer) return;
+
+    btn.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Fermer le menu' : 'Menu principal');
+    drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+}
 
 export function openMobileMenu() {
     const btn = document.getElementById('mobile-menu-btn');
@@ -20,19 +32,18 @@ export function openMobileMenu() {
     isOpen = true;
     drawer.classList.remove('pointer-events-none');
     drawer.classList.add('menu-open');
-    btn.classList.add('hidden');
+    syncBurgerState(true);
     document.body.style.overflow = 'hidden';
 }
 
 export function closeMobileMenu() {
-    const btn = document.getElementById('mobile-menu-btn');
     const drawer = document.getElementById('mobile-menu-drawer');
     if (!drawer) return;
 
     isOpen = false;
     drawer.classList.remove('menu-open');
     drawer.classList.add('pointer-events-none');
-    btn?.classList.remove('hidden');
+    syncBurgerState(false);
     document.body.style.overflow = '';
 }
 

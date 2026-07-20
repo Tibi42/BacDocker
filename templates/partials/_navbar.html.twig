@@ -64,11 +64,13 @@
 				</button>
 			</span>
 		{% endif %}
-		{# Hamburger Menu Button #}
-		<button id="mobile-menu-btn" type="button" class="lg:hidden flex flex-col gap-1.5 p-2 z-[100] text-text-primary" aria-label="Menu principal">
-			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
-			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
-			<span class="w-6 h-0.5 bg-current transition-all duration-300 origin-center"></span>
+		{# Hamburger → X morph #}
+		<button id="mobile-menu-btn" type="button" class="burger-btn lg:hidden z-[100]" aria-label="Menu principal" aria-expanded="false" aria-controls="mobile-menu-drawer">
+			<span class="burger-btn__box" aria-hidden="true">
+				<span class="burger-btn__line burger-btn__line--top"></span>
+				<span class="burger-btn__line burger-btn__line--mid"></span>
+				<span class="burger-btn__line burger-btn__line--bot"></span>
+			</span>
 		</button>
 	</div>
 </div>
