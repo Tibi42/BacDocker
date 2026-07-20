@@ -2243,7 +2243,6 @@ html.light-mode .calendar-day-empty.is-past {
 /* ── Burger button (morph → X) ── */
 .burger-btn {
     position: relative;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 2.75rem;
