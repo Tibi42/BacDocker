@@ -1,0 +1,14 @@
+{# Réponse légère pour les navigations Turbo Frame du calendrier (sans hero / articles / modales). #}
+<turbo-frame id="calendar-frame" class="calendar-turbo-frame">
+	<div id="calendar" class="lg:hidden mx-auto max-w-[1240px] px-8 mb-8">
+		<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6">ÉVÉNEMENTS À VENIR</h2>
+		{{ include('components/_calendar_panel.html.twig', { layout: 'mobile' }) }}
+	</div>
+</turbo-frame>
+
+<turbo-frame id="calendar-desktop-frame" class="calendar-turbo-frame">
+	<div class="hidden lg:block">
+		<h2 class="text-base font-bold uppercase tracking-[0.2em] text-text-primary mb-6 lg:mb-8">ÉVÉNEMENTS À VENIR</h2>
+		{{ include('components/_calendar_panel.html.twig', { layout: 'desktop' }) }}
+	</div>
+</turbo-frame>

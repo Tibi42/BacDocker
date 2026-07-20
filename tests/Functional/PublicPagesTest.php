@@ -43,6 +43,20 @@ class PublicPagesTest extends DatabaseWebTestCase
         $this->assertResponseRedirects('/?open=login');
     }
 
+    public function testCalendarTurboFrameReturnsLightweightResponse(): void
+    {
+        $this->client->request('GET', '/?month=7&year=2026', server: [
+            'HTTP_TURBO_FRAME' => 'calendar-desktop-frame',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('id="calendar-desktop-frame"', $content);
+        $this->assertStringContainsString('id="calendar-frame"', $content);
+        $this->assertStringNotContainsString('hero-brand', $content);
+        $this->assertStringNotContainsString('DERNIÈRES CHIMÈRES', $content);
+    }
+
     public function testSitemapReturnsXml(): void
     {
         $this->client->request('GET', '/sitemap.xml');
