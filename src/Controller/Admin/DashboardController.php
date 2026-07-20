@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\NewsletterSubscriber;
 use App\Repository\ActivityRepository;
+use App\Repository\ArticleRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\NewsletterSubscriberRepository;
 use App\Repository\UserRepository;
@@ -28,6 +29,7 @@ class DashboardController extends AbstractController
         private readonly ActivityRepository $activityRepository,
         private readonly NewsletterSubscriberRepository $newsletterRepository,
         private readonly UserRepository $userRepository,
+        private readonly ArticleRepository $articleRepository,
     ) {
     }
 
@@ -48,6 +50,7 @@ class DashboardController extends AbstractController
         $latestUsers = $this->userRepository->findLatest(5);
         $totalUsers = $this->userRepository->countActive();
         $inactiveUsers = $this->userRepository->countInactive();
+        $articlesCount = $this->articleRepository->count([]);
 
         return $this->render('admin/dashboard.html.twig', [
             'inscriptionsTotal' => $inscriptionsTotal,
@@ -59,6 +62,7 @@ class DashboardController extends AbstractController
             'newsletterPending' => $newsletterPending,
             'totalUsers' => $totalUsers,
             'inactiveUsers' => $inactiveUsers,
+            'articlesCount' => $articlesCount,
         ]);
     }
 }

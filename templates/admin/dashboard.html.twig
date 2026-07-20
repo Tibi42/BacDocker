@@ -48,6 +48,22 @@
             </div>
         </a>
 
+        {# Articles #}
+        <a href="{{ path('app_admin_article_index') }}"
+           class="flex flex-col gap-3 p-5 rounded-2xl border border-custom bg-custom-secondary shadow-lg glass-card hover:border-custom-orange transition-colors text-decoration-none">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl" aria-hidden="true">📰</span>
+                <div>
+                    <div class="font-bold text-text-primary">Articles</div>
+                    <div class="text-xs text-text-secondary">Gestion des Dernières Chimères</div>
+                </div>
+            </div>
+            <div class="flex justify-between items-end mt-auto">
+                <span class="text-4xl font-extrabold text-text-primary" style="line-height:1.1">{{ articlesCount|default(0) }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg bg-custom-orange text-text-primary">Gérer →</span>
+            </div>
+        </a>
+
         {# Dernières inscriptions #}
         <div class="flex flex-col gap-3 p-5 rounded-2xl border border-custom bg-custom-secondary shadow-lg glass-card">
             <div class="flex items-center gap-3">

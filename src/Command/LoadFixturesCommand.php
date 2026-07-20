@@ -42,7 +42,7 @@ class LoadFixturesCommand extends Command
 
         $users = [
             [
-                'email'    => 'superadmin@example.com',
+                'email'    => 'boiteachimere@guillaumepecquet.ovh',
                 'username' => 'superadmin',
                 'roles'    => ['ROLE_SUPER_ADMIN'],
                 'password' => 'DevSuperAdmin!12',

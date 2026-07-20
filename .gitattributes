@@ -1,0 +1,2 @@
+# Scripts shell : toujours LF (évite "no such file or directory" dans Docker/Linux)
+*.sh text eol=lf

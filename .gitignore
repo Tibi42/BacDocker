@@ -21,7 +21,6 @@
 
 ###> docker ###
 .env.docker.local
-.env.docker.local.dist
 docker/volumes/
 ###< docker ###
 

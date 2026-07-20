@@ -5,10 +5,14 @@ node_modules/
 .gitignore
 .env.local
 .env.*.local
+.env.docker.local
 docker-compose*.yml
 compose.override.yaml
 .idea/
 .vscode/
 .phpunit.cache/
+_bmad/
+_bmad-output/
+.worktrees/
 Thumbs.db
 .DS_Store

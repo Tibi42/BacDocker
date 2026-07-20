@@ -4,9 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Website for **La Boite Chimère**, a gaming association (board games, RPG, tabletop miniatures, LARP). Symfony 8.0 app running locally on Laragon (MySQL).
+Website for **La Boite Chimère**, a gaming association (board games, RPG, tabletop miniatures, LARP). Symfony 8.0 app running locally on Laragon (MySQL) or via Docker.
 
 ## Common Commands
+
+### Docker (recommandé)
+
+```bash
+# Première installation
+cp .env.docker.local.dist .env.docker.local
+docker compose up -d --build
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec php php bin/console tailwind:build
+
+# Ou via le script helper
+./bin/docker.sh setup
+
+# Commandes courantes
+docker compose exec php php bin/console <commande>
+docker compose exec php php bin/phpunit
+docker compose logs -f
+```
+
+**Services locaux :**
+| Service | URL |
+|---------|-----|
+| Application | http://localhost:8080 |
+| Mailpit (emails) | http://localhost:8025 |
+| phpMyAdmin | http://localhost:8081 |
+| MySQL (hôte) | localhost:3307 |
+
+**Production Docker :** `docker compose -f compose.prod.yaml up -d --build`
+
+### Laragon (sans Docker)
 
 ```bash
 # Install PHP dependencies
@@ -44,6 +74,8 @@ php bin/console make:controller
 ## Architecture
 
 **Backend**: Symfony 8.0, PHP 8.4, Doctrine ORM with lifecycle callbacks for `createdAt`/`updatedAt`.
+
+**Docker**: `Dockerfile` (stages `dev` / `prod`), `compose.yaml` + `compose.override.yaml` (dev), `compose.prod.yaml` (prod). PHP-FPM + Nginx + MySQL 8 + Mailpit. Config dans `docker/php/` et `docker/nginx/`.
 
 **Frontend**: No webpack/npm. Uses Symfony **AssetMapper** with **importmap** for JS modules and **symfonycasts/tailwind-bundle** for CSS. Stimulus controllers live in `assets/controllers/`. Standalone JS modules in `assets/`: `carousel.js`, `mobile_menu.js`, `reveal.js`, `theme_toggle.js`, `join_panel.js`.
 

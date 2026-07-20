@@ -1,0 +1,73 @@
+# Stack de production (PHP-FPM + Nginx + MySQL).
+# Usage :
+#   docker compose --env-file .env.docker.local -f compose.prod.yaml up -d --build
+#
+# Créer .env.docker.local à partir de .env.docker.local.dist (secrets requis).
+
+name: bac-prod
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    volumes:
+      - public_data:/app/public
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - path: .env.docker.local
+        required: true
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE}?serverVersion=8.0&charset=utf8mb4"
+      MAILER_DSN: ${MAILER_DSN:-smtp://mailer:1025}
+      MAILER_FROM: ${MAILER_FROM:-boiteachimere@guillaumepecquet.ovh}
+      MAILER_FROM_NAME: ${MAILER_FROM_NAME:-La Boîte à Chimère}
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost:8080}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - public_data:/app/public:ro
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  # Capture des mails en local (même en mode prod Docker).
+  # Pour un vrai SMTP OVH, remplacer MAILER_DSN dans .env.docker.local.
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "127.0.0.1:8025:8025"
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  public_data:

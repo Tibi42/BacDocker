@@ -1,11 +1,11 @@
+# Surcharges développement local (chargé automatiquement par Docker Compose).
 services:
   php:
-    user: root # Nécessaire pour que composer ait les droits d'écriture sur vendor_data
+    user: root
     environment:
       APP_DEBUG: 1
-      XDEBUG_MODE: "off" # Changer en "debug" pour activer Xdebug
-    
+      XDEBUG_MODE: "off"
+
   database:
     ports:
-      - "3307:3306" # Accès MySQL depuis votre machine (DBeaver, TablePlus…)
-# Port 3307 pour éviter le conflit avec Laragon
+      - "3307:3306"
