@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/admin/utilisateurs', name: 'app_admin_user_')]
 class UserController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -200,6 +202,106 @@ class UserController extends AbstractController
         return $response;
     }
 
+    #[Route('/suspendre-selection', name: 'suspend_bulk', methods: ['POST'])]
+    public function suspendBulk(Request $request): Response
+    {
+        $redirectParams = $this->indexQueryParams($request);
+
+        if (!$this->isCsrfTokenValid('suspend_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun utilisateur sélectionné.');
+
+            return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+        }
+
+        $current = $this->getUser();
+        $users = $this->userRepository->findBy(['id' => $ids]);
+        $count = 0;
+        $skipped = 0;
+
+        foreach ($users as $user) {
+            if ($user === $current) {
+                ++$skipped;
+                continue;
+            }
+            if (AdminUserAuthorization::isPrivilegedAccount($user) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                ++$skipped;
+                continue;
+            }
+            $user->setSuspended(!$user->isSuspended());
+            ++$count;
+        }
+
+        if ($count > 0) {
+            $this->entityManager->flush();
+            $this->addFlash('success', $count . ' utilisateur' . ($count > 1 ? 's' : '') . ' mis à jour.');
+        }
+        if ($skipped > 0) {
+            $this->addFlash('warning', $skipped . ' utilisateur' . ($skipped > 1 ? 's' : '') . ' ignoré' . ($skipped > 1 ? 's' : '') . ' (droits insuffisants ou compte courant).');
+        }
+        if ($count === 0 && $skipped === 0) {
+            $this->addFlash('error', 'Aucun utilisateur à suspendre.');
+        }
+
+        return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+    }
+
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $redirectParams = $this->indexQueryParams($request);
+
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun utilisateur sélectionné.');
+
+            return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+        }
+
+        $current = $this->getUser();
+        $users = $this->userRepository->findBy(['id' => $ids]);
+        $count = 0;
+        $skipped = 0;
+
+        foreach ($users as $user) {
+            if ($user === $current) {
+                ++$skipped;
+                continue;
+            }
+            if (AdminUserAuthorization::isPrivilegedAccount($user) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                ++$skipped;
+                continue;
+            }
+            $this->entityManager->remove($user);
+            ++$count;
+        }
+
+        if ($count > 0) {
+            $this->entityManager->flush();
+            $this->addFlash('success', $count . ' utilisateur' . ($count > 1 ? 's' : '') . ' supprimé' . ($count > 1 ? 's' : '') . '.');
+        }
+        if ($skipped > 0) {
+            $this->addFlash('warning', $skipped . ' utilisateur' . ($skipped > 1 ? 's' : '') . ' ignoré' . ($skipped > 1 ? 's' : '') . ' (droits insuffisants ou compte courant).');
+        }
+        if ($count === 0 && $skipped === 0) {
+            $this->addFlash('error', 'Aucun utilisateur à supprimer.');
+        }
+
+        return $this->redirectToRoute('app_admin_user_index', $redirectParams);
+    }
+
     #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(Request $request, User $user): Response
     {
@@ -248,5 +350,25 @@ class UserController extends AbstractController
         }
 
         return null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function indexQueryParams(Request $request): array
+    {
+        $params = [];
+        foreach (['from', 'to', 'role', 'q'] as $key) {
+            $value = $request->query->get($key);
+            if (\is_string($value) && $value !== '') {
+                $params[$key] = $value;
+            }
+        }
+        $page = $request->query->getInt('page', 1);
+        if ($page > 1) {
+            $params['page'] = $page;
+        }
+
+        return $params;
     }
 }

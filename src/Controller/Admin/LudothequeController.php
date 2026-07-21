@@ -33,6 +33,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class LudothequeController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     private const PER_PAGE = 15;
     private const IMAGE_MAX_WIDTH = 600;
     private const IMAGE_MAX_HEIGHT = 600;
@@ -284,6 +286,69 @@ class LudothequeController extends AbstractController
     }
 
     /**
+     * Valide en masse des demandes d'emprunt (même date de retour pour tous).
+     */
+    #[Route('/valider-selection', name: 'validate_bulk', methods: ['POST'])]
+    public function validateBulk(Request $request): Response
+    {
+        $redirectParams = $this->redirectParams($request);
+
+        if (!$this->isCsrfTokenValid('validate_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun jeu sélectionné.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $returnDueAtRaw = $request->request->get('returnDueAt');
+        if (!$returnDueAtRaw) {
+            $this->addFlash('error', 'Veuillez indiquer une date de retour.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        try {
+            $returnDueAt = new \DateTimeImmutable((string) $returnDueAtRaw);
+        } catch (\Exception) {
+            $this->addFlash('error', 'La date de retour est invalide.');
+
+            return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $games = $this->boardGameRepository->findBy(['id' => $ids, 'status' => BoardGame::STATUS_PENDING]);
+        $count = 0;
+        foreach ($games as $boardGame) {
+            if ($boardGame->getBorrower() === null) {
+                continue;
+            }
+            $boardGame->setStatus(BoardGame::STATUS_LOANED);
+            $boardGame->setLoanedAt(new \DateTimeImmutable());
+            $boardGame->setReturnDueAt($returnDueAt);
+
+            $loanLog = new LoanLog();
+            $loanLog->setBoardGame($boardGame);
+            $loanLog->setUser($boardGame->getBorrower());
+            $this->entityManager->persist($loanLog);
+            ++$count;
+        }
+
+        if ($count > 0) {
+            $this->entityManager->flush();
+            $this->addFlash('success', $count . ' emprunt' . ($count > 1 ? 's' : '') . ' validé' . ($count > 1 ? 's' : '') . '.');
+        } else {
+            $this->addFlash('error', 'Aucune demande en attente valide dans la sélection.');
+        }
+
+        return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
+    }
+
+    /**
      * Supprime définitivement plusieurs jeux disponibles en une seule action.
      */
     #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
@@ -297,20 +362,7 @@ class LudothequeController extends AbstractController
             return $this->redirectToRoute('app_admin_ludotheque_index', $redirectParams, Response::HTTP_SEE_OTHER);
         }
 
-        $rawIds = $request->request->all('ids');
-        if (!\is_array($rawIds)) {
-            $rawIds = [];
-        }
-
-        $ids = [];
-        foreach ($rawIds as $rawId) {
-            $id = filter_var($rawId, \FILTER_VALIDATE_INT);
-            if ($id !== false && $id > 0) {
-                $ids[] = $id;
-            }
-        }
-        $ids = array_values(array_unique($ids));
-
+        $ids = $this->parseBulkIds($request);
         if ($ids === []) {
             $this->addFlash('error', 'Aucun jeu sélectionné.');
 

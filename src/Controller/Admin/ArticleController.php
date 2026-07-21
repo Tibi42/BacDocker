@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/articles', name: 'app_admin_article_')]
 class ArticleController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     public function __construct(
         private readonly ArticleRepository $articleRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -121,6 +123,84 @@ class ArticleController extends AbstractController
 
         $status = $article->isActive() ? 'activé' : 'suspendu';
         $this->addFlash('success', 'L\'article « ' . $article->getTitle() . ' » a été ' . $status . '.');
+
+        return $this->redirectToRoute('app_admin_article_index');
+    }
+
+    #[Route('/suspendre-selection', name: 'suspend_bulk', methods: ['POST'])]
+    public function suspendBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('suspend_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_article_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun article sélectionné.');
+
+            return $this->redirectToRoute('app_admin_article_index');
+        }
+
+        $articles = $this->articleRepository->findBy(['id' => $ids]);
+        if ($articles === []) {
+            $this->addFlash('error', 'Aucun article trouvé.');
+
+            return $this->redirectToRoute('app_admin_article_index');
+        }
+
+        $anyActive = false;
+        foreach ($articles as $article) {
+            if ($article->isActive()) {
+                $anyActive = true;
+                break;
+            }
+        }
+        $targetActive = !$anyActive;
+        foreach ($articles as $article) {
+            $article->setActive($targetActive);
+        }
+        $this->entityManager->flush();
+
+        $status = $targetActive ? 'activé' : 'suspendu';
+        $count = \count($articles);
+        $this->addFlash('success', $count . ' article' . ($count > 1 ? 's' : '') . ' ' . $status . ($count > 1 ? 's' : '') . '.');
+
+        return $this->redirectToRoute('app_admin_article_index');
+    }
+
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_article_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun article sélectionné.');
+
+            return $this->redirectToRoute('app_admin_article_index');
+        }
+
+        $articles = $this->articleRepository->findBy(['id' => $ids]);
+        foreach ($articles as $article) {
+            $this->entityManager->remove($article);
+        }
+
+        if ($articles !== []) {
+            $this->entityManager->flush();
+        }
+
+        $count = \count($articles);
+        if ($count === 0) {
+            $this->addFlash('error', 'Aucun article à supprimer.');
+        } else {
+            $this->addFlash('success', $count . ' article' . ($count > 1 ? 's' : '') . ' supprimé' . ($count > 1 ? 's' : '') . '.');
+        }
 
         return $this->redirectToRoute('app_admin_article_index');
     }

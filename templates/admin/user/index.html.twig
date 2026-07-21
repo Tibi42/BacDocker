@@ -63,13 +63,33 @@
 		</form>
 
 		{% if pagination.totalItemCount > 0 %}
+			{% set bulkQuery = app.request.query.all %}
+			<div data-controller="bulk-selection"
+				 data-bulk-selection-delete-confirm-value="Supprimer %n% utilisateur(s) ?"
+				 data-bulk-selection-suspend-confirm-value="Suspendre %n% utilisateur(s) ?">
+				{% include 'admin/_bulk_bar.html.twig' with {
+					entity_label: 'utilisateur',
+					suspend_path: path('app_admin_user_suspend_bulk', bulkQuery),
+					delete_path: path('app_admin_user_delete_bulk', bulkQuery),
+				} only %}
+
 			{# Vue mobile : cartes #}
 			<div class="lg:hidden space-y-3">
 				{% for user in pagination %}
 					{% set isSuperAdmin = 'ROLE_SUPER_ADMIN' in user.roles %}
+					{% set canManage = (not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+					{% set canAct = user != app.user and canManage %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ user == app.user ? 'border-custom-orange/30 bg-custom-orange/5' : '' }} {{ user.suspended ? 'opacity-50' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
-							<div class="flex items-center gap-2 flex-wrap">
+							<div class="flex items-center gap-2 flex-wrap min-w-0">
+								{% include 'admin/_bulk_checkbox.html.twig' with {
+									id: user.id,
+									label: user.username,
+									edit_url: canManage ? path('app_admin_user_edit', { id: user.id }) : null,
+									can_suspend: canAct,
+									can_delete: canAct,
+									checkbox_class: 'mt-0.5',
+								} only %}
 								<span class="font-medium text-text-primary text-sm">{{ user.username }}</span>
 								{% if user == app.user %}
 									<span class="text-[9px] font-bold uppercase tracking-widest text-custom-orange px-1.5 py-0.5 rounded bg-custom-orange/10">Vous</span>
@@ -93,10 +113,10 @@
 						<p class="text-xs text-text-secondary">{{ user.email }}</p>
 						<p class="text-[10px] text-text-secondary/60 mb-3">Inscrit le {{ user.createdAt ? user.createdAt|date('d/m/Y à H:i') : '—' }}</p>
 						<div class="flex flex-wrap items-center gap-3 pt-2 border-t border-custom/50">
-							{% if not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN') %}
+							{% if canManage %}
 								<a href="{{ path('app_admin_user_edit', { id: user.id }) }}" class="text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors">Modifier</a>
 							{% endif %}
-							{% if user != app.user and (not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+							{% if canAct %}
 								<form method="post" action="{{ path('app_admin_user_suspend', { id: user.id }) }}" class="contents" onsubmit="return confirm('{{ user.suspended ? 'Réactiver' : 'Suspendre' }} l\'utilisateur {{ user.email }} ?');">
 									<input type="hidden" name="_token" value="{{ csrf_token('suspend' ~ user.id) }}">
 									<button type="submit" class="text-[10px] font-bold uppercase tracking-wider {{ user.suspended ? 'text-emerald-400 hover:text-emerald-300' : 'text-amber-400 hover:text-amber-300' }} transition-colors">{{ user.suspended ? 'Réactiver' : 'Suspendre' }}</button>
@@ -117,6 +137,7 @@
 					<table class="w-full text-left">
 						<thead class="bg-custom-tertiary/50 border-b border-custom">
 							<tr>
+								<th class="px-4 py-3 w-10" aria-hidden="true"></th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Utilisateur</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Email</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Rôles</th>
@@ -127,7 +148,18 @@
 						<tbody>
 							{% for user in pagination %}
 								{% set isSuperAdmin = 'ROLE_SUPER_ADMIN' in user.roles %}
+								{% set canManage = (not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+								{% set canAct = user != app.user and canManage %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ user == app.user ? 'bg-custom-orange/5' : '' }} {{ user.suspended ? 'opacity-50' : '' }}">
+									<td class="px-4 py-3">
+										{% include 'admin/_bulk_checkbox.html.twig' with {
+											id: user.id,
+											label: user.username,
+											edit_url: canManage ? path('app_admin_user_edit', { id: user.id }) : null,
+											can_suspend: canAct,
+											can_delete: canAct,
+										} only %}
+									</td>
 									<td class="px-4 py-3">
 										<span class="font-medium text-text-primary">{{ user.username }}</span>
 										{% if user == app.user %}
@@ -152,10 +184,10 @@
 									</td>
 									<td class="px-4 py-3 text-sm text-text-secondary">{{ user.createdAt ? user.createdAt|date('d/m/Y H:i') : '—' }}</td>
 									<td class="px-4 py-3 text-right whitespace-nowrap">
-										{% if not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN') %}
+										{% if canManage %}
 											<a href="{{ path('app_admin_user_edit', { id: user.id }) }}" class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-custom-orange hover:text-orange-400 transition-colors mr-3">Modifier</a>
 										{% endif %}
-										{% if user != app.user and (not isSuperAdmin or is_granted('ROLE_SUPER_ADMIN')) %}
+										{% if canAct %}
 											<form method="post" action="{{ path('app_admin_user_suspend', { id: user.id }) }}" class="inline" onsubmit="return confirm('{{ user.suspended ? 'Réactiver' : 'Suspendre' }} l\'utilisateur {{ user.email }} ?');">
 												<input type="hidden" name="_token" value="{{ csrf_token('suspend' ~ user.id) }}">
 												<button type="submit" class="text-[10px] font-bold uppercase tracking-wider {{ user.suspended ? 'text-emerald-400 hover:text-emerald-300' : 'text-amber-400 hover:text-amber-300' }} transition-colors mr-3">{{ user.suspended ? 'Réactiver' : 'Suspendre' }}</button>
@@ -204,6 +236,8 @@
 					</nav>
 				</div>
 			{% endif %}
+
+			</div>{# /bulk-selection #}
 
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">

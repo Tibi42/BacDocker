@@ -1,0 +1,11 @@
+{# Checkbox bulk — variables : id, label, edit_url, can_validate, can_suspend, can_delete #}
+<input type="checkbox"
+	   value="{{ id }}"
+	   class="rounded border-custom bg-custom-tertiary text-custom-orange focus:ring-custom-orange shrink-0 {{ checkbox_class|default('') }}"
+	   data-bulk-selection-target="item"
+	   data-action="change->bulk-selection#toggle"
+	   data-can-validate="{{ can_validate|default(false) ? '1' : '0' }}"
+	   data-can-suspend="{{ can_suspend|default(false) ? '1' : '0' }}"
+	   data-can-delete="{{ can_delete|default(false) ? '1' : '0' }}"
+	   {% if edit_url is defined and edit_url %}data-edit-url="{{ edit_url }}"{% endif %}
+	   aria-label="Sélectionner {{ label }}">

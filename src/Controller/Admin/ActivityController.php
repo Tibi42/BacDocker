@@ -31,6 +31,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Route('/admin/activites', name: 'app_activity_')]
 class ActivityController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly InscriptionRepository $inscriptionRepository,
@@ -214,6 +216,98 @@ class ActivityController extends AbstractController
     }
 
     /**
+     * Valide en masse les activités en attente (pending → published).
+     */
+    #[Route('/valider-selection', name: 'validate_bulk', methods: ['POST'])]
+    public function validateBulk(Request $request): Response
+    {
+        $redirectParams = $this->indexQueryParams($request);
+
+        if (!$this->isCsrfTokenValid('validate_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucune activité sélectionnée.');
+
+            return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $activities = $this->activityRepository->findBy(['id' => $ids, 'status' => Activity::STATUS_PENDING]);
+        foreach ($activities as $activity) {
+            $activity->setStatus(Activity::STATUS_PUBLISHED);
+        }
+
+        if ($activities !== []) {
+            $this->entityManager->flush();
+        }
+
+        $count = \count($activities);
+        if ($count === 0) {
+            $this->addFlash('error', 'Aucune activité en attente dans la sélection.');
+        } else {
+            $this->addFlash('success', $count . ' activité' . ($count > 1 ? 's' : '') . ' validée' . ($count > 1 ? 's' : '') . '.');
+        }
+
+        return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Supprime en masse les activités à venir (emails d'annulation inclus).
+     */
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $redirectParams = $this->indexQueryParams($request);
+
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucune activité sélectionnée.');
+
+            return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+        }
+
+        $now = new \DateTimeImmutable();
+        $activities = $this->activityRepository->findBy(['id' => $ids]);
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach ($activities as $activity) {
+            if ($activity->getStartAt() <= $now) {
+                ++$skipped;
+                continue;
+            }
+
+            $title = (string) $activity->getTitle();
+            $this->sendCancellationEmails($activity, $title);
+            $this->entityManager->remove($activity);
+            ++$deleted;
+        }
+
+        if ($deleted > 0) {
+            $this->entityManager->flush();
+            $this->addFlash('success', $deleted . ' activité' . ($deleted > 1 ? 's' : '') . ' supprimée' . ($deleted > 1 ? 's' : '') . '.');
+        }
+        if ($skipped > 0) {
+            $this->addFlash('warning', $skipped . ' activité' . ($skipped > 1 ? 's' : '') . ' passée' . ($skipped > 1 ? 's' : '') . ' ignorée' . ($skipped > 1 ? 's' : '') . '.');
+        }
+        if ($deleted === 0 && $skipped === 0) {
+            $this->addFlash('error', 'Aucune activité à supprimer dans la sélection.');
+        }
+
+        return $this->redirectToRoute('app_activity_index', $redirectParams, Response::HTTP_SEE_OTHER);
+    }
+
+    /**
      * Approuve une proposition d'activité en la passant au statut STATUS_PUBLISHED.
      */
     #[Route('/{id}/approuver', name: 'approve', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -311,5 +405,25 @@ class ActivityController extends AbstractController
                 $this->mailer->send($email);
             } catch (\Throwable) {}
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function indexQueryParams(Request $request): array
+    {
+        $params = [];
+        foreach (['status', 'type', 'location', 'period'] as $key) {
+            $value = $request->query->get($key);
+            if (\is_string($value) && $value !== '') {
+                $params[$key] = $value;
+            }
+        }
+        $page = $request->query->getInt('page', 1);
+        if ($page > 1) {
+            $params['page'] = $page;
+        }
+
+        return $params;
     }
 }

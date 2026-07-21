@@ -33,12 +33,33 @@
 		</div>
 
 		{% if subscribers|length > 0 %}
+			<div data-controller="bulk-selection"
+				 data-bulk-selection-delete-confirm-value="Supprimer %n% abonné(s) ?"
+				 data-bulk-selection-suspend-confirm-value="Suspendre (désinscrire) la sélection ?"
+				 data-bulk-selection-validate-confirm-value="Valider les abonnés en attente sélectionnés ?">
+				{% include 'admin/_bulk_bar.html.twig' with {
+					entity_label: 'abonné',
+					validate_path: path('app_admin_newsletter_validate_bulk'),
+					suspend_path: path('app_admin_newsletter_suspend_bulk'),
+					delete_path: path('app_admin_newsletter_delete_bulk'),
+				} only %}
+
 			{# Vue mobile : cartes #}
 			<div class="lg:hidden space-y-3">
 				{% for subscriber in subscribers %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card">
 						<div class="flex items-start justify-between gap-3 mb-2">
-							<span class="font-medium text-text-primary text-sm">{{ subscriber.email }}</span>
+							<div class="flex items-start gap-3 min-w-0">
+								{% include 'admin/_bulk_checkbox.html.twig' with {
+									id: subscriber.id,
+									label: subscriber.email,
+									can_validate: subscriber.status == 'pending',
+									can_suspend: subscriber.status != 'unsubscribed',
+									can_delete: true,
+									checkbox_class: 'mt-1',
+								} only %}
+								<span class="font-medium text-text-primary text-sm">{{ subscriber.email }}</span>
+							</div>
 							{% if subscriber.status == 'confirmed' %}
 								<span class="text-[9px] font-bold uppercase tracking-widest text-green-400 bg-green-400/10 px-2 py-0.5 rounded shrink-0">Confirmé</span>
 							{% elseif subscriber.status == 'pending' %}
@@ -69,6 +90,7 @@
 					<table class="w-full text-left">
 						<thead class="bg-custom-tertiary/50 border-b border-custom">
 							<tr>
+								<th class="px-4 py-3 w-10" aria-hidden="true"></th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Email</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Statut</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Inscription</th>
@@ -79,6 +101,15 @@
 						<tbody>
 							{% for subscriber in subscribers %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors">
+									<td class="px-4 py-3">
+										{% include 'admin/_bulk_checkbox.html.twig' with {
+											id: subscriber.id,
+											label: subscriber.email,
+											can_validate: subscriber.status == 'pending',
+											can_suspend: subscriber.status != 'unsubscribed',
+											can_delete: true,
+										} only %}
+									</td>
 									<td class="px-4 py-3">
 										<span class="font-medium text-text-primary">{{ subscriber.email }}</span>
 									</td>
@@ -104,6 +135,7 @@
 						</tbody>
 					</table>
 				</div>
+			</div>
 			</div>
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">

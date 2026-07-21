@@ -84,20 +84,15 @@ Azul;Familial;4;45;Neuf;</code>
 			{% if pagination.currentPageNumber > 1 %}{% set bulkQuery = bulkQuery|merge({ page: pagination.currentPageNumber }) %}{% endif %}
 			{% if search %}{% set bulkQuery = bulkQuery|merge({ q: search }) %}{% endif %}
 
-			<form id="ludo-bulk-delete-form"
-				  method="post"
-				  action="{{ path('app_admin_ludotheque_delete_bulk', bulkQuery) }}"
-				  class="mb-4"
-				  onsubmit="return window.ludoBulkDeleteConfirm()">
-				<input type="hidden" name="_token" value="{{ csrf_token('delete_bulk') }}">
-				<div id="ludo-bulk-bar" hidden class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-400/30 bg-red-500/5 p-4 glass-card">
-					<p class="text-xs text-text-secondary"><span id="ludo-bulk-count">0</span> jeu(x) sélectionné(s)</p>
-					<button type="submit" id="ludo-bulk-submit" disabled
-							class="inline-flex items-center gap-2 rounded-lg border border-red-400/40 bg-red-500/10 py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-40 disabled:pointer-events-none">
-						Supprimer la sélection (<span id="ludo-bulk-count-btn">0</span>)
-					</button>
-				</div>
-			</form>
+			<div data-controller="bulk-selection"
+				 data-bulk-selection-delete-confirm-value="Supprimer %n% jeu(x) disponible(s) ? Seuls les jeux disponibles seront supprimés."
+				 data-bulk-selection-validate-confirm-value="Valider %n% emprunt(s) en attente ?">
+				{% include 'admin/_bulk_bar.html.twig' with {
+					entity_label: 'jeu',
+					validate_path: path('app_admin_ludotheque_validate_bulk', bulkQuery),
+					delete_path: path('app_admin_ludotheque_delete_bulk', bulkQuery),
+					show_return_due_at: true,
+				} only %}
 
 			{# Vue mobile : cartes empilées #}
 			<div class="lg:hidden space-y-3">
@@ -105,14 +100,14 @@ Azul;Familial;4;45;Neuf;</code>
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ boardGame.status == 'pending' ? 'border-custom-orange/30 bg-custom-orange/5' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
 							<div class="flex items-start gap-3 min-w-0">
-								<input type="checkbox"
-									   name="ids[]"
-									   value="{{ boardGame.id }}"
-									   form="ludo-bulk-delete-form"
-									   class="mt-1 rounded border-custom bg-custom-tertiary text-custom-orange focus:ring-custom-orange shrink-0"
-									   data-bulk-item
-									   {% if boardGame.status != 'available' %}disabled{% endif %}
-									   aria-label="Sélectionner {{ boardGame.title }}">
+								{% include 'admin/_bulk_checkbox.html.twig' with {
+									id: boardGame.id,
+									label: boardGame.title,
+									edit_url: boardGame.status == 'available' ? path('app_admin_ludotheque_edit', { id: boardGame.id }) : null,
+									can_validate: boardGame.status == 'pending',
+									can_delete: boardGame.status == 'available',
+									checkbox_class: 'mt-1',
+								} only %}
 								{% if boardGame.image %}
 									<img src="{{ asset('images/board-games/' ~ boardGame.image) }}" alt="{{ boardGame.title }}" class="h-12 w-12 object-cover rounded-md border border-custom shrink-0">
 								{% endif %}
@@ -199,14 +194,13 @@ Azul;Familial;4;45;Neuf;</code>
 							{% for boardGame in pagination %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ boardGame.status == 'pending' ? 'bg-custom-orange/5' : '' }}">
 									<td class="px-4 py-3">
-										<input type="checkbox"
-											   name="ids[]"
-											   value="{{ boardGame.id }}"
-											   form="ludo-bulk-delete-form"
-											   class="rounded border-custom bg-custom-tertiary text-custom-orange focus:ring-custom-orange"
-											   data-bulk-item
-											   {% if boardGame.status != 'available' %}disabled{% endif %}
-											   aria-label="Sélectionner {{ boardGame.title }}">
+										{% include 'admin/_bulk_checkbox.html.twig' with {
+											id: boardGame.id,
+											label: boardGame.title,
+											edit_url: boardGame.status == 'available' ? path('app_admin_ludotheque_edit', { id: boardGame.id }) : null,
+											can_validate: boardGame.status == 'pending',
+											can_delete: boardGame.status == 'available',
+										} only %}
 									</td>
 									<td class="px-4 py-3 font-medium text-text-primary">
 										<div class="flex items-center gap-3">
@@ -310,60 +304,7 @@ Azul;Familial;4;45;Neuf;</code>
 				</div>
 			{% endif %}
 
-			<script nonce="{{ csp_nonce() }}">
-			(function () {
-				var items = Array.prototype.slice.call(document.querySelectorAll('[data-bulk-item]:not(:disabled)'));
-				var bar = document.getElementById('ludo-bulk-bar');
-				var countEl = document.getElementById('ludo-bulk-count');
-				var countBtn = document.getElementById('ludo-bulk-count-btn');
-				var submitBtn = document.getElementById('ludo-bulk-submit');
-
-				function uniqueCheckedValues() {
-					var seen = {};
-					var values = [];
-					items.forEach(function (el) {
-						if (el.checked && !seen[el.value]) {
-							seen[el.value] = true;
-							values.push(el.value);
-						}
-					});
-					return values;
-				}
-
-				function syncValue(value, checked) {
-					items.forEach(function (el) {
-						if (el.value === value) {
-							el.checked = checked;
-						}
-					});
-				}
-
-				function refresh() {
-					var n = uniqueCheckedValues().length;
-					if (countEl) countEl.textContent = String(n);
-					if (countBtn) countBtn.textContent = String(n);
-					if (submitBtn) submitBtn.disabled = n === 0;
-					if (bar) bar.hidden = n === 0;
-				}
-
-				items.forEach(function (el) {
-					el.addEventListener('change', function () {
-						syncValue(el.value, el.checked);
-						refresh();
-					});
-				});
-
-				window.ludoBulkDeleteConfirm = function () {
-					var n = uniqueCheckedValues().length;
-					if (n === 0) return false;
-					return confirm(n > 1
-						? ('Supprimer définitivement ' + n + ' jeux ? Cette action est irréversible.')
-						: 'Supprimer définitivement 1 jeu ? Cette action est irréversible.');
-				};
-
-				refresh();
-			})();
-			</script>
+			</div>{# /bulk-selection #}
 
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">

@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/carousel', name: 'app_admin_carousel_')]
 class CarouselController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     public function __construct(
         private readonly CarouselSlideRepository $carouselSlideRepository,
         private readonly EntityManagerInterface $entityManager
@@ -89,6 +91,84 @@ class CarouselController extends AbstractController
 
         $status = $slide->isActive() ? 'activée' : 'suspendue';
         $this->addFlash('success', 'La slide « ' . $slide->getTitle() . ' » a été ' . $status . '.');
+
+        return $this->redirectToRoute('app_admin_carousel_index');
+    }
+
+    #[Route('/suspendre-selection', name: 'suspend_bulk', methods: ['POST'])]
+    public function suspendBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('suspend_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_carousel_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucune slide sélectionnée.');
+
+            return $this->redirectToRoute('app_admin_carousel_index');
+        }
+
+        $slides = $this->carouselSlideRepository->findBy(['id' => $ids]);
+        if ($slides === []) {
+            $this->addFlash('error', 'Aucune slide trouvée.');
+
+            return $this->redirectToRoute('app_admin_carousel_index');
+        }
+
+        $anyActive = false;
+        foreach ($slides as $slide) {
+            if ($slide->isActive()) {
+                $anyActive = true;
+                break;
+            }
+        }
+        $targetActive = !$anyActive;
+        foreach ($slides as $slide) {
+            $slide->setActive($targetActive);
+        }
+        $this->entityManager->flush();
+
+        $status = $targetActive ? 'activée' : 'suspendue';
+        $count = \count($slides);
+        $this->addFlash('success', $count . ' slide' . ($count > 1 ? 's' : '') . ' ' . $status . ($count > 1 ? 's' : '') . '.');
+
+        return $this->redirectToRoute('app_admin_carousel_index');
+    }
+
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_carousel_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucune slide sélectionnée.');
+
+            return $this->redirectToRoute('app_admin_carousel_index');
+        }
+
+        $slides = $this->carouselSlideRepository->findBy(['id' => $ids]);
+        foreach ($slides as $slide) {
+            $this->entityManager->remove($slide);
+        }
+
+        if ($slides !== []) {
+            $this->entityManager->flush();
+        }
+
+        $count = \count($slides);
+        if ($count === 0) {
+            $this->addFlash('error', 'Aucune slide à supprimer.');
+        } else {
+            $this->addFlash('success', $count . ' slide' . ($count > 1 ? 's' : '') . ' supprimée' . ($count > 1 ? 's' : '') . '.');
+        }
 
         return $this->redirectToRoute('app_admin_carousel_index');
     }

@@ -1,0 +1,86 @@
+{#
+  Barre d'actions bulk (affichée dès qu'une case est cochée).
+  À placer dans un conteneur data-controller="bulk-selection".
+
+  Variables :
+  - entity_label (string)
+  - validate_path / suspend_path / delete_path (string|null)
+  - validate_label / suspend_label (string)
+  - show_return_due_at (bool)
+#}
+{% set validate_label = validate_label|default('Valider') %}
+{% set suspend_label = suspend_label|default('Suspendre') %}
+{% set show_return_due_at = show_return_due_at|default(false) %}
+
+<div data-bulk-selection-target="bar"
+	 hidden
+	 class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-custom-orange/30 bg-custom-orange/5 p-4 glass-card">
+	<p class="text-xs text-text-secondary">
+		<span data-bulk-selection-target="count">0</span> {{ entity_label }}(s) sélectionné(s)
+	</p>
+	<div class="flex flex-wrap items-center gap-2">
+		<a data-bulk-selection-target="editLink"
+		   href="#"
+		   hidden
+		   class="inline-flex items-center gap-2 rounded-lg border border-custom py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-custom-orange hover:border-custom-orange transition-all">
+			Modifier
+		</a>
+
+		{% if validate_path is defined and validate_path %}
+			<form method="post"
+				  action="{{ validate_path }}"
+				  class="contents"
+				  data-action="submit->bulk-selection#confirmValidate">
+				<input type="hidden" name="_token" value="{{ csrf_token('validate_bulk') }}">
+				<span data-bulk-selection-target="validateWrap" class="inline-flex flex-wrap items-center gap-2" hidden>
+					{% if show_return_due_at %}
+						<input type="date"
+							   name="returnDueAt"
+							   data-bulk-selection-target="returnDueAt"
+							   class="rounded-lg border border-custom bg-custom-tertiary px-2 py-1.5 text-xs text-text-primary focus:border-custom-orange focus:outline-none"
+							   aria-label="Date de retour">
+					{% endif %}
+					<button type="submit"
+							data-bulk-selection-target="validateBtn"
+							disabled
+							hidden
+							class="inline-flex items-center gap-2 rounded-lg border border-emerald-400/40 bg-emerald-500/10 py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-emerald-400 hover:bg-emerald-500/20 transition-all disabled:opacity-40 disabled:pointer-events-none">
+						{{ validate_label }}
+					</button>
+				</span>
+			</form>
+		{% endif %}
+
+		{% if suspend_path is defined and suspend_path %}
+			<form method="post"
+				  action="{{ suspend_path }}"
+				  class="contents"
+				  data-action="submit->bulk-selection#confirmSuspend">
+				<input type="hidden" name="_token" value="{{ csrf_token('suspend_bulk') }}">
+				<button type="submit"
+						data-bulk-selection-target="suspendBtn"
+						disabled
+						hidden
+						class="inline-flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-500/10 py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-40 disabled:pointer-events-none">
+					{{ suspend_label }}
+				</button>
+			</form>
+		{% endif %}
+
+		{% if delete_path is defined and delete_path %}
+			<form method="post"
+				  action="{{ delete_path }}"
+				  class="contents"
+				  data-action="submit->bulk-selection#confirmDelete">
+				<input type="hidden" name="_token" value="{{ csrf_token('delete_bulk') }}">
+				<button type="submit"
+						data-bulk-selection-target="deleteBtn"
+						disabled
+						hidden
+						class="inline-flex items-center gap-2 rounded-lg border border-red-400/40 bg-red-500/10 py-2.5 px-4 text-[10px] font-extrabold uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-40 disabled:pointer-events-none">
+					Supprimer
+				</button>
+			</form>
+		{% endif %}
+	</div>
+</div>

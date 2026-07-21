@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/newsletter', name: 'app_admin_newsletter_')]
 class NewsletterController extends AbstractController
 {
+    use BulkSelectionTrait;
+
     public function __construct(
         private readonly NewsletterSubscriberRepository $repository,
         private readonly EntityManagerInterface $entityManager,
@@ -56,6 +58,115 @@ class NewsletterController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="newsletter_' . date('Y-m-d') . '.csv"');
 
         return $response;
+    }
+
+    #[Route('/valider-selection', name: 'validate_bulk', methods: ['POST'])]
+    public function validateBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('validate_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun abonné sélectionné.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $subscribers = $this->repository->findBy([
+            'id' => $ids,
+            'status' => NewsletterSubscriber::STATUS_PENDING,
+        ]);
+        foreach ($subscribers as $subscriber) {
+            $subscriber->confirm();
+        }
+
+        if ($subscribers !== []) {
+            $this->entityManager->flush();
+        }
+
+        $count = \count($subscribers);
+        if ($count === 0) {
+            $this->addFlash('error', 'Aucun abonné en attente dans la sélection.');
+        } else {
+            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' validé' . ($count > 1 ? 's' : '') . '.');
+        }
+
+        return $this->redirectToRoute('app_admin_newsletter_index');
+    }
+
+    #[Route('/suspendre-selection', name: 'suspend_bulk', methods: ['POST'])]
+    public function suspendBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('suspend_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun abonné sélectionné.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $subscribers = $this->repository->findBy(['id' => $ids]);
+        $count = 0;
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_UNSUBSCRIBED) {
+                continue;
+            }
+            $subscriber->unsubscribe();
+            ++$count;
+        }
+
+        if ($count > 0) {
+            $this->entityManager->flush();
+            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' suspendu' . ($count > 1 ? 's' : '') . '.');
+        } else {
+            $this->addFlash('error', 'Aucun abonné à suspendre dans la sélection.');
+        }
+
+        return $this->redirectToRoute('app_admin_newsletter_index');
+    }
+
+    #[Route('/supprimer-selection', name: 'delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_bulk', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $ids = $this->parseBulkIds($request);
+        if ($ids === []) {
+            $this->addFlash('error', 'Aucun abonné sélectionné.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $subscribers = $this->repository->findBy(['id' => $ids]);
+        foreach ($subscribers as $subscriber) {
+            $this->entityManager->remove($subscriber);
+        }
+
+        if ($subscribers !== []) {
+            $this->entityManager->flush();
+        }
+
+        $count = \count($subscribers);
+        if ($count === 0) {
+            $this->addFlash('error', 'Aucun abonné à supprimer.');
+        } else {
+            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' supprimé' . ($count > 1 ? 's' : '') . '.');
+        }
+
+        return $this->redirectToRoute('app_admin_newsletter_index');
     }
 
     #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['POST'])]

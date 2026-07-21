@@ -18,12 +18,32 @@
 		</div>
 
 		{% if slides|length > 0 %}
+			{% set bulkQuery = app.request.query.all %}
+			<div data-controller="bulk-selection"
+				 data-bulk-selection-delete-confirm-value="Supprimer %n% slide(s) ?"
+				 data-bulk-selection-suspend-confirm-value="Suspendre %n% slide(s) ?">
+				{% include 'admin/_bulk_bar.html.twig' with {
+					entity_label: 'slide',
+					suspend_path: path('app_admin_carousel_suspend_bulk', bulkQuery),
+					delete_path: path('app_admin_carousel_delete_bulk', bulkQuery),
+				} only %}
+
 			{# Vue mobile : cartes #}
 			<div class="lg:hidden space-y-3">
 				{% for slide in slides %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ not slide.active ? 'opacity-50' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
-							<span class="font-medium text-text-primary text-sm">{{ slide.title }}</span>
+							<div class="flex items-start gap-3 min-w-0">
+								{% include 'admin/_bulk_checkbox.html.twig' with {
+									id: slide.id,
+									label: slide.title,
+									edit_url: path('app_admin_carousel_edit', { id: slide.id }),
+									can_suspend: true,
+									can_delete: true,
+									checkbox_class: 'mt-1',
+								} only %}
+								<span class="font-medium text-text-primary text-sm">{{ slide.title }}</span>
+							</div>
 							<div class="flex items-center gap-2 shrink-0">
 								{% if not slide.active %}
 									<span class="text-[9px] font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Suspendue</span>
@@ -60,6 +80,7 @@
 					<table class="w-full text-left">
 						<thead class="bg-custom-tertiary/50 border-b border-custom">
 							<tr>
+								<th class="px-4 py-3 w-10" aria-hidden="true"></th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary w-16">Ordre</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Titre</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Tag</th>
@@ -71,6 +92,15 @@
 						<tbody>
 							{% for slide in slides %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ not slide.active ? 'opacity-50' : '' }}">
+									<td class="px-4 py-3">
+										{% include 'admin/_bulk_checkbox.html.twig' with {
+											id: slide.id,
+											label: slide.title,
+											edit_url: path('app_admin_carousel_edit', { id: slide.id }),
+											can_suspend: true,
+											can_delete: true,
+										} only %}
+									</td>
 									<td class="px-4 py-3 text-sm text-text-secondary">{{ slide.position }}</td>
 									<td class="px-4 py-3">
 										<span class="font-medium text-text-primary">{{ slide.title }}</span>
@@ -105,6 +135,7 @@
 					</table>
 				</div>
 			</div>
+			</div>{# /bulk-selection #}
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">
 				<p class="text-text-secondary mb-4">Aucune slide. Le carrousel de la page d'accueil affichera les slides par défaut jusqu'à ce que vous en ajoutiez.</p>

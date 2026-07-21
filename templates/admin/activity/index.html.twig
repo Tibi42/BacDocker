@@ -117,13 +117,32 @@
 		</div>
 
 		{% if pagination.totalItemCount > 0 %}
+			{% set bulkQuery = app.request.query.all %}
+			<div data-controller="bulk-selection"
+				 data-bulk-selection-delete-confirm-value="Supprimer %n% activité(s) ? Les inscrits recevront un email d'annulation."
+				 data-bulk-selection-validate-confirm-value="Valider les activités en attente sélectionnées ?">
+				{% include 'admin/_bulk_bar.html.twig' with {
+					entity_label: 'activité',
+					validate_path: path('app_activity_validate_bulk', bulkQuery),
+					delete_path: path('app_activity_delete_bulk', bulkQuery),
+				} only %}
+
 			{# Vue mobile : cartes empilées #}
 			<div class="lg:hidden space-y-3">
 				{% for activity in pagination %}
 					{% set isPast = activity.startAt|date('Y-m-d') < date()|date('Y-m-d') %}
+					{% set canDelete = activity.startAt|date('Y-m-d') >= date()|date('Y-m-d') %}
 					<div class="rounded-xl border border-custom bg-custom-secondary p-4 shadow-lg glass-card {{ activity.status == 'pending' ? 'border-custom-orange/30 bg-custom-orange/5' : '' }} {{ isPast ? 'opacity-50' : '' }}">
 						<div class="flex items-start justify-between gap-3 mb-2">
-							<div class="flex items-center gap-2 flex-wrap">
+							<div class="flex items-center gap-2 flex-wrap min-w-0">
+								{% include 'admin/_bulk_checkbox.html.twig' with {
+									id: activity.id,
+									label: activity.title,
+									edit_url: path('app_activity_edit', { id: activity.id }),
+									can_validate: activity.status == 'pending',
+									can_delete: canDelete,
+									checkbox_class: 'mt-0.5',
+								} only %}
 								{{ activity_badge(activity.type|default('—')) }}
 								{% if activity.status == 'pending' %}
 									<span class="bg-custom-orange text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">En attente</span>
@@ -183,6 +202,7 @@
 					<table class="w-full text-left">
 						<thead class="bg-custom-tertiary/50 border-b border-custom">
 							<tr>
+								<th class="px-4 py-3 w-10" aria-hidden="true"></th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Date</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Titre</th>
 								<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-text-secondary">Type</th>
@@ -195,7 +215,17 @@
 						<tbody>
 							{% for activity in pagination %}
 								{% set isPast = activity.startAt|date('Y-m-d') < date()|date('Y-m-d') %}
+								{% set canDelete = activity.startAt|date('Y-m-d') >= date()|date('Y-m-d') %}
 								<tr class="border-b border-custom/50 hover:bg-white/5 transition-colors {{ activity.status == 'pending' ? 'bg-custom-orange/5' : '' }} {{ isPast ? 'opacity-50' : '' }}">
+									<td class="px-4 py-3">
+										{% include 'admin/_bulk_checkbox.html.twig' with {
+											id: activity.id,
+											label: activity.title,
+											edit_url: path('app_activity_edit', { id: activity.id }),
+											can_validate: activity.status == 'pending',
+											can_delete: canDelete,
+										} only %}
+									</td>
 									<td class="px-4 py-3 text-sm text-text-primary whitespace-nowrap">
 										{{ activity.startAt|date('d/m/Y') }}
 									</td>
@@ -284,6 +314,8 @@
 					</nav>
 				</div>
 			{% endif %}
+
+			</div>{# /bulk-selection #}
 
 		{% else %}
 			<div class="rounded-2xl border border-custom bg-custom-secondary overflow-hidden shadow-xl glass-card px-6 py-12 text-center">
