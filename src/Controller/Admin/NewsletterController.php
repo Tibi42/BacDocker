@@ -60,8 +60,8 @@ class NewsletterController extends AbstractController
         return $response;
     }
 
-    #[Route('/valider-selection', name: 'validate_bulk', methods: ['POST'])]
-    public function validateBulk(Request $request): Response
+    #[Route('/confirmer-selection', name: 'confirm_bulk', methods: ['POST'])]
+    public function confirmBulk(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('validate_bulk', (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
@@ -76,30 +76,28 @@ class NewsletterController extends AbstractController
             return $this->redirectToRoute('app_admin_newsletter_index');
         }
 
-        $subscribers = $this->repository->findBy([
-            'id' => $ids,
-            'status' => NewsletterSubscriber::STATUS_PENDING,
-        ]);
+        $subscribers = $this->repository->findBy(['id' => $ids]);
+        $count = 0;
         foreach ($subscribers as $subscriber) {
+            if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_CONFIRMED) {
+                continue;
+            }
             $subscriber->confirm();
+            ++$count;
         }
 
-        if ($subscribers !== []) {
+        if ($count > 0) {
             $this->entityManager->flush();
-        }
-
-        $count = \count($subscribers);
-        if ($count === 0) {
-            $this->addFlash('error', 'Aucun abonné en attente dans la sélection.');
+            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' confirmé' . ($count > 1 ? 's' : '') . '.');
         } else {
-            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' validé' . ($count > 1 ? 's' : '') . '.');
+            $this->addFlash('error', 'Aucun abonné à confirmer dans la sélection.');
         }
 
         return $this->redirectToRoute('app_admin_newsletter_index');
     }
 
-    #[Route('/suspendre-selection', name: 'suspend_bulk', methods: ['POST'])]
-    public function suspendBulk(Request $request): Response
+    #[Route('/en-attente-selection', name: 'pending_bulk', methods: ['POST'])]
+    public function pendingBulk(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('suspend_bulk', (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide.');
@@ -117,18 +115,18 @@ class NewsletterController extends AbstractController
         $subscribers = $this->repository->findBy(['id' => $ids]);
         $count = 0;
         foreach ($subscribers as $subscriber) {
-            if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_UNSUBSCRIBED) {
+            if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_PENDING) {
                 continue;
             }
-            $subscriber->unsubscribe();
+            $subscriber->markAsPending();
             ++$count;
         }
 
         if ($count > 0) {
             $this->entityManager->flush();
-            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' suspendu' . ($count > 1 ? 's' : '') . '.');
+            $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' remis en attente.');
         } else {
-            $this->addFlash('error', 'Aucun abonné à suspendre dans la sélection.');
+            $this->addFlash('error', 'Aucun abonné à remettre en attente dans la sélection.');
         }
 
         return $this->redirectToRoute('app_admin_newsletter_index');
@@ -165,6 +163,28 @@ class NewsletterController extends AbstractController
         } else {
             $this->addFlash('success', $count . ' abonné' . ($count > 1 ? 's' : '') . ' supprimé' . ($count > 1 ? 's' : '') . '.');
         }
+
+        return $this->redirectToRoute('app_admin_newsletter_index');
+    }
+
+    #[Route('/{id}/confirmer', name: 'confirm', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function confirm(Request $request, NewsletterSubscriber $subscriber): Response
+    {
+        if (!$this->isCsrfTokenValid('confirm' . $subscriber->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        if ($subscriber->getStatus() === NewsletterSubscriber::STATUS_CONFIRMED) {
+            $this->addFlash('error', 'Cet abonné est déjà confirmé.');
+
+            return $this->redirectToRoute('app_admin_newsletter_index');
+        }
+
+        $subscriber->confirm();
+        $this->entityManager->flush();
+        $this->addFlash('success', 'L\'abonné « ' . $subscriber->getEmail() . ' » a été confirmé.');
 
         return $this->redirectToRoute('app_admin_newsletter_index');
     }

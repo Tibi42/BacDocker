@@ -161,7 +161,21 @@ class NewsletterSubscriber
     {
         $this->status = self::STATUS_CONFIRMED;
         $this->confirmedAt = new \DateTimeImmutable();
+        $this->unsubscribedAt = null;
         $this->tokenExpiresAt = null;
+
+        return $this;
+    }
+
+    /**
+     * Remet l'abonné en attente de confirmation (admin).
+     */
+    public function markAsPending(): static
+    {
+        $this->status = self::STATUS_PENDING;
+        $this->confirmedAt = null;
+        $this->unsubscribedAt = null;
+        $this->regenerateToken();
 
         return $this;
     }

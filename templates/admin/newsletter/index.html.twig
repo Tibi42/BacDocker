@@ -35,12 +35,14 @@
 		{% if subscribers|length > 0 %}
 			<div data-controller="bulk-selection"
 				 data-bulk-selection-delete-confirm-value="Supprimer %n% abonné(s) ?"
-				 data-bulk-selection-suspend-confirm-value="Suspendre (désinscrire) la sélection ?"
-				 data-bulk-selection-validate-confirm-value="Valider les abonnés en attente sélectionnés ?">
+				 data-bulk-selection-suspend-confirm-value="Remettre %n% abonné(s) en attente ?"
+				 data-bulk-selection-validate-confirm-value="Confirmer %n% abonné(s) ?">
 				{% include 'admin/_bulk_bar.html.twig' with {
 					entity_label: 'abonné',
-					validate_path: path('app_admin_newsletter_validate_bulk'),
-					suspend_path: path('app_admin_newsletter_suspend_bulk'),
+					validate_path: path('app_admin_newsletter_confirm_bulk'),
+					validate_label: 'Confirmer',
+					suspend_path: path('app_admin_newsletter_pending_bulk'),
+					suspend_label: 'En attente',
 					delete_path: path('app_admin_newsletter_delete_bulk'),
 				} only %}
 
@@ -53,8 +55,8 @@
 								{% include 'admin/_bulk_checkbox.html.twig' with {
 									id: subscriber.id,
 									label: subscriber.email,
-									can_validate: subscriber.status == 'pending',
-									can_suspend: subscriber.status != 'unsubscribed',
+									can_validate: subscriber.status != 'confirmed',
+									can_suspend: subscriber.status != 'pending',
 									can_delete: true,
 									checkbox_class: 'mt-1',
 								} only %}
@@ -74,7 +76,13 @@
 								<span>Confirmé le {{ subscriber.confirmedAt|date('d/m/Y à H:i') }}</span>
 							{% endif %}
 						</div>
-						<div class="flex items-center pt-2 border-t border-custom/50">
+						<div class="flex items-center gap-4 pt-2 border-t border-custom/50">
+							{% if subscriber.status != 'confirmed' %}
+								<form method="post" action="{{ path('app_admin_newsletter_confirm', { id: subscriber.id }) }}" class="contents" onsubmit="return confirm('Confirmer cet abonné ?');">
+									<input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ subscriber.id) }}">
+									<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors">Confirmer</button>
+								</form>
+							{% endif %}
 							<form method="post" action="{{ path('app_admin_newsletter_delete', { id: subscriber.id }) }}" class="contents" onsubmit="return confirm('Supprimer cet abonné ?');">
 								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscriber.id) }}">
 								<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Supprimer</button>
@@ -105,8 +113,8 @@
 										{% include 'admin/_bulk_checkbox.html.twig' with {
 											id: subscriber.id,
 											label: subscriber.email,
-											can_validate: subscriber.status == 'pending',
-											can_suspend: subscriber.status != 'unsubscribed',
+											can_validate: subscriber.status != 'confirmed',
+											can_suspend: subscriber.status != 'pending',
 											can_delete: true,
 										} only %}
 									</td>
@@ -125,10 +133,18 @@
 									<td class="px-4 py-3 text-sm text-text-secondary">{{ subscriber.createdAt|date('d/m/Y H:i') }}</td>
 									<td class="px-4 py-3 text-sm text-text-secondary">{{ subscriber.confirmedAt ? subscriber.confirmedAt|date('d/m/Y H:i') : '—' }}</td>
 									<td class="px-4 py-3 text-right">
-										<form method="post" action="{{ path('app_admin_newsletter_delete', { id: subscriber.id }) }}" class="inline" onsubmit="return confirm('Supprimer cet abonné ?');">
-											<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscriber.id) }}">
-											<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Supprimer</button>
-										</form>
+										<div class="inline-flex items-center justify-end gap-4">
+											{% if subscriber.status != 'confirmed' %}
+												<form method="post" action="{{ path('app_admin_newsletter_confirm', { id: subscriber.id }) }}" class="inline" onsubmit="return confirm('Confirmer cet abonné ?');">
+													<input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ subscriber.id) }}">
+													<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors">Confirmer</button>
+												</form>
+											{% endif %}
+											<form method="post" action="{{ path('app_admin_newsletter_delete', { id: subscriber.id }) }}" class="inline" onsubmit="return confirm('Supprimer cet abonné ?');">
+												<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscriber.id) }}">
+												<button type="submit" class="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors">Supprimer</button>
+											</form>
+										</div>
 									</td>
 								</tr>
 							{% endfor %}

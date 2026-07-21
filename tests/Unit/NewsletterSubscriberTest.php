@@ -59,12 +59,29 @@ class NewsletterSubscriberTest extends TestCase
     {
         $subscriber = new NewsletterSubscriber();
         $subscriber->regenerateToken();
+        $subscriber->unsubscribe();
 
         $subscriber->confirm();
 
         $this->assertSame(NewsletterSubscriber::STATUS_CONFIRMED, $subscriber->getStatus());
         $this->assertInstanceOf(\DateTimeImmutable::class, $subscriber->getConfirmedAt());
+        $this->assertNull($subscriber->getUnsubscribedAt());
         $this->assertNull($subscriber->getTokenExpiresAt());
+    }
+
+    public function testMarkAsPendingResetsConfirmationState(): void
+    {
+        $subscriber = new NewsletterSubscriber();
+        $subscriber->confirm();
+        $oldToken = $subscriber->getToken();
+
+        $subscriber->markAsPending();
+
+        $this->assertSame(NewsletterSubscriber::STATUS_PENDING, $subscriber->getStatus());
+        $this->assertNull($subscriber->getConfirmedAt());
+        $this->assertNull($subscriber->getUnsubscribedAt());
+        $this->assertNotSame($oldToken, $subscriber->getToken());
+        $this->assertFalse($subscriber->isTokenExpired());
     }
 
     public function testUnsubscribeSetsStatusAndUnsubscribedAt(): void
