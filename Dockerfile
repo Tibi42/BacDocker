@@ -73,7 +73,8 @@ COPY . .
 RUN composer run-script post-install-cmd || true
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var
-USER www-data
+# Entrypoint en root pour chown des volumes ; PHP-FPM bascule les workers en www-data.
+USER root
 EXPOSE 9000
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
@@ -96,8 +97,8 @@ RUN mkdir -p var/cache var/log \
 # Strip build tools and optional CLI utilities in production to eliminate their CVEs
 USER root
 RUN apk del --no-network git tar curl xz && rm -rf /var/cache/apk/*
-USER www-data
 
+# Entrypoint en root pour chown du volume public/ ; PHP-FPM bascule les workers en www-data.
 EXPOSE 9000
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
